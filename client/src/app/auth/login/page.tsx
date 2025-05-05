@@ -4,12 +4,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 import { Separator } from '@/components/ui/separator'
-import HorizontalLineWithText from '@/components/horizontal-line-with-text'
-import { ThemeToggleButton } from '@/components/theme-toggle-button'
-import { HeaderLogo2 } from '@/components/logo'
-import MagicLinkSignIn from '../(components)/magic-link-signin'
-import EmailPasswordSignIn from '../(components)/email-password-signin'
-import SSOSignIn from '../(components)/sso-signin'
 import { toast } from "sonner"
 
 
@@ -27,47 +21,11 @@ const LoginPage = () => {
 
         <div className="w-full h-full  mb-6 text-2xl max-w-[350px] space-y-4">
 
-          {/* <div className='flex flex-col mb-4'> */}
           <div className='grid grid-cols-1 gap-4  rounded-lg border border-dashed border-opacity-50 border-slate-400 p-4 '>
-            <SSOSignIn className='w-full flex justify-center items-center' provider='google' variant={'outline'}>
-
-              Google
-            </SSOSignIn>
-
-            {/* <SSOSignIn className='w-full flex justify-center items-center ' provider='yandex' variant={'outline'}>
-              Yandex
-            </SSOSignIn> */}
+            fitifiti
 
           </div>
-          {/* </div> */}
-          {/* <HorizontalLineWithText className='w-full' text='OR' />
-          <div className='flex flex-col mb-4'>
-
-            <div className='rounded-lg border border-dashed border-opacity-50 border-slate-400 p-4 space-y-4'>
-              <Label >Email</Label>
-              <EmailPasswordSignIn />
-
-              <p className="w-full mt-6 text-start text-sm text-muted-foreground ">
-                Don't have an account?
-                <Link
-                  href="/auth/register"
-                  className="underline underline-offset-4 hover:text-primary ms-2"
-                >
-                  Sign Up
-                </Link>
-              </p>
-            </div>
-          </div>
-          <HorizontalLineWithText className='w-full' text='OR' />
-
-
-          <div className='flex flex-col mb-4'>
-
-            <div className='rounded-lg border border-dashed border-opacity-50 border-slate-400 p-4 space-y-4'>
-              <Label >Magic Link</Label>
-              <MagicLinkSignIn redirectUrl='/auth/login/checkEmail' />
-            </div>
-          </div> */}
+         
 
           <p className="w-full mt-6 text-center text-xs text-muted-foreground ">
             By clicking continue, you agree to our{" "}

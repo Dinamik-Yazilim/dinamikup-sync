@@ -1,3 +1,4 @@
+import { MemberType } from './MemberType'
 import { Settings } from './Settings'
 
 export interface Database {
@@ -5,10 +6,14 @@ export interface Database {
   owner?: string
   identifier?: string
   name?: string
-  team?: []
+  team?: Team[]
   dbHost?: string
   dbName?: string
   passive?: boolean
   settings?: Settings
 }
 
+export interface Team {
+  teamMember?: MemberType
+  permissions?: any
+}
