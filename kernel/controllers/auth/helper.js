@@ -1,6 +1,6 @@
 const auth = require('../../lib/auth')
 const { ObjectId } = require('mongodb')
-exports.saveSession = async function (memberDoc, role, req, loginProvider = 'dinamikup', oauth2 = null) {
+exports.saveSession = async function (memberDoc, req, loginProvider = 'dinamikup', oauth2 = null) {
 	let deviceId = req.getValue('deviceId') || ''
 	let lang = req.getValue('lang') || ''
 	let oldSessions = []
@@ -10,7 +10,7 @@ exports.saveSession = async function (memberDoc, role, req, loginProvider = 'din
 			.sort({ _id: -1 })
 			.limit(1)
 
-		const closeResult = await db.sessions.updateMany(
+		await db.sessions.updateMany(
 			{ member: memberDoc._id, deviceId: deviceId, closed: false },
 			{ $set: { closed: true } },
 			{ multi: true }
@@ -38,7 +38,7 @@ exports.saveSession = async function (memberDoc, role, req, loginProvider = 'din
 			let sessionDoc = new db.sessions({
 				member: memberDoc._id,
 				loginProvider: loginProvider,
-				role: role,
+				role: memberDoc.role,
 				db: oldDbId,
 				// dbList: oldDbList || [],
 				deviceId: deviceId,

@@ -82,6 +82,7 @@ function authControllers(app, route) {
       if (ctl) {
         ctl(req)
           .then((data) => {
+            console.log('data:', data)
             if (data == undefined) res.json({ success: true })
             else if (data == null) res.json({ success: true })
             else {

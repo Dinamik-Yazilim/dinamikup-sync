@@ -11,28 +11,24 @@ module.exports = (req) =>
 			let doc = null
 
 			switch (req.params.param1) {
-				case 'username':
-					const username = req.params.param2 || req.getValue('username')
-					doc = await db.members.findOne({ username: username })
 
-					break
 				case 'email':
 					const email = req.params.param2 || req.getValue('email')
 					doc = await db.members.findOne({ email: email })
 					break
 				case 'phoneNumber':
-					const phoneNumber = req.params.param2 || req.getValue('phoneNumber')
+					const phoneNumber = util.fixPhoneNumber(req.params.param2 || req.getValue('phoneNumber'))
 					doc = await db.members.findOne({ phoneNumber: phoneNumber })
 					break
 				default:
-					reject('wrong parameter. /auth/check/:[email | username | phoneNumber]')
+					reject('wrong parameter. /auth/check/:[email | phoneNumber]/:value')
 					break
 			}
 
 			if (doc == null) {
 				resolve({ inUse: false })
 			} else if (doc.passive) {
-				reject(`Kullanıcı aktif değil. Sistem yöneticisine başvurun.`)
+				reject(`Kullanici aktif degil. Sistem yöneticisine başvurun.`)
 			} else {
 				resolve({ inUse: true, role: doc.role })
 			}

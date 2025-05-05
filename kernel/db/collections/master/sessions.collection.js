@@ -4,7 +4,7 @@ module.exports = function (dbModel) {
   const schema = mongoose.Schema(
     {
       member: { type: ObjectId, ref: 'members', index: true },
-      loginProvider: { type: String, default: 'aliabi', enum: ['aliabi', 'google', 'yandex', 'github', 'facebook', 'magiclink', ''] },
+      loginProvider: { type: String, default: 'dinamikup', enum: ['dinamikup', 'google', 'yandex', 'github', 'facebook', 'magiclink', ''] },
       role: { type: String },
       db: { type: ObjectId, ref: 'databases', default: null, index: true },
       language: { type: String, default: 'tr' },

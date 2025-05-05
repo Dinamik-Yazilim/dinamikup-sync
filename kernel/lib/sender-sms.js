@@ -12,7 +12,7 @@ exports.sendSms = function (dest, msg) {
       message_content_type: 'bilgi',
       sender: process.env.SMS_SENDER,
       phones: [dest],
-      messages: msg
+      message: msg
     }
 
     fetch(process.env.SMS_API_URI, {
@@ -25,7 +25,13 @@ exports.sendSms = function (dest, msg) {
         if (resp.ok) {
           resp
             .json()
-            .then(resolve)
+            .then(result=>{
+              if(result.status=='success'){
+                resolve(result)
+              }else{
+                reject(result)
+              }
+            })
             .catch(reject)
         } else reject(resp.description)
       })

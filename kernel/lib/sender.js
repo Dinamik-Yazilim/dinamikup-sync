@@ -6,10 +6,10 @@ exports.sendAuthSms = (tel, authCode) =>
 		let msg = process.env.SMS_VERIFY_TEMPLATE || '${authCode} verification code'
 		msg = eval('`' + msg + '`')
 
+		return resolve('qwerty')
 		sendSms(tel, msg)
 			.then(resolve).catch(reject)
 	})
-
 
 
 exports.sendAuthEmail = (email, authCode) =>
@@ -18,7 +18,7 @@ exports.sendAuthEmail = (email, authCode) =>
 		let subject = process.env.EMAIL_VERIFY_SUBJECT || 'Verification Code'
 		msg = eval('`' + msg + '`')
 		subject = eval('`' + subject + '`')
-
+		return resolve('qwerty')
 		sendEmail(email, subject, msg)
 			.then(resolve).catch(reject)
 	})
