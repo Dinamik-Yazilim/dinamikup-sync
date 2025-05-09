@@ -316,7 +316,7 @@ function passport(req) {
   return new Promise((resolve, reject) => {
     let token = req.getValue('token')
     if (token) {
-      token = token.split('AABI_')[1]
+      token = token.split('DINAMIKUP_')[1]
       auth
         .verify(token)
         .then((decoded) => {

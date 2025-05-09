@@ -10,7 +10,7 @@ import { ThemeToggleButton } from '@/components/theme-toggle-button'
 import Link from 'next/link'
 import { SignOutButton } from './signout-button'
 import { FC, useEffect, useState } from 'react'
-import { UserType } from '@/types/UserType'
+import { MemberType } from '@/types/MemberType'
 // import { getAuthUser, getDatabases } from '@/lib/authHelper'
 import Cookies from 'js-cookie'
 import { SelectLang } from '@/components/select-lang'
@@ -19,14 +19,14 @@ import { DatabaseSelect } from '@/components/database-select'
 import { Skeleton } from '@/components/ui/skeleton'
 export function UserMenu() {
   const [token, setToken] = useState('')
-  const [userInfo, setUserInfo] = useState<UserType>()
+  const [userInfo, setUserInfo] = useState<MemberType>()
   const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
   useEffect(() => {
     try {
       if (Cookies.get('user'))
-        setUserInfo(JSON.parse(Cookies.get('user') || '{}') as UserType)
+        setUserInfo(JSON.parse(Cookies.get('user') || '{}') as MemberType)
 
     } catch (err) {
       console.log('hata:', err)
@@ -48,7 +48,7 @@ export function UserMenu() {
               alt="Avatar"
               className="rounded-full shadow-[1px_1px_2px_2px_black] dark:shadow-none"
               height="48"
-              src={userInfo?.image || "/img/avatar-place-holder.png"}  // TODO:// session user image
+              src={ "/img/avatar-place-holder.png"}  // TODO:// session user image
               style={{
                 aspectRatio: "32/32",
                 objectFit: "cover",
@@ -61,8 +61,8 @@ export function UserMenu() {
         <DropdownMenuContent align="end">
           <DropdownMenuItem>
             <Link href="/me" className='flex flex-col'>
-              <span className=''>{userInfo?.fullName}</span>
-              <span className='text-sm'>{userInfo?.email}</span>
+              <span className=''>{userInfo?.name}</span>
+              <span className='text-muted-foreground'>🏣 {userInfo?.organization?.name}</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -71,11 +71,7 @@ export function UserMenu() {
             <DropdownMenuLabel className='w-full py-0 text-start'>{t('Language')}</DropdownMenuLabel>
             <div className='w-full'><SelectLang /></div>
           </DropdownMenuItem>
-          {/* <DropdownMenuSeparator />
-        <DropdownMenuItem className='flex flex-col md:hidden'>
-          <DropdownMenuLabel className='w-full py-0 text-start'>{t('Database List')}</DropdownMenuLabel>
-          <DatabaseSelect />
-        </DropdownMenuItem> */}
+        
           <DropdownMenuSeparator />
           <DropdownMenuItem className='flex flex-row justify-between gap-6'>
             <ThemeToggleButton />

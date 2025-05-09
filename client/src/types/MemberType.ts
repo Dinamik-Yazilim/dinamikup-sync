@@ -1,8 +1,9 @@
+import { Organization } from "./Organization"
+
 export interface MemberType {
   _id?: string
-  email?: string
-  phoneNumber?: string
-  password?: string
+  organization:Organization
+  username?: string
   name?: string
   role?: string
   passive?: boolean

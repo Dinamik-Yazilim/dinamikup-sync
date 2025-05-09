@@ -6,16 +6,17 @@ import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
 import { Settings } from '@/types/Settings'
 import { useToast } from '@/components/ui/use-toast'
-import { TsnSelect } from '@/components/ui216/tsn-select'
+
 import { useLanguage } from '@/i18n'
 import { StandartForm } from '@/components/ui216/standart-form'
+import { TsnSelect } from '@/components/ui216/tsn-select'
 import { TsnInput } from '@/components/ui216/tsn-input'
 import { Label } from '@/components/ui/label'
 import { TsnPanel } from '@/components/ui216/tsn-panel'
 import { TsnInputAddress } from '@/components/ui216/tsn-input-address'
-interface Props {
-}
-export default function SettingsPage({ }: Props) {
+import { SettingsIcon } from 'lucide-react'
+
+export default function ConnectorPage() {
   const [settings, setSettings] = useState<Settings>()
   const [token, setToken] = useState('')
   const { toast } = useToast()
@@ -55,9 +56,10 @@ export default function SettingsPage({ }: Props) {
 
   return (
     <StandartForm
-      title={t('Settings')}
+      title={t('Settings') + ' - ' + t('Connector')}
       onSaveClick={save}
       onCancelClick={() => router.back()}
+      icon=<SettingsIcon />
     >
       {!loading && <>
         <div className='flex flex-col ga-4'>

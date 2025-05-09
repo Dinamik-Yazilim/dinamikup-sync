@@ -5,78 +5,76 @@ module.exports = (req) =>
     try {
       if (req.method != 'POST') return restError.method(req, reject)
 
+      let organization = util.fixOrganizationName(req.getValue('organization') || '')
       let email = null
       let phoneNumber = null
-      let identifier = null
+      let username = req.getValue('username')
+      if (!organization) return reject('organization required')
+      if (!username) return reject('username required')
+      const orgDoc = await db.organizations.findOne({ name: organization })
+      if (!orgDoc) return reject('organization not found')
 
-      identifier = req.getValue('identifier')
-      if (!identifier) {
-        // username = req.getValue('username')
-    		email = req.getValue('email')
-        phoneNumber = util.fixPhoneNumber(req.getValue('phoneNumber'))
+      username = req.getValue('username')
+
+      if (username.includes('@')) {
+        username = username.trim()
+      } else if (!isNaN(username)) {
+        username = util.fixPhoneNumber(username)
       } else {
-        if (identifier.includes('@')) {
-          email = identifier
-        } else if (!isNaN(identifier)) {
-          phoneNumber = util.fixPhoneNumber(identifier)
-        } else {
-          return reject('identifier error')
-        }
+        return reject('username error')
       }
       let password = req.getValue('password')
       let deviceId = req.getValue('deviceId')
 
-      let filter = {}
-      if (email) {
-        filter.email = email
-      } else if (phoneNumber) {
-        filter.phoneNumber = phoneNumber
-      } else {
-        return reject(`email or phoneNumber required.`)
-      }
+      const memberDoc = await db.members.findOne({ organization: orgDoc._id, username: username })
+      if (!memberDoc) return reject(`login failed. member not found.`)
+      if (memberDoc.passive) return reject(`account is passive. please contact with administrators`)
+
       if (password) {
-        filter.password = password
-        const memberDoc = await db.members.findOne(filter)
-        if (!memberDoc) return reject(`login failed. member not found.`)
-        if (memberDoc.passive) return reject(`account is passive. please contact with administrators`)
-        saveSession(memberDoc, req, 'dinamikup', null).then(resolve).catch(reject)
+        if (memberDoc.password == password) {
+          saveSession(memberDoc, req, 'dinamikup', null).then(resolve).catch(reject)
+        } else {
+          return reject(`username or password incorrect`)
+        }
+
       } else {
         // TODO: buraya gelecekte saatte istenebilecek veya gunluk istenebilecek sms/email limiti koyalim
         // TODO: resolve mesaj icindeki authCode bilgileri kaldirilacak.
         let authCodeDoc = await db.authCodes.findOne({
-          email: email,
-          phoneNumber: phoneNumber,
+          organization: orgDoc._id,
+          username: username,
           deviceId: deviceId,
           verified: false,
           passive: false,
           authCodeExpire: { $gt: new Date() },
         })
         if (authCodeDoc) {
-          return resolve(`authCode already has been sent. authCode:${authCodeDoc.authCode} email:${authCodeDoc.email} phoneNumber:${authCodeDoc.phoneNumber}`)
+          return resolve(`authCode already has been sent. authCode:${authCodeDoc.authCode} username:${authCodeDoc.username}`)
         } else {
           authCodeDoc = new db.authCodes({
-						deviceId: deviceId,
-            email: email,
-            phoneNumber: phoneNumber,
+            organization: orgDoc._id,
+            deviceId: deviceId,
+            username: username,
             authCode: util.randomNumber(120000, 980700),
             authCodeExpire: new Date(new Date().setMinutes(new Date().getMinutes() + 55)), // TODO: 3 dk ya indirilecek. simdilik 55 dk
           })
           authCodeDoc = await authCodeDoc.save()
         }
-        if (phoneNumber) {
-          sendAuthSms(authCodeDoc.phoneNumber, authCodeDoc.authCode)
-            .then((result) => {
-              devLog('login sms result:', result)
-              return resolve(`authCode has been sent to your phone. authCode:${authCodeDoc.authCode} phoneNumber:${authCodeDoc.phoneNumber}`)
-            })
-            .catch(reject)
-        } else if (email) {
-          sendAuthEmail(authCodeDoc.email, authCodeDoc.authCode)
+        if (authCodeDoc.username.includes('@')) {
+          sendAuthEmail(authCodeDoc.username, authCodeDoc.authCode)
             .then((result) => {
               devLog('login email result:', result)
-              return resolve(`authCode has been sent to your email. authCode:${authCodeDoc.authCode} email:${authCodeDoc.email}`)
+              return resolve(`authCode has been sent to your email. authCode:${authCodeDoc.authCode} username:${authCodeDoc.username}`)
             })
             .catch(reject)
+        } else if (!isNaN(authCodeDoc.username)) {
+          sendAuthSms(authCodeDoc.username, authCodeDoc.authCode)
+            .then((result) => {
+              devLog('login sms result:', result)
+              return resolve(`authCode has been sent to your phone. authCode:${authCodeDoc.authCode} username:${authCodeDoc.username}`)
+            })
+            .catch(reject)
+
         } else {
           reject('username authCode error') // TODO: buraya daha anlamli bir hata mesaji lutfen
         }

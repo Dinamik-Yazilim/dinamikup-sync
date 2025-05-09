@@ -52,7 +52,12 @@ function changePassword(dbModel, sessionDoc, req) {
 function getMyProfile(dbModel, sessionDoc, req) {
 	return new Promise(async (resolve, reject) => {
 		try {
-			let doc = await dbModel.members.findOne({ _id: sessionDoc.member })
+			let doc = await dbModel.members
+				.findOne({ _id: sessionDoc.member })
+				.populate([{
+					path: 'organization',
+					select: '_id name'
+				}])
 				.select('-password')
 
 			if (doc) {
@@ -61,7 +66,6 @@ function getMyProfile(dbModel, sessionDoc, req) {
 					sessionId: sessionDoc._id,
 					lang: sessionDoc.lang,
 					db: sessionDoc.db,
-					dbList: sessionDoc.dbList,
 				}
 
 				resolve(obj)

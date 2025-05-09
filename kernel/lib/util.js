@@ -298,3 +298,21 @@ exports.cemalize = function (text) {
 exports.yesterday = function () {
 	return new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().substring(0, 10)
 }
+exports.fixOrganizationName = function (name) {
+	name = name.toLowerCase()
+		.replaceAll('İ', 'i')
+		.replaceAll('I', 'i')
+		.replaceAll('ı', 'i')
+		.replaceAll('Ü', 'u')
+		.replaceAll('ü', 'u')
+		.replaceAll('ş', 's')
+		.replaceAll('Ş', 's')
+		.replaceAll('ğ', 'g')
+		.replaceAll('Ğ', 'g')
+		.replaceAll('Ö', 'o')
+		.replaceAll('ö', 'o')
+		.replaceAll('Ç', 'c')
+		.replaceAll('ç', 'c')
+	name = name.replace(/[^a-z,0-9]+/, '')
+	return name
+}

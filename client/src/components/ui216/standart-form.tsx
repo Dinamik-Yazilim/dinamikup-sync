@@ -9,9 +9,10 @@ interface Props {
   id?: string
   children?: any
   title?: string
+  icon?:React.ReactNode
 }
 export function StandartForm({
-  onCancelClick, onSaveClick, loading, id, children, title
+  onCancelClick, onSaveClick, loading, id, children, title, icon
 }: Props) {
 
   return (<div className='flex flex-col gap-4 h-full'>
@@ -19,8 +20,11 @@ export function StandartForm({
       <div className='flex flex-col gap-4 '>
         <div className='flex justify-between border-b'>
           <h2 className='flex items-center gap-4 border-none'>
+            {!icon && <>
             {id == 'addnew' && <PlusSquareIcon />}
             {id != 'addnew' && <EditIcon />}
+            </>}
+            {icon && <>{icon}</>}
             {title}
           </h2>
           <div className='flex gap-2'>

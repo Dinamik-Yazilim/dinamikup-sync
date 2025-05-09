@@ -19,17 +19,9 @@ export function SignOutButton() {
     <Button variant={'outline'}
       onClick={() => {
         if (confirm(t('Do you want to exit?'))) {
-          Cookies.remove('aliabi.pkce.code_verifier')
-          Cookies.remove('aliabi.csrfToken')
-          Cookies.remove('aliabi.callbackUrl')
-          Cookies.remove('aliabi.sessionToken')
-          Cookies.remove('token')
           Cookies.remove('token')
           Cookies.remove('user')
           Cookies.remove('db')
-          Cookies.remove('firm')
-          Cookies.remove('period')
-          Cookies.remove('dbList')
           setTimeout(() => {
             router.push('/auth/login')
           }, 300)

@@ -13,6 +13,7 @@ import { TsnInput } from '@/components/ui216/tsn-input'
 import { Label } from '@/components/ui/label'
 import { TsnPanel } from '@/components/ui216/tsn-panel'
 import { TsnInputAddress } from '@/components/ui216/tsn-input-address'
+import { SettingsIcon } from 'lucide-react'
 interface Props {
 }
 export default function SettingsPage({ }: Props) {
@@ -55,9 +56,10 @@ export default function SettingsPage({ }: Props) {
 
   return (
     <StandartForm
-      title={t('Settings')}
+      title={t('Settings') + ' - ' + t('Working Parameters')}
       onSaveClick={save}
       onCancelClick={() => router.back()}
+      icon=<SettingsIcon />
     >
       {!loading && <>
         <div className='flex flex-col ga-4'>

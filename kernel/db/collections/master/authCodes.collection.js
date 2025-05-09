@@ -3,9 +3,8 @@ const collectionName = path.basename(__filename, '.collection.js')
 module.exports = function (dbModel) {
   let schema = mongoose.Schema(
     {
-      // member: { type: ObjectId, ref: 'members', index: true },
-      email: { type: String, default: null, index: true },
-      phoneNumber: { type: String, default: null, index: true },
+      organization: { type: ObjectId, ref: 'organizations', index: true },
+      username: { type: String, default: null, index: true },
       authCode: { type: String, default: '', index: true },
       authCodeExpire: { type: Date, default: Date.now, index: true },
       verified: { type: Boolean, default: false, index: true },
@@ -19,7 +18,7 @@ module.exports = function (dbModel) {
   schema.pre('save', (next) => next())
   schema.pre('remove', (next) => next())
   schema.pre('remove', true, (next, done) => next())
-  schema.on('init', (model) => {})
+  schema.on('init', (model) => { })
   schema.plugin(mongoosePaginate)
 
   let model = dbModel.conn.model(collectionName, schema, collectionName)

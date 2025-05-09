@@ -10,6 +10,7 @@ import { Footer } from './(components)/footer'
 import { getAuthToken } from '@/lib/authHelper'
 import React from 'react'
 import '@/styles/piechart-style.css'
+import { Sidebar } from './(components)/sidebar'
 
 
 export interface AppLayoutProps {
@@ -25,8 +26,8 @@ const AppLayout: FC<AppLayoutProps> = ({ children }) => {
   return (
     <div className="flex min-h-screen w-full flex-col px-2 dark:bg-[#030611] ">
       <Header />
-      <div className='lg:mt-2'></div>
-      <div className="flex-1 md:border border-dashed border-opacity-25 rounded-md border-yellow-400 " style={{ overflowWrap: 'anywhere' }}>
+      <div className="flex flex-row justify-between md:border border-dashed border-opacity-25 rounded-md border-yellow-400 " style={{ overflowWrap: 'anywhere' }}>
+        <Sidebar />
         <div className='container mx-auto py-1 px-1 md:px-4 md:py-4'>
           {children}
         </div>
