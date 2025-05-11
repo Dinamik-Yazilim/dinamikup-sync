@@ -11,5 +11,9 @@
   "Reports":"Raporlar",
   "Purchase":"Satın Alma",
   "Sales":"Satış",
-  "Do you want to exit?":"Çıkmak istiyor musunuz?"
+  "Do you want to exit?":"Çıkmak istiyor musunuz?",
+  "Username":"Kullanıcı Adı",
+  "Name":"İsim",
+  "Passive?":"Pasif?",
+  "Passive":"Pasif"
 }

@@ -36,6 +36,7 @@ interface Props {
   onFilterPanel?: (e: any, setFilter: (a: any) => void) => ReactNode
   defaultFilter?: any
   params?: any
+  icon?:React.ReactNode
 }
 export function ListGrid({
   // headers = [],
@@ -47,7 +48,8 @@ export function ListGrid({
   title,
   onFilterPanel,
   defaultFilter = {},
-  params
+  params,
+  icon
 }: Props) {
   const [list, setList] = useState<any[]>([])
   const [filter, setFilter] = useState<any>(defaultFilter)
@@ -119,10 +121,11 @@ export function ListGrid({
 
   return (<div className='flex flex-col gap-0'>
     <div className='w-full flex flex-col lg:flex-row lg:justify-between lg:items-center mb-2'>
-      <h1 className='text-2xl lg:text-3xl lg:ms-2'>{title}</h1>
+      <h1 className='text-2xl lg:text-3xl lg:ms-2 flex items-center gap-2'>
+        {icon}
+        {title}
+        </h1>
       <div className='flex items-center gap-4'>
-
-
         {options.showSearch &&
           <div className="relative w-full">
             <div className='absolute left-1.5 top-1.5 text-xl'>🔍</div>
@@ -158,9 +161,9 @@ export function ListGrid({
       <div className='w-full text-[70%] md:text-base lg:text-[110%]'>
         {onHeaderPaint &&
           <div className='w-full flex flex-row items-center border-b mb-1 p-1'>
-            {onHeaderPaint()}
+            <div className='text-slate-500 w-full font-semibold text-sm'>{onHeaderPaint()}</div>
             {options.type == 'Update' && (options.showAddNew || options.showEdit || options.showDelete) &&
-              <div className=" w-20 ">
+              <div className=" w-20 p-1">
                 <div className='w-full flex justify-end lg:justify-center'>
                   {options.showAddNew &&
                     <div
@@ -178,7 +181,7 @@ export function ListGrid({
         }
         <div >
           {list.map((e, index) => (
-            <div key={(e._id || 'grid' + index)} className={`w-full flex flex-row items-center rounded my-1 p-1 ${index % 2 == 1 ? classBgOdd : classBgEven}`}>
+            <div key={(e._id || 'grid' + index)} className={`w-full flex flex-row items-center rounded my-1 p-1 text-sm ${index % 2 == 1 ? classBgOdd : classBgEven}`}>
               {onRowPaint && onRowPaint(e, index)}
 
               <div className="w-20">

@@ -1,4 +1,4 @@
-import { MemberType } from './MemberType'
+import { Member } from './Member'
 import { Settings } from './Settings'
 
 export interface Database {
@@ -14,6 +14,6 @@ export interface Database {
 }
 
 export interface Team {
-  teamMember?: MemberType
+  teamMember?: Member
   permissions?: any
 }

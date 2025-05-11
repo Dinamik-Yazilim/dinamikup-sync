@@ -18,8 +18,9 @@ interface Props {
   trigger?: string | ReactNode
   defaultOpen?: boolean
   className?: string
+  contentClassName?: string
 }
-export function TsnPanel({ name, children, trigger, defaultOpen = true, className }: Props) {
+export function TsnPanel({ name, children, trigger, defaultOpen = true, className,contentClassName }: Props) {
   const [open, setOpen] = useState(defaultOpen)
   const pathName = usePathname()
   const storageKey = generateStorageKey('panel_open', name, pathName)
@@ -33,7 +34,7 @@ export function TsnPanel({ name, children, trigger, defaultOpen = true, classNam
     }
   }, [])
   return (
-    <div className='flex flex-col my-1'>
+    <div className={`flex flex-col my-1 ${className}`}>
       <div
         onClick={() => {
           if (typeof window != 'undefined') {
@@ -46,7 +47,7 @@ export function TsnPanel({ name, children, trigger, defaultOpen = true, classNam
         <ChevronsUpDown />
         {trigger}
       </div>
-      <div className={` py-4 px-4 rounded-b-lg border border-dashed ${className} ${!open ? 'hidden' : ''}`}>
+      <div className={` py-4 px-4 rounded-b-lg border border-dashed ${contentClassName} ${!open ? 'hidden' : ''}`}>
         {children}
       </div>
     </div>

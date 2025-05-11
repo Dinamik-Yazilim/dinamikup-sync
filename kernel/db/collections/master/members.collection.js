@@ -3,7 +3,7 @@ module.exports = function (dbModel) {
   const schema = mongoose.Schema(
     {
       organization: { type: ObjectId, ref: 'organizations', index: true },
-      username: { type: String, unique: true },
+      username: { type: String, required: true, index: true },
       password: { type: String, default: null, index: true, select: false },
       role: { type: String, default: 'user' },
       name: { type: String, default: '', index: true },
@@ -13,11 +13,7 @@ module.exports = function (dbModel) {
     { versionKey: false, timestamps: true }
   )
 
-  schema.pre('save', async function (next) {
-    const doc = this
-    doc.fullName = (doc.firstName || '') + ' ' + (doc.lastName || '')
-    next()
-  })
+  schema.pre('save', (next) => next())
   schema.pre('remove', (next) => next())
   schema.pre('remove', true, (next, done) => next())
   schema.on('init', (model) => { })

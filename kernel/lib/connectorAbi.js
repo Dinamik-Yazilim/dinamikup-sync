@@ -28,8 +28,10 @@ exports.dateTime = function (clientId, clientPass) {
 
 exports.mssql = function (clientId, clientPass, config, query) {
   return new Promise((resolve, reject) => {
-    console.log('{ config: config, query: query }', { config: config, query: query })
     try {
+      if (config && !config.options) {
+        config.options = { encrypt: false, trustServerCertificate: true }
+      }
       fetch(`${process.env.CONNECTOR_API}/mssql`, {
         method: 'POST',
         redirect: 'follow',

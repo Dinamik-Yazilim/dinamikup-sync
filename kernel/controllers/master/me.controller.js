@@ -28,23 +28,28 @@ module.exports = (dbModel, sessionDoc, req) => new Promise(async (resolve, rejec
 
 function changePassword(dbModel, sessionDoc, req) {
 	return new Promise(async (resolve, reject) => {
-		let oldPassword = req.getValue('oldPassword')
-		let newPassword = req.getValue('newPassword')
+		try {
+
+			let oldPassword = req.getValue('oldPassword')
+			let newPassword = req.getValue('newPassword')
 
 
-		if (!oldPassword) return reject('old password required')
-		if (!newPassword) return reject('new password required')
-		if (newPassword.length < 8) return reject('password must be at least 8 characters')
-		let memberDoc = await dbModel.members.findOne({ _id: sessionDoc.member })
+			if (!newPassword) return reject('new password required')
+			if (newPassword.length < 8) return reject('password must be at least 8 characters')
+			let memberDoc = await dbModel.members.findOne({ _id: sessionDoc.member }).select('_id password')
+			if (memberDoc.password && !oldPassword) return reject('old password required')
 
-		if ((memberDoc.password || '') != oldPassword) {
-			return reject(`incorrect old password`)
+			if ((memberDoc.password || '') != oldPassword) {
+				return reject(`incorrect old password`)
+			}
+			memberDoc.password = newPassword
+			memberDoc
+				.save()
+				.then(() => resolve(`your password has been changed successfuly`))
+				.catch(reject)
+		} catch (err) {
+			reject(err)
 		}
-		memberDoc.password = newPassword
-		memberDoc
-			.save()
-			.then(() => resolve(`your password has been changed successfuly`))
-			.catch(reject)
 
 	})
 }
@@ -89,7 +94,6 @@ function updateMyProfile(dbModel, sessionDoc, req) {
 		delete data.passive
 		delete data.createdDate
 		delete data.modifiedDate
-		delete data.fullName
 
 		let newDoc = Object.assign(doc, data)
 		if (!epValidateSync(newDoc, reject)) return
@@ -97,7 +101,6 @@ function updateMyProfile(dbModel, sessionDoc, req) {
 		newDoc.fullName = (doc.firstName || '') + ' ' + (doc.lastName || '')
 		newDoc.save()
 			.then((doc2) => {
-				doc2.populate('image')
 				let obj = doc2.toJSON()
 				delete obj.password
 

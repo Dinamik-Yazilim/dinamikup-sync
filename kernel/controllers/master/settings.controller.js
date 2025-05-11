@@ -25,38 +25,33 @@ module.exports = (dbModel, sessionDoc, req) =>
   })
 
 function getOne(dbModel, sessionDoc, req) {
-  return new Promise((resolve, reject) => {
-    dbModel.settings
-      .findOne({ member: sessionDoc.member })
-      .then(async doc => {
-        if (!doc) {
-          doc = new dbModel.settings({ member: sessionDoc.member })
-          doc = await doc.save()
-        }
-        resolve(doc)
+  return new Promise(async (resolve, reject) => {
+    try {
+      let orgDoc = await dbModel.organizations.findOne({ _id: sessionDoc.organization })
+      resolve({
+        connector: orgDoc.connector,
+        settings: orgDoc.settings
       })
-      .catch(reject)
+    } catch (err) {
+      reject(err)
+    }
   })
 }
 
 function save(dbModel, sessionDoc, req) {
   return new Promise(async (resolve, reject) => {
     try {
-
       let data = req.body || {}
-      delete data._id
-      data.member = sessionDoc.member
-      let settingDoc = await dbModel.settings.findOne({ member: sessionDoc.member })
-      if (!settingDoc) {
-        settingDoc = new dbModel.settings(data)
-      } else {
-
-        Object.assign(settingDoc.connector, data.connector || {})
+      let orgDoc = await dbModel.organizations.findOne({ _id: sessionDoc.organization })
+      if (data.connector) {
+        orgDoc.connector = Object.assign(orgDoc.connector || {}, data.connector)
       }
-
-      if (!epValidateSync(settingDoc, reject)) return
-      settingDoc.save().then(resolve).catch(reject)
-
+      if (data.settings) {
+        orgDoc.settings = Object.assign(orgDoc.settings || {}, data.settings)
+      }
+      orgDoc.save()
+        .then(resolve)
+        .catch(reject)
     } catch (err) {
       reject(err)
     }
@@ -71,6 +66,8 @@ function connectorTest(dbModel, sessionDoc, req) {
       const clientPass = req.getValue('clientPass')
       if (!clientId) return reject(`clientId required`)
       if (!clientPass) return reject(`clientPass required`)
+      devLog('connectorTest clientId:', clientId)
+      devLog('connectorTest clientPass:', clientPass)
       connectorAbi
         .dateTime(clientId, clientPass)
         .then(resolve)
@@ -92,7 +89,9 @@ function mssqlTest(dbModel, sessionDoc, req) {
       if (!clientId) return reject(`clientId required`)
       if (!clientPass) return reject(`clientPass required`)
       if (!mssql) return reject(`mssql required`)
-
+      if (!mssql.options) {
+        mssql.options = { encrypt: false, trustServerCertificate: true }
+      }
       const query = `SELECT name, object_id, create_date FROM sys.objects WHERE type='U' ORDER BY name`
       connectorAbi
         .mssql(clientId, clientPass, mssql, query)

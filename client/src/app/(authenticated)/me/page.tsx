@@ -11,17 +11,17 @@ import { Input } from "@/components/ui/input"
 import { getItem } from '@/lib/fetch'
 import CustomLink from '@/components/custom-link'
 import Cookies from 'js-cookie'
-import { MemberType } from '@/types/MemberType'
+import { Member } from '@/types/Member'
 
 const MePage = () => {
   const [token, setToken] = useState('')
-  const [user, setUser] = useState<MemberType | null>(null)
+  const [user, setUser] = useState<Member | null>(null)
 
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
   useEffect(() => {
     if (token) {
       getItem('/me', token)
-        .then(result => setUser(result as MemberType))
+        .then(result => setUser(result as Member))
         .catch(err => console.log(err))
     }
   }, [token])

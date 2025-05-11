@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { getItem, putItem } from '@/lib/fetch'
+import { getItem, postItem, putItem } from '@/lib/fetch'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
-import { Settings } from '@/types/Settings'
+import { Connector } from '@/types/Connector'
 import { useToast } from '@/components/ui/use-toast'
 
 import { useLanguage } from '@/i18n'
@@ -14,41 +14,76 @@ import { TsnInput } from '@/components/ui216/tsn-input'
 import { Label } from '@/components/ui/label'
 import { TsnPanel } from '@/components/ui216/tsn-panel'
 import { TsnInputAddress } from '@/components/ui216/tsn-input-address'
-import { SettingsIcon } from 'lucide-react'
+import { BrushIcon, DatabaseZapIcon, PaintbrushIcon, PlugZapIcon, SettingsIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { TsnSwitch } from '@/components/ui216/tsn-switch'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function ConnectorPage() {
-  const [settings, setSettings] = useState<Settings>()
+  const [connector, setConnector] = useState<Connector>({
+    clientId: '',
+    clientPass: '',
+    connectionType: 'mssql',
+    mssql: {
+      server: 'localhost',
+      port: 1433,
+      database: 'MikroDB_V16',
+      user: 'sa',
+      password: '',
+    }
+  })
   const [token, setToken] = useState('')
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
+  const [connTesting, setConnTesting] = useState(false)
+  const [connTestResult, setConnTestResult] = useState<any>()
+  const [sqlTestResult, setSqlTestResult] = useState<any>()
   const router = useRouter()
   const { t } = useLanguage()
 
   const load = () => {
-    // setLoading(true)
-    // getItem(`/db/settings`, token)
-    //   .then(result => {
-    //     setSettings(result as Settings)
-    //     Cookies.set('dbSettings', JSON.stringify(result as Settings))
-    //   })
-    //   .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
-    //   .finally(() => setLoading(false))
+    setLoading(true)
+    getItem(`/settings`, token)
+      .then(result => {
+        if (result.connector) {
+          setConnector(result.connector as Connector)
+        }
+      })
+      .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
+      .finally(() => setLoading(false))
   }
 
   const save = () => {
     setLoading(true)
-    putItem(`/db/settings`, token, settings)
+    putItem(`/settings`, token, { connector: connector })
       .then(result => {
-        getItem(`/db/settings`, token)
-          .then(result => {
-            Cookies.set('dbSettings', JSON.stringify(result as Settings))
-            router.back()
-          })
-          .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
+        console.log('result:', result)
+
       })
       .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
       .finally(() => setLoading(false))
+  }
 
+  const connectorTest = () => {
+    setConnTesting(true)
+
+    postItem(`/settings/connectorTest`, token, connector)
+      .then(result => {
+        setConnTestResult(result)
+      })
+      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .finally(() => setConnTesting(false))
+  }
+
+  const sqlConnTest = () => {
+    setConnTesting(true)
+
+    postItem(`/settings/mssqlTest`, token, connector)
+      .then(result => {
+        setSqlTestResult(result)
+      })
+      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .finally(() => setConnTesting(false))
   }
 
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
@@ -56,16 +91,57 @@ export default function ConnectorPage() {
 
   return (
     <StandartForm
-      title={t('Settings') + ' - ' + t('Connector')}
+      title={t('Connector')}
       onSaveClick={save}
       onCancelClick={() => router.back()}
-      icon=<SettingsIcon />
+      icon=<PlugZapIcon />
     >
-      {!loading && <>
-        <div className='flex flex-col ga-4'>
-          settings
+      {!loading && <div className='flex flex-col gap-8'>
+        <div className='border rounded-md border-dashed p-2'>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-2'>
+            <TsnInput title='ClientID' defaultValue={connector?.clientId} onBlur={e => setConnector({ ...connector, clientId: e.target.value })} />
+            <TsnInput title='ClientPass' defaultValue={connector?.clientPass} onBlur={e => setConnector({ ...connector, clientPass: e.target.value })} />
+            <TsnSelect title='Connection Type' defaultValue={connector?.connectionType} disabled list={[{ _id: 'mssql', name: 'MS SQL Server' }]} />
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className='flex gap-2'>
+              <Button onClick={connectorTest} disabled={connTesting || connTestResult != undefined} className='w-44 bg-green-600 text-white' variant={'outline'} >
+                <PlugZapIcon />  {t('Connector Test')}
+              </Button>
+              {connTestResult && <Button onClick={() => setConnTestResult(undefined)} ><PaintbrushIcon /></Button>}
+            </div>
+            <div className='flex flex-col gap-1'>
+              <Label>{t('Result')}</Label>
+              <div>{JSON.stringify(connTestResult, null, 2)}</div>
+            </div>
+            {connTesting && <Skeleton className='w-full h-12' />}
+          </div>
         </div>
-      </>}
+        <div className='border rounded-md border-dashed p-2'>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-2'>
+            <TsnInput title={'Server'} defaultValue={connector?.mssql?.server} onBlur={e => setConnector({ ...connector, mssql: { ...connector.mssql, server: e.target.value } })} />
+            <TsnInput title={'Instance'} defaultValue={connector?.mssql?.dialectOptions?.instanceName} onBlur={e => setConnector({ ...connector, mssql: { ...connector.mssql, dialectOptions: { ...connector.mssql?.dialectOptions, instanceName: e.target.value } } })} />
+            <TsnInput type='number' title={'Port'} defaultValue={connector?.mssql?.port} onBlur={e => setConnector({ ...connector, mssql: { ...connector.mssql, port: !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0 } })} />
+            <TsnInput title={'Database'} defaultValue={connector?.mssql?.database} onBlur={e => setConnector({ ...connector, mssql: { ...connector.mssql, database: e.target.value } })} />
+            <TsnInput title={'User'} defaultValue={connector?.mssql?.user} onBlur={e => setConnector({ ...connector, mssql: { ...connector.mssql, user: e.target.value } })} />
+            <TsnInput title={'Password'} defaultValue={connector?.mssql?.password} onBlur={e => setConnector({ ...connector, mssql: { ...connector.mssql, password: e.target.value } })} />
+            <TsnSwitch title={'Encrypt'} defaultChecked={connector?.mssql?.options?.encrypt} onCheckedChange={e => setConnector({ ...connector, mssql: { ...connector.mssql, options: { ...connector.mssql?.options, encrypt: e } } })} />
+            <TsnSwitch title={'Trust Server Certificate'} defaultChecked={connector?.mssql?.options?.trustServerCertificate} onCheckedChange={e => setConnector({ ...connector, mssql: { ...connector.mssql, options: { ...connector.mssql?.options, trustServerCertificate: e } } })} />
+          </div>
+          <div className='flex flex-col gap-2'>
+            <div className='flex gap-2'>
+              <Button onClick={sqlConnTest} disabled={connTesting || sqlTestResult != undefined} className='w-44 bg-amber-600 text-white' variant={'outline'} >
+                <DatabaseZapIcon />  {t('SQL Test')}
+              </Button>
+              {sqlTestResult && <Button onClick={() => setSqlTestResult(undefined)} ><PaintbrushIcon /></Button>}
+            </div>
+            <div className='flex flex-col gap-1'>
+              <Label>{t('Result')}</Label>
+              <pre>{JSON.stringify(sqlTestResult, null, 2)}</pre>
+            </div>
+          </div>
+        </div>
+      </div>}
     </StandartForm>
   )
 }

@@ -35,7 +35,7 @@ export interface Connector {
       filePath?: string
       encoding?: string | 'base64' | undefined
     },
-    excel: {
+    excel?: {
       filePath?: string
     }
   }

@@ -10,7 +10,7 @@ import { ThemeToggleButton } from '@/components/theme-toggle-button'
 import Link from 'next/link'
 import { SignOutButton } from './signout-button'
 import { FC, useEffect, useState } from 'react'
-import { MemberType } from '@/types/MemberType'
+import { Member } from '@/types/Member'
 // import { getAuthUser, getDatabases } from '@/lib/authHelper'
 import Cookies from 'js-cookie'
 import { SelectLang } from '@/components/select-lang'
@@ -19,14 +19,14 @@ import { DatabaseSelect } from '@/components/database-select'
 import { Skeleton } from '@/components/ui/skeleton'
 export function UserMenu() {
   const [token, setToken] = useState('')
-  const [userInfo, setUserInfo] = useState<MemberType>()
+  const [userInfo, setUserInfo] = useState<Member>()
   const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
   useEffect(() => {
     try {
       if (Cookies.get('user'))
-        setUserInfo(JSON.parse(Cookies.get('user') || '{}') as MemberType)
+        setUserInfo(JSON.parse(Cookies.get('user') || '{}') as Member)
 
     } catch (err) {
       console.log('hata:', err)

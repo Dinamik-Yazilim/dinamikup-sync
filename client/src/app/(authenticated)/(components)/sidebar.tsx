@@ -84,7 +84,7 @@ export function Sidebar() {
       title: t('Settings'),
       icon: <Settings className="h-5 w-5" />,
       submenu: [
-        { title: t('Users'), href: "/setttings/users" },
+        { title: t('Users'), href: "/settings/users" },
         { title: t('Connector'), href: "/settings/connector" },
         { title: t('Working Parameters'), href: "/settings/workingParams" },
       ],

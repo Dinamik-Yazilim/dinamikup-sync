@@ -1,8 +1,8 @@
 import { Organization } from "./Organization"
 
-export interface MemberType {
+export interface Member {
   _id?: string
-  organization:Organization
+  organization?:Organization
   username?: string
   name?: string
   role?: string

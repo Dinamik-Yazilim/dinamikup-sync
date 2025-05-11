@@ -12,13 +12,13 @@ import CustomLink from '@/components/custom-link'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { useToast } from '@/components/ui/use-toast'
-import { MemberType } from '@/types/MemberType'
+import { Member } from '@/types/Member'
 
 export default function MeEditPage() {
   const router = useRouter()
   const { toast } = useToast()
   const [token, setToken] = useState('')
-  const [user, setUser] = useState<MemberType>({})
+  const [user, setUser] = useState<Member>({})
   const [newLink, setNewLink] = useState('')
 
   const save = () => {
@@ -34,7 +34,7 @@ export default function MeEditPage() {
   useEffect(() => {
     if (token) {
       getItem('/me', token)
-        .then(result => setUser(result as MemberType))
+        .then(result => setUser(result as Member))
         .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
     }
   }, [token])

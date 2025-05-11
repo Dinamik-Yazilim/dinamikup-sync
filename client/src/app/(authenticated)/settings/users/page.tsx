@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { getItem, putItem } from '@/lib/fetch'
+import { getItem, getList, putItem } from '@/lib/fetch'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
 import { Settings } from '@/types/Settings'
@@ -13,10 +13,13 @@ import { TsnInput } from '@/components/ui216/tsn-input'
 import { Label } from '@/components/ui/label'
 import { TsnPanel } from '@/components/ui216/tsn-panel'
 import { TsnInputAddress } from '@/components/ui216/tsn-input-address'
+import { Users2Icon } from 'lucide-react'
+import { Member } from '@/types/Member'
+import { ListGrid } from '@/components/ui216/list-grid'
 interface Props {
 }
 export default function SettingsPage({ }: Props) {
-  const [settings, setSettings] = useState<Settings>()
+  const [members, setMembers] = useState<Member[]>([])
   const [token, setToken] = useState('')
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
@@ -24,46 +27,34 @@ export default function SettingsPage({ }: Props) {
   const { t } = useLanguage()
 
   const load = () => {
-    // setLoading(true)
-    // getItem(`/db/settings`, token)
-    //   .then(result => {
-    //     setSettings(result as Settings)
-    //     Cookies.set('dbSettings', JSON.stringify(result as Settings))
-    //   })
-    //   .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
-    //   .finally(() => setLoading(false))
-  }
-
-  const save = () => {
     setLoading(true)
-    putItem(`/db/settings`, token, settings)
+    getList(`/members`, token)
       .then(result => {
-        getItem(`/db/settings`, token)
-          .then(result => {
-            Cookies.set('dbSettings', JSON.stringify(result as Settings))
-            router.back()
-          })
-          .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
+        setMembers(result.docs as Member[])
       })
-      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
       .finally(() => setLoading(false))
-
   }
 
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
   useEffect(() => { token && load() }, [token])
 
   return (
-    <StandartForm
-      title={t('Settings')}
-      onSaveClick={save}
-      onCancelClick={() => router.back()}
-    >
-      {!loading && <>
-        <div className='flex flex-col ga-4'>
-          settings
-        </div>
-      </>}
-    </StandartForm>
+    <ListGrid
+      apiPath='/members'
+
+      title={t('Users')}
+      icon=<Users2Icon />
+      onHeaderPaint={() => <div className='grid grid-cols-3 w-full'>
+        <div>{t('Username')}</div>
+        <div>{t('Name')}</div>
+        <div>{t('Passive?')}</div>
+      </div>}
+      onRowPaint={(e:Member,colIndex) => <div className='grid grid-cols-3 w-full'>
+        <div>{e.username}</div>
+        <div>{e.name}</div>
+        <div>{e.passive}</div>
+      </div>}
+    />
   )
 }

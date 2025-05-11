@@ -11,5 +11,9 @@
   "Reports":"Reports",
   "Purchase":"Purchase",
   "Sales":"Sales",
-  "Do you want to exit?":"Do you want to exit?"
+  "Do you want to exit?":"Do you want to exit?",
+  "Username":"Username",
+  "Name":"Name",
+  "Passive?":"Passive?",
+  "Passive":"Passive"
 }
