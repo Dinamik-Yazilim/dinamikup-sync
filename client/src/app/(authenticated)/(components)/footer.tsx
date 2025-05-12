@@ -1,7 +1,7 @@
 "use client"
 
 import { CopyrightInfo } from '@/components/copyright'
-import { DatabaseSelect } from '@/components/database-select'
+import { DatabaseSelect } from '@/app/(authenticated)/(components)/database-select'
 
 // import { DatabaseSelect } from './database-selection'
 export function Footer() {

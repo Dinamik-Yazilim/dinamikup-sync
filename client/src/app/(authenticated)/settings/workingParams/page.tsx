@@ -13,7 +13,8 @@ import { TsnInput } from '@/components/ui216/tsn-input'
 import { Label } from '@/components/ui/label'
 import { TsnPanel } from '@/components/ui216/tsn-panel'
 import { TsnInputAddress } from '@/components/ui216/tsn-input-address'
-import { SettingsIcon } from 'lucide-react'
+import { Settings2Icon, SettingsIcon } from 'lucide-react'
+import { TsnSwitch } from '@/components/ui216/tsn-switch'
 interface Props {
 }
 export default function SettingsPage({ }: Props) {
@@ -25,26 +26,21 @@ export default function SettingsPage({ }: Props) {
   const { t } = useLanguage()
 
   const load = () => {
-    // setLoading(true)
-    // getItem(`/db/settings`, token)
-    //   .then(result => {
-    //     setSettings(result as Settings)
-    //     Cookies.set('dbSettings', JSON.stringify(result as Settings))
-    //   })
-    //   .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
-    //   .finally(() => setLoading(false))
+    setLoading(true)
+    getItem(`/settings`, token)
+      .then(result => {
+        console.log('result', result)
+        setSettings(result.settings as Settings)
+      })
+      .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
+      .finally(() => setLoading(false))
   }
 
   const save = () => {
     setLoading(true)
-    putItem(`/db/settings`, token, settings)
+    putItem(`/settings`, token, {settings:settings})
       .then(result => {
-        getItem(`/db/settings`, token)
-          .then(result => {
-            Cookies.set('dbSettings', JSON.stringify(result as Settings))
-            router.back()
-          })
-          .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
+        router.push('/')
       })
       .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
       .finally(() => setLoading(false))
@@ -56,16 +52,15 @@ export default function SettingsPage({ }: Props) {
 
   return (
     <StandartForm
-      title={t('Settings') + ' - ' + t('Working Parameters')}
+      title={t('Working Parameters')}
       onSaveClick={save}
       onCancelClick={() => router.back()}
-      icon=<SettingsIcon />
+      icon=<Settings2Icon />
+      loading={loading}
     >
-      {!loading && <>
-        <div className='flex flex-col ga-4'>
-          settings
-        </div>
-      </>}
+      <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+        <TsnSwitch title={t('VAT Included')} defaultChecked={settings?.vatIncluded} onCheckedChange={e=>setSettings({...settings,vatIncluded:e})} />
+      </div>
     </StandartForm>
   )
 }

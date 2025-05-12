@@ -15,7 +15,7 @@ import { Member } from '@/types/Member'
 import Cookies from 'js-cookie'
 import { SelectLang } from '@/components/select-lang'
 import { useLanguage } from '@/i18n'
-import { DatabaseSelect } from '@/components/database-select'
+import { DatabaseSelect } from '@/app/(authenticated)/(components)/database-select'
 import { Skeleton } from '@/components/ui/skeleton'
 export function UserMenu() {
   const [token, setToken] = useState('')

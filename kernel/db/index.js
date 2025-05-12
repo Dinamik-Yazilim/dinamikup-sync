@@ -47,7 +47,7 @@ module.exports = () =>
   new Promise((resolve, reject) => {
     connectMongoDatabase('collections/master', process.env.MONGODB_URI, db)
       .then(() => {
-        initRepoDb()
+        // initRepoDb()
         resolve()
       })
       .catch(reject)

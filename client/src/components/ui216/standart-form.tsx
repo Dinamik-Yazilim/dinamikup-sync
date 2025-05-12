@@ -19,7 +19,7 @@ export function StandartForm({
     {!loading &&
       <div className='flex flex-col gap-4 '>
         <div className='flex justify-between border-b'>
-          <h2 className='flex items-center gap-4 border-none'>
+          <h2 className='flex items-center gap-4 border-none text-base lg:text-2xl'>
             {!icon && <>
             {id == 'addnew' && <PlusSquareIcon />}
             {id != 'addnew' && <EditIcon />}
@@ -27,9 +27,9 @@ export function StandartForm({
             {icon && <>{icon}</>}
             {title}
           </h2>
-          <div className='flex gap-2'>
-            {onSaveClick && <ButtonOK onClick={onSaveClick} />}
-            {onCancelClick && <ButtonCancel onClick={onCancelClick} />}
+          <div className='flex gap-2 mb-1'>
+            {onSaveClick && <ButtonOK className='w-8 h-8 lg:w-9 lg:h-9' onClick={onSaveClick} />}
+            {onCancelClick && <ButtonCancel className='w-8 h-8 lg:w-9 lg:h-9' onClick={onCancelClick} />}
           </div>
         </div>
         <div>

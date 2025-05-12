@@ -25,10 +25,13 @@ interface SubMenuItem {
   href: string
 }
 
+interface Props {
+  className?:string
+}
 
-
-export function Sidebar() {
-  const [pathname, setPathname] = useState(usePathname())
+export function Sidebar({className}:Props) {
+  // const [pathname, setPathname] = useState(usePathname())
+  const pathname = usePathname()
   // Track open accordion values
   const [openAccordions, setOpenAccordions] = useState<string[]>([])
   const { t } = useLanguage()
@@ -64,15 +67,6 @@ export function Sidebar() {
         { title: "Add Product", href: "/products/add" },
         { title: "Categories", href: "/products/categories" },
         { title: "Inventory", href: "/products/inventory" },
-      ],
-    },
-    {
-      title: "Content",
-      icon: <FileText className="h-5 w-5" />,
-      submenu: [
-        { title: "Pages", href: "/content/pages" },
-        { title: "Blog", href: "/content/blog" },
-        { title: "Media", href: "/content/media" },
       ],
     },
     {
@@ -138,7 +132,7 @@ export function Sidebar() {
   // }, [pathname])
 
   return (
-    <div className="w-64 min-h-screen border-r">
+    <div className={`w-64 min-h-screen border-r ${className}`}>
 
       <nav className="p-2 mt-0">
         <Accordion type="multiple" value={openAccordions} className="space-y-1">
@@ -167,7 +161,7 @@ export function Sidebar() {
                           href={subItem.href}
                           className={cn(
                             "px-3 py-2 rounded-md text-sm hover:bg-slate-600 hover:text-white transition-all",
-                            isActive(subItem.href) && "bg-slate-600 text-white font-medium",
+                            isActive(subItem.href) && "bg-amber-700 text-white font-medium",
                           )}
                         >
                           {subItem.title}

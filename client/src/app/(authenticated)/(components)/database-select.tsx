@@ -14,12 +14,12 @@ import {
 import { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 import { useLanguage } from '@/i18n'
-import { Button } from './ui/button'
+import { Button } from '@/components/ui/button'
 import { DatabaseIcon, DatabaseZapIcon, ListIcon, RefreshCcwDotIcon, Settings2Icon } from 'lucide-react'
 import { getItem, postItem } from '@/lib/fetch'
 import { Database } from '@/types/Database'
-import { useToast } from './ui/use-toast'
-import { Skeleton } from './ui/skeleton'
+import { useToast } from '@/components/ui/use-toast'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useRouter } from 'next/navigation'
 
 
@@ -32,25 +32,9 @@ export function DatabaseSelect() {
   const { toast } = useToast()
   const router = useRouter()
 
-  const setVariables = (l: Database[]) => {
-    const d = Cookies.get('db') || ''
-    const foundIndex = l.findIndex((e: Database) => e._id == d)
-    if (foundIndex > -1) {
-      setDb(d)
-      Cookies.set('databaseName', l[foundIndex].name || '')
-    } else if (l.length > 0) {
-      setDb(l[l.length - 1]._id || '')
-      Cookies.set('databaseName', l[l.length - 1].name || '')
-    } else {
-      setDb('')
-      Cookies.remove('db')
-      Cookies.remove('databaseName')
-    }
-  }
-
   const changeDb = (dbId: string) => {
     setLoading(true)
-    postItem(`/session/change/db/${dbId}`, token)
+    postItem(`/databases/${dbId}`, token)
       .then(result => {
         toast({ title: t('Database changed'), description: `database:${result.db.name}`, variant: 'default', duration: 1500 })
         setTimeout(() => location.reload(), 400)
@@ -63,15 +47,23 @@ export function DatabaseSelect() {
     setLoading(true)
     getItem(`/databases`, token)
       .then(result => {
-        setDbList(result.docs as Database[])
-        // Cookies.set('dbList', JSON.stringify(l))
-        setVariables(result.docs as Database[])
+        setDbList(result as Database[])
+        Cookies.set('dbList', JSON.stringify(result))
       })
-      .catch(err => toast({ title: err, variant: 'destructive', duration: 1500 }))
+      .catch(err => toast({ title: t('Error'), description:t(err || ''), variant: 'destructive', duration: 1500 }))
       .finally(() => setLoading(false))
   }
+
+  const loadFromCookies=()=>{
+    try {
+      
+    } catch (error) {
+      
+    }
+    
+  }
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
-  useEffect(() => { token && load() }, [token])
+  useEffect(() => { token && loadFromCookies() }, [token])
 
   return (
     <>
@@ -82,7 +74,6 @@ export function DatabaseSelect() {
             defaultValue={db}
             onValueChange={e => {
               Cookies.set('db', e)
-              setVariables(dbList)
               changeDb(e)
 
             }}
@@ -96,11 +87,11 @@ export function DatabaseSelect() {
             <SelectContent>
               <SelectGroup>
                 {dbList.map((e, index) =>
-                  <SelectItem key={'database' + index} value={e._id || ''}>
-                    <div className={`flex gap-2 items-center uppercase ${db == e._id ? 'text-[#1e40af] dark:text-[#eab308] font-bold' : ''}`}>
-                      {db == e._id && <DatabaseZapIcon />}
-                      {db != e._id && <DatabaseIcon />}
-                      {e.name}
+                  <SelectItem key={'database' + index} value={e.db || ''}>
+                    <div className={`flex gap-2 items-center uppercase ${db == e.db ? 'text-[#1e40af] dark:text-[#eab308] font-bold' : ''}`}>
+                      {db == e.db && <DatabaseZapIcon />}
+                      {db != e.db && <DatabaseIcon />}
+                      {e.dbName}
                     </div>
 
                   </SelectItem>)

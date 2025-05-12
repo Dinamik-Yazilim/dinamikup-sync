@@ -1,19 +1,4 @@
-import { Member } from './Member'
-import { Settings } from './Settings'
-
 export interface Database {
-  _id?: string
-  owner?: string
-  identifier?: string
-  name?: string
-  team?: Team[]
-  dbHost?: string
+  db?: string
   dbName?: string
-  passive?: boolean
-  settings?: Settings
-}
-
-export interface Team {
-  teamMember?: Member
-  permissions?: any
 }

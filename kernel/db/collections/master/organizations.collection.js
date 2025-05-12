@@ -45,7 +45,9 @@ module.exports = function (dbModel) {
           filePath: { type: String, default: '' },
         }
       },
-      settings: {},
+      settings: {
+        vatIncluded: { type: Boolean, default: false }
+      },
       passive: { type: Boolean, default: false, index: true }
     },
     { versionKey: false, timestamps: true }

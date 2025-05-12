@@ -15,5 +15,11 @@
   "Username":"Kullanıcı Adı",
   "Name":"İsim",
   "Passive?":"Pasif?",
-  "Passive":"Pasif"
+  "Passive":"Pasif",
+  "User":"Kullanıcı",
+  "Administrator":"Yönetici",
+  "Role":"Rol",
+  "you can not delete yourself":"Kendinizi silemezsiniz",
+  "Error": "Hata"
+
 }

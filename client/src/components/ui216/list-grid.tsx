@@ -98,7 +98,7 @@ export function ListGrid({
         setList(result.docs as any[])
         setPagination(result as PaginationType)
       })
-      .catch(err => toast({ title: 'error', description: err || '', variant: 'destructive' }))
+      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
       .finally(() => setLoading(false))
   }
 
@@ -108,7 +108,7 @@ export function ListGrid({
       .then(result => {
         load(1, search)
       })
-      .catch(err => toast({ title: 'error', description: err || '', variant: 'destructive' }))
+      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
   }
 
   const classBgOdd = 'bg-slate-300 bg-opacity-10 hover:bg-blue-500 hover:bg-opacity-10'

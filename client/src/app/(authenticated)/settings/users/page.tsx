@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label'
 import { TsnPanel } from '@/components/ui216/tsn-panel'
 import { TsnInputAddress } from '@/components/ui216/tsn-input-address'
 import { Users2Icon } from 'lucide-react'
-import { Member } from '@/types/Member'
+import { getRoleList, Member } from '@/types/Member'
 import { ListGrid } from '@/components/ui216/list-grid'
 interface Props {
 }
@@ -25,6 +25,7 @@ export default function SettingsPage({ }: Props) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { t } = useLanguage()
+  const roleList=getRoleList(t)
 
   const load = () => {
     setLoading(true)
@@ -45,15 +46,17 @@ export default function SettingsPage({ }: Props) {
 
       title={t('Users')}
       icon=<Users2Icon />
-      onHeaderPaint={() => <div className='grid grid-cols-3 w-full'>
+      onHeaderPaint={() => <div className='grid grid-cols-4 w-full'>
         <div>{t('Username')}</div>
         <div>{t('Name')}</div>
-        <div>{t('Passive?')}</div>
+        <div>{t('Rol')}</div>
+        <div className='text-center'>{t('Passive?')}</div>
       </div>}
-      onRowPaint={(e:Member,colIndex) => <div className='grid grid-cols-3 w-full'>
+      onRowPaint={(e:Member,colIndex) => <div className='grid grid-cols-4 w-full'>
         <div>{e.username}</div>
         <div>{e.name}</div>
-        <div>{e.passive}</div>
+        <div>{roleList.find(r=>r._id==e.role)?.name}</div>
+        <div className='text-center'>{e.passive?'✅':''}</div>
       </div>}
     />
   )

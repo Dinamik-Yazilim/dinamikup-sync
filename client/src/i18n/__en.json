@@ -15,5 +15,10 @@
   "Username":"Username",
   "Name":"Name",
   "Passive?":"Passive?",
-  "Passive":"Passive"
+  "Passive":"Passive",
+  "User":"User",
+  "Administrator":"Administrator",
+  "Role":"Role",
+  "you can not delete yourself":"You can't delete yourself",
+  "Error":"Error"
 }

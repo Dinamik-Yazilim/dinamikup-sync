@@ -12,8 +12,9 @@ import Link from 'next/link'
 import { BoxesIcon, DatabaseIcon, FactoryIcon, HomeIcon, PiggyBankIcon, ShoppingCartIcon, TruckIcon } from 'lucide-react'
 import { useLanguage } from '@/i18n'
 import Cookies from 'js-cookie'
-import { DatabaseSelect } from '@/components/database-select'
+import { DatabaseSelect } from '@/app/(authenticated)/(components)/database-select'
 import { NotificationButton } from '@/components/notify-icon'
+import { Sidebar } from './sidebar'
 
 export function Header() {
   const { t } = useLanguage()
@@ -22,7 +23,7 @@ export function Header() {
     <header className="flex h-16 items-center justify-between bor11der-b bg-white px-0 md:px-2 dark:border-gray-800 dark:bg-gray-950"    >
       <div className="flex items-center gap-2">
         <CustomLink className="" href="/">
-          <HeaderLogo2 className='' />
+          <HeaderLogo2 className='w-40 lg:w-48' />
         </CustomLink>
         <div className='hidden lg:flex'>
           <DatabaseSelect />
@@ -31,7 +32,7 @@ export function Header() {
       </div>
       <div className="flex items-center justify-end gap-2">
         
-        <NotificationButton />
+        {/* <NotificationButton /> */}
         <UserMenu />
         <div className='flex lg:hidden'><MobileMenu /></div>
 
@@ -53,12 +54,12 @@ function MobileMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" >
-
-        
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        {/* <DropdownMenuItem>
           <DatabaseSelect />
         </DropdownMenuItem>
+        <DropdownMenuSeparator /> */}
+        <Sidebar />
+        
       </DropdownMenuContent>
     </DropdownMenu>
   </>)

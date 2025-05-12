@@ -33,10 +33,7 @@ module.exports = (app) => {
 
   authControllers(app, '/api/v1/auth/:func/:param1/:param2/:param3')
   sessionControllers(app, '/api/v1/session/:func/:param1/:param2/:param3')
-  adminAuthControllers(app, '/api/v1/admin/auth/:func/:param1/:param2/:param3')
-  adminControllers(app, '/api/v1/admin/:func/:param1/:param2/:param3')
   s3Controllers(app, '/api/v1/s3/:func/:param1/:param2/:param3')
-  repoControllers(app, '/api/v1/db/:func/:param1/:param2/:param3')
   masterControllers(app, '/api/v1/:func/:param1/:param2/:param3')
 
 
@@ -46,31 +43,6 @@ module.exports = (app) => {
 
   app.use((err, req, res, next) => {
     sendError(err, req, res)
-  })
-}
-
-function adminAuthControllers(app, route) {
-  setRoutes(app, route, (req, res, next) => {
-    const ctl = getController('/admin/auth', req.params.func)
-    let spam = spamCheck(req.IP)
-    if (!spam) {
-      if (ctl) {
-        ctl(req)
-          .then((data) => {
-            if (data == undefined) res.json({ success: true })
-            else if (data == null) res.json({ success: true })
-            else {
-              res.status(200).json({
-                success: true,
-                data: data,
-              })
-            }
-          })
-          .catch(next)
-      } else next()
-    } else {
-      next(`Suspicious login attempts. Try again after ${spam} seconds.`)
-    }
   })
 }
 
@@ -126,88 +98,31 @@ function sessionControllers(app, route) {
 
 function masterControllers(app, route) {
   setRoutes(app, route, (req, res, next) => {
-    const ctl = getController('/master', req.params.func)
-    if (ctl) {
-      passport(req)
-        .then((sessionDoc) => {
-          ctl(db, sessionDoc, req)
-            .then((data) => {
-              if (data == undefined) res.json({ success: true })
-              else if (data == null) res.json({ success: true })
-              else {
-                res.status(200).json({ success: true, data: data })
-              }
-            })
-            .catch(next)
-        })
-        .catch((err) => {
-          res.status(401).json({ success: false, error: err })
-        })
-    } else next()
-  })
-}
+    try {
 
-
-function repoControllers(app, route) {
-  setRoutes(app, route, (req, res, next) => {
-    const ctl = getController('/repo', req.params.func)
-    if (ctl) {
-      passport(req)
-        .then(async sessionDoc => {
-          if (!sessionDoc) return reject('Unauthorized operation. {token} is empty. Please log in again.')
-          if (!sessionDoc.db) return reject('Database not selected')
-          const dbDoc = await db.databases.findOne({
-            $or: [{ owner: sessionDoc.member }, { 'team.teamMember': sessionDoc.member }],
-            _id: sessionDoc.db
+      const ctl = getController('/master', req.params.func)
+      if (ctl) {
+        passport(req)
+          .then(async (sessionDoc) => {
+            const orgDoc = await db.organizations.findOne({ _id: sessionDoc.organization })
+            ctl(db, sessionDoc, req, orgDoc)
+              .then((data) => {
+                if (data == undefined) res.json({ success: true })
+                else if (data == null) res.json({ success: true })
+                else {
+                  res.status(200).json({ success: true, data: data })
+                }
+              })
+              .catch(next)
           })
-          if (!dbDoc) return reject(`Database not found`)
-          getRepoDbModel(sessionDoc.member, dbDoc._id, dbDoc.dbName, 'server1')
-            .then(dbModel => {
-              ctl(dbModel, sessionDoc, req)
-                .then((data) => {
-                  if (data == undefined) res.json({ success: true })
-                  else if (data == null) res.json({ success: true })
-                  else {
-                    res.status(200).json({ success: true, data: data })
-                  }
-                })
-                .catch(next)
-                .finally(() => {
-                  dbModel.free()
-                  dbModel = undefined
-                })
-            })
-            .catch(err => {
-              res.status(400).json({ success: false, error: err })
-            })
+          .catch((err) => {
+            res.status(401).json({ success: false, error: err })
+          })
+      } else next()
+    } catch (err) {
+      next(err)
+    }
 
-        })
-        .catch((err) => {
-          res.status(401).json({ success: false, error: err })
-        })
-    } else next()
-  })
-}
-function adminControllers(app, route) {
-  setRoutes(app, route, (req, res, next) => {
-    const ctl = getController('/admin', req.params.func)
-    if (ctl) {
-      adminPassport(req)
-        .then(sessionDoc => {
-          ctl(db, sessionDoc, req)
-            .then((data) => {
-              if (data == undefined) res.json({ success: true })
-              else if (data == null) res.json({ success: true })
-              else {
-                res.status(200).json({ success: true, data: data })
-              }
-            })
-            .catch(next)
-        })
-        .catch((err) => {
-          res.status(401).json({ success: false, error: err })
-        })
-    } else next()
   })
 }
 
@@ -348,41 +263,6 @@ function passport(req) {
   })
 }
 
-function adminPassport(req) {
-  return new Promise((resolve, reject) => {
-    let admintoken = req.getValue('admintoken')
-    if (admintoken) {
-      admintoken = admintoken.split('ADMIN_')[1]
-      auth
-        .verify(admintoken)
-        .then(decoded => {
-          db.adminSessions
-            .findOne({ _id: decoded.sessionId })
-            .then((sessionDoc) => {
-
-              if (sessionDoc) {
-                if (sessionDoc.closed) {
-                  reject('session closed')
-                } else {
-                  sessionDoc.lastOnline = new Date()
-                  sessionDoc.lastIP = req.IP
-                  sessionDoc.save()
-                    .then(resolve)
-                    .catch(reject)
-
-                }
-              } else {
-                reject('admin session not found. login again.')
-              }
-            })
-            .catch(reject)
-        })
-        .catch(reject)
-    } else {
-      reject('authorization failed. admintoken is empty.')
-    }
-  })
-}
 
 global.getSessionMember = (sessionDoc) => new Promise((resolve, reject) => {
   db.members.findOne({ _id: sessionDoc.member })

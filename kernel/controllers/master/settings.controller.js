@@ -28,6 +28,7 @@ function getOne(dbModel, sessionDoc, req) {
   return new Promise(async (resolve, reject) => {
     try {
       let orgDoc = await dbModel.organizations.findOne({ _id: sessionDoc.organization })
+      console.log('orgDoc.settings:', orgDoc.settings)
       resolve({
         connector: orgDoc.connector,
         settings: orgDoc.settings

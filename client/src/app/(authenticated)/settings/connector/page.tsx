@@ -49,7 +49,7 @@ export default function ConnectorPage() {
           setConnector(result.connector as Connector)
         }
       })
-      .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
+      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
       .finally(() => setLoading(false))
   }
 

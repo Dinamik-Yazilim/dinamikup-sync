@@ -7,7 +7,7 @@ module.exports = function (dbModel) {
       member: { type: ObjectId, ref: 'members', index: true },
       loginProvider: { type: String, default: 'dinamikup', enum: ['dinamikup', 'google', 'yandex', 'github', 'facebook', 'magiclink', ''] },
       role: { type: String },
-      db: { type: ObjectId, ref: 'databases', default: null, index: true },
+      db: { type: String, default: '', index: true },
       language: { type: String, default: 'tr' },
       deviceId: { type: String, default: '', index: true },
       IP: { type: String, default: '' },
