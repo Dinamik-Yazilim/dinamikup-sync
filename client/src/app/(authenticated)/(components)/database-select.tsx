@@ -36,8 +36,10 @@ export function DatabaseSelect() {
     setLoading(true)
     postItem(`/databases/${dbId}`, token)
       .then(result => {
-        toast({ title: t('Database changed'), description: `database:${result.db.name}`, variant: 'default', duration: 1500 })
-        setTimeout(() => location.reload(), 400)
+        console.log('result:', result)
+        Cookies.set('db', dbId)
+        toast({ title: t('Database changed'), description: `database:${result.db.name}`, variant: 'default', duration: 500 })
+        setTimeout(() => location.reload(), 1000)
       })
       .catch(err => toast({ title: err, variant: 'destructive', duration: 1500 }))
       .finally(() => setLoading(false))
@@ -50,17 +52,22 @@ export function DatabaseSelect() {
         setDbList(result as Database[])
         Cookies.set('dbList', JSON.stringify(result))
       })
-      .catch(err => toast({ title: t('Error'), description:t(err || ''), variant: 'destructive', duration: 1500 }))
+      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive', duration: 1500 }))
       .finally(() => setLoading(false))
   }
 
-  const loadFromCookies=()=>{
+  const loadFromCookies = () => {
     try {
-      
-    } catch (error) {
-      
+      setLoading(true)
+      if (Cookies.get('dbList')) {
+        setDbList(JSON.parse(Cookies.get('dbList') || '[]'))
+        setDb(Cookies.get('db') || '')
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
     }
-    
   }
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
   useEffect(() => { token && loadFromCookies() }, [token])
@@ -69,17 +76,12 @@ export function DatabaseSelect() {
     <>
 
       {!loading &&
-        <div className='flex gap-4'>
+        <div className='flex gap-2'>
           <Select
-            defaultValue={db}
+            value={db}
             onValueChange={e => {
-              Cookies.set('db', e)
               changeDb(e)
-
             }}
-          // onOpenChange={e => {
-          //   !e && load()
-          // }}
           >
             <SelectTrigger className={`w-[180px] px-1 border-0`}>
               <SelectValue placeholder={'[' + t('Select Database') + ']'} />
@@ -98,20 +100,14 @@ export function DatabaseSelect() {
                 }
               </SelectGroup>
               <SelectGroup>
-                <SelectLabel onClick={() => router.push('/databases')} className='cursor-pointer flex items-center gap-2'>
-                  <ListIcon size={'16px'} />  {t('Database List')}
-                </SelectLabel>
-                <SelectSeparator />
-                <SelectLabel onClick={() => router.push('/settings')} className='cursor-pointer flex items-center gap-2'>
-                  <Settings2Icon size={'16px'} />  {t('Settings')}
-                </SelectLabel>
+              <Button onClick={load} variant={'outline'} className="flex gap-2" ><RefreshCcwDotIcon /> {t('Reload Databases')}</Button>
               </SelectGroup>
             </SelectContent>
           </Select>
-
+          
         </div>
       }
-      {loading && <Skeleton className='w-[140px]' />}
+      {loading && <Skeleton className='w-[180px]  h-11' />}
     </>
   )
 }

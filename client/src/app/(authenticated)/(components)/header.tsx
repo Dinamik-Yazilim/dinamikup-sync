@@ -21,7 +21,7 @@ export function Header() {
 
   return (
     <header className="flex h-16 items-center justify-between bor11der-b bg-white px-0 md:px-2 dark:border-gray-800 dark:bg-gray-950"    >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-8">
         <CustomLink className="" href="/">
           <HeaderLogo2 className='w-40 lg:w-48' />
         </CustomLink>
@@ -54,10 +54,10 @@ function MobileMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" >
-        {/* <DropdownMenuItem>
+        <DropdownMenuItem>
           <DatabaseSelect />
         </DropdownMenuItem>
-        <DropdownMenuSeparator /> */}
+        <DropdownMenuSeparator />
         <Sidebar />
         
       </DropdownMenuContent>

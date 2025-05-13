@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Settings, Users, ShoppingCart, BarChart, FileText, Mail, Bell, HelpCircle, CheckCircle2Icon, ChartAreaIcon, TruckIcon } from "lucide-react"
+import { Home, Settings, Users, ShoppingCart, BarChart, FileText, Mail, Bell, HelpCircle, CheckCircle2Icon, ChartAreaIcon, TruckIcon, ShoppingCartIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
@@ -46,14 +46,12 @@ export function Sidebar({className}:Props) {
       title: t('Purchase'),
       icon: <TruckIcon className="h-5 w-5" />,
       submenu: [
-        { title: "Overview", href: "/analytics" },
-        { title: "Reports", href: "/analytics/reports" },
-        { title: "Sales", href: "/analytics/sales" },
+        { title: t('Inventory'), href: "/purchase/inventory" },
       ],
     },
     {
       title: t('Sales'),
-      icon: <TruckIcon className="h-5 w-5" />,
+      icon: <ShoppingCartIcon className="h-5 w-5" />,
       submenu: [
         { title: "Reports", href: "/analytics/reports" },
         { title: "Sales", href: "/analytics/sales" },

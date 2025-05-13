@@ -20,6 +20,10 @@
   "Administrator":"Yönetici",
   "Role":"Rol",
   "you can not delete yourself":"Kendinizi silemezsiniz",
-  "Error": "Hata"
+  "Error": "Hata",
+  "Select Database":"Veritabanı Seç",
+  "Database changed":"Veritabanı Değişti",
+  "Reload Databases":"Veritabanlarını yeniden yükle",
+  "Inventory":"Envanter"
 
 }

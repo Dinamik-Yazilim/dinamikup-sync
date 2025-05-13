@@ -20,5 +20,9 @@
   "Administrator":"Administrator",
   "Role":"Role",
   "you can not delete yourself":"You can't delete yourself",
-  "Error":"Error"
+  "Error":"Error",
+  "Select Database":"Select Database",
+  "Database changed":"Database changed",
+  "Reload Databases":"Reload Databases",
+  "Inventory":"Inventory"
 }
