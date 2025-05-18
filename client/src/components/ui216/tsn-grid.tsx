@@ -1,7 +1,7 @@
 "use client"
 
 import { FC, ReactNode, useEffect, useState } from 'react'
-import { deleteItem, getItem, getList } from '@/lib/fetch'
+import { deleteItem, getItem, getList, postItem } from '@/lib/fetch'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Cookies from 'js-cookie'
 import { useToast } from '@/components/ui/use-toast'
@@ -14,10 +14,11 @@ import { EditIcon, FilterIcon, PlusSquareIcon, Trash2Icon } from 'lucide-react'
 import Pagination from '@/components/ui216/pagination'
 import { ButtonConfirm } from '@/components/button-confirm'
 import { FilterPanel } from './filter-panel'
+import { emitKeypressEvents } from 'readline'
 
 interface OptionProps {
   type?: 'List' | 'Update'
-  paging?: boolean
+  // paging?: boolean
   showSearch?: boolean
   showAddNew?: boolean
   showEdit?: boolean
@@ -28,6 +29,7 @@ interface Props {
   // headers?: ReactNode[]
   // cells?: GridCellType[]
   apiPath?: string,
+  query?: string,
   onHeaderPaint?: () => ReactNode
   onRowPaint?: (e: any, colIndex: number) => ReactNode
   onDelete?: (e: any) => void
@@ -36,15 +38,22 @@ interface Props {
   onFilterPanel?: (e: any, setFilter: (a: any) => void) => ReactNode
   defaultFilter?: any
   params?: any
-  icon?:React.ReactNode
+  icon?: React.ReactNode
 }
-export function ListGrid({
+export function TsnGrid({
   // headers = [],
-  apiPath = '',
+  apiPath = '/mikro/get',
+  query = '',
   onRowPaint,
   onHeaderPaint,
   onDelete,
-  options = {},
+  options = {
+    showSearch: true,
+    showAddNew: false,
+    showEdit: false,
+    showDelete: false,
+    type: 'List'
+  },
   title,
   onFilterPanel,
   defaultFilter = {},
@@ -58,45 +67,23 @@ export function ListGrid({
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const pathName = usePathname()
-  const [pagination, setPagination] = useState<PaginationType>({ pageCount: 0, page: 1, pageSize: 10, totalDocs: 0 })
   const [search, setSearch] = useState('')
   const { t } = useLanguage()
   const searchParams = useSearchParams()
-  options = Object.assign({
-    type: 'Update',
-    showSearch: true,
-    showAddNew: true,
-    showDelete: true,
-    showEdit: true,
-    paging: true,
-  }, options)
-  const load = (pageNo?: number, s?: string, f?: any) => {
-    let url = `${apiPath}${(apiPath || '').indexOf('?') > -1 ? '&' : '?'}`
-    if (options.paging == false) {
-      url += `pageSize=2000&page=1`
-    } else {
-      url += `pageSize=${pagination.pageSize}&page=${pageNo || pagination.page}`
-    }
-    if (s != undefined)
-      url += `&search=` + encodeURIComponent(s)
-    else if (search)
-      url += `&search=` + encodeURIComponent(search)
-    if (f) {
-      let valList = url.split('?')[1].split('&')
-      let yeniUrl = url.split('?')[0] + '?' + valList.filter(e => {
-        if (Object.keys(f).findIndex(key => key == e.split('=')[0]) < 0) {
 
-          return e
-        }
-      }).join('&')
-      yeniUrl += '&' + Object.keys(f).map(key => `${key}=${encodeURIComponent((f[key] || '').trim())}`).join('&')
-      url = yeniUrl
-    }
+  const load = (s?: string, f?: any) => {
     setLoading(true)
-    getList(url, token)
+    let q = query
+    q = q.replaceAll('{search}', s || '')
+    if (f) {
+      Object.keys(f).forEach(key => {
+        q = q.replaceAll(`{${key}}`, f[key])
+      })
+
+    }
+    postItem(apiPath, token, { query: q })
       .then(result => {
-        setList(result.docs as any[])
-        setPagination(result as PaginationType)
+        setList(result as any[])
       })
       .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
       .finally(() => setLoading(false))
@@ -106,7 +93,7 @@ export function ListGrid({
     let url = `${apiPath.split('?')[0]}/${id}`
     deleteItem(url, token)
       .then(result => {
-        load(1, search)
+        load(search)
       })
       .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
   }
@@ -115,7 +102,7 @@ export function ListGrid({
   const classBgEven = 'hover:bg-blue-500 hover:bg-opacity-10'
 
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
-  useEffect(() => { token && load(1, '', filter) }, [token])
+  useEffect(() => { token && load('', filter) }, [token])
 
 
 
@@ -124,7 +111,7 @@ export function ListGrid({
       <h1 className='text-2xl lg:text-3xl lg:ms-2 flex items-center gap-2'>
         {icon}
         {title}
-        </h1>
+      </h1>
       <div className='flex items-center gap-4'>
         {options.showSearch &&
           <div className="relative w-full">
@@ -136,9 +123,9 @@ export function ListGrid({
               defaultValue={search}
               onChange={e => {
                 setSearch(e.target.value)
-                e.target.value == "" && load(1, "")
+                e.target.value == "" && load("", filter)
               }}
-              onKeyDown={e => e.code == 'Enter' && load(1, search)}
+              onKeyDown={e => e.code == 'Enter' && load(search, filter)}
             />
           </div>
         }
@@ -149,7 +136,7 @@ export function ListGrid({
             </div>}>
             {onFilterPanel(filter, (e) => {
               setFilter(e)
-              token && load(1, search, e)
+              token && load(search, e)
             })}
           </FilterPanel>
         }
@@ -162,19 +149,18 @@ export function ListGrid({
         {onHeaderPaint &&
           <div className='w-full flex flex-row items-center border-b mb-1 p-1'>
             <div className='text-slate-500 w-full font-semibold text-sm'>{onHeaderPaint()}</div>
-            {options.type == 'Update' && (options.showAddNew || options.showEdit || options.showDelete) &&
-              <div className=" w-20 p-1">
-                <div className='w-full flex justify-end lg:justify-center'>
-                  {options.showAddNew &&
-                    <div
-                      onClick={() => router.push(`${pathName}/addnew?${searchParams.toString()}`)}
-                      className={`w-8 cursor-pointer px-2 py-2 rounded-md bg-green-800 text-white hover:bg-green-500 hover:text-white`}>
-                      <PlusSquareIcon size={'16px'} />
-                    </div>
-
-                  }
-                  {!options.showAddNew && <>#</>}
-                </div>
+            {options.type == 'Update' && (options.showEdit || options.showDelete || options.showAddNew) &&
+              <div className='w-20 p-1 flex justify-end lg:justify-center'>
+                {options.showAddNew &&
+                  <div
+                    onClick={() => router.push(`${pathName}/addnew?${searchParams.toString()}`)}
+                    className={`w-8 cursor-pointer px-2 py-2 rounded-md bg-green-800 text-white hover:bg-green-500 hover:text-white`}>
+                    <PlusSquareIcon size={'16px'} />
+                  </div>
+                }
+                {!options.showAddNew &&
+                  (options.showDelete || options.showEdit)
+                  && <>#</>}
               </div>
             }
           </div>
@@ -184,8 +170,8 @@ export function ListGrid({
             <div key={(e._id || 'grid' + index)} className={`w-full flex flex-row items-center rounded my-1 p-1 text-sm ${index % 2 == 1 ? classBgOdd : classBgEven}`}>
               {onRowPaint && onRowPaint(e, index)}
 
-              <div className="w-20">
-                <div className='w-full flex gap-2'>
+              {options.type == 'Update' && (options.showEdit || options.showDelete) &&
+                <div className='w-20 flex flex-row items-end justify-end mx-2 gap-2'>
                   {options.type == 'Update' && options.showEdit && e._id && <>
                     <div
                       onClick={() => router.push(`${pathName}/${e._id}?${searchParams.toString()}`)}
@@ -213,18 +199,11 @@ export function ListGrid({
                     </ButtonConfirm>
                   }
                 </div>
-              </div>
+              }
             </div>
           ))}
         </div>
-        {options.paging &&
-          <div className='w-full'>
-            <Pagination pagination={pagination} onPageClick={(pageNo: number) => {
-              setPagination({ ...pagination, page: pageNo })
-              load(pageNo, '', filter)
-            }} />
-          </div>
-        }
+
       </div>
     </>}
     {loading && <div className='flex w-full h-full justify-center items-center'>
@@ -232,3 +211,5 @@ export function ListGrid({
     </div>}
   </div>)
 }
+
+

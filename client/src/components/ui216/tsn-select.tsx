@@ -16,10 +16,11 @@ export interface TsnSelectProps extends SelectPrimitive.SelectProps {
   list?: TsnListType[]
   onValueChange?: (e: string, text?: string) => void
   className?: string
+  itemClassName?: string
   autoFocus?: boolean
 
 }
-export function TsnSelect({ all, list, title, onValueChange, autoFocus, ...props }: TsnSelectProps) {
+export function TsnSelect({ all, list, title, onValueChange, autoFocus, itemClassName, ...props }: TsnSelectProps) {
   useEffect(() => {
     if (props.defaultValue && list) {
       const findex = list.findIndex(e => e._id == props.defaultValue)
@@ -55,7 +56,7 @@ export function TsnSelect({ all, list, title, onValueChange, autoFocus, ...props
           </SelectGroup>
         }
         <SelectGroup>
-          {list && list.map((e, index) => (e._id && <SelectItem key={e._id} value={e._id}>{e.text || e.name}</SelectItem>))}
+          {list && list.map((e, index) => (e._id && <SelectItem key={e._id} value={e._id} className={`${itemClassName}`}>{e.text || e.name}</SelectItem>))}
         </SelectGroup>
       </SelectContent>
     </Select>

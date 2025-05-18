@@ -24,6 +24,26 @@
   "Select Database":"Veritabanı Seç",
   "Database changed":"Veritabanı Değişti",
   "Reload Databases":"Veritabanlarını yeniden yükle",
-  "Inventory":"Envanter"
-
+  "Inventory":"Envanter",
+  "P.C. Price":"SA.Şart Fiyat",
+  "Last Purchase":"Son Alış",
+  "Sales Price": "Satış Fiyatı",
+  "Quantity": "Miktar",
+  "Brand": "Marka",
+  "Category": "Kategori",
+  "Rayon": "Reyon",
+  "Main Group": "Ana Grup",
+  "Sub Group": "Alt Grup",
+  "Code": "Kod",
+  "Purchase Orders": "Satın Alma Siparişleri",
+  "Date": "Tarih",
+  "Firm": "Firma",
+  "VAT": "KDV",
+  "Discounts":"İndirimler",
+  "Amount":"Tutar",
+  "Order No":"Sipariş No",
+  "Net Total": "Net Toplam",
+  "Start Date": "Başlangıç Tarihi",
+  "End Date": "Bitiş Tarihi",
+  "Warehouse": "Depo"
 }

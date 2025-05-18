@@ -50,11 +50,47 @@ export function currSymbol(currency?: string) {
 }
 
 export function yesterday() {
-  return new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().substring(0, 10)
+  var t=new Date(new Date().setDate(new Date().getDate() - 1))
+  t.setMinutes(t.getTimezoneOffset()*-1)
+  return t.toISOString().substring(0, 10)
 }
 
 export function today() {
-  return new Date().toISOString().substring(0, 10)
+  var t=new Date()
+  t.setMinutes(t.getTimezoneOffset()*-1)
+  return t.toISOString().substring(0, 10)
 }
 
+export function startOfMonth() {
+  var t=new Date(new Date().getFullYear(),new Date().getMonth(),1)
+  t.setMinutes(t.getTimezoneOffset() * -1)
+  return t.toISOString().substring(0, 10)
+}
 
+export function startOfWeek() {
+  var t=new Date()
+  var w=new Date(t.setDate(t.getDate()-t.getDay()))
+  w.setMinutes(w.getTimezoneOffset()*-1)
+  return w.toISOString().substring(0, 10)
+}
+
+export function startOfLastMonth() {
+  var t=new Date()
+  var w=new Date(t.getFullYear(),t.getMonth()-1,1)
+  w.setMinutes(w.getTimezoneOffset()*-1)
+  return w.toISOString().substring(0, 10)
+}
+
+export function endOfLastMonth() {
+  var t=new Date()
+  var w=new Date(t.getFullYear(),t.getMonth(),0)
+  w.setMinutes(w.getTimezoneOffset()*-1)
+  return w.toISOString().substring(0, 10)
+}
+
+export function startOfThreeMonthsAgo() {
+  var t=new Date()
+  var w=new Date(t.getFullYear(),t.getMonth()-3,1)
+  w.setMinutes(w.getTimezoneOffset()*-1)
+  return w.toISOString().substring(0, 10)
+}

@@ -47,6 +47,7 @@ export function Sidebar({className}:Props) {
       icon: <TruckIcon className="h-5 w-5" />,
       submenu: [
         { title: t('Inventory'), href: "/purchase/inventory" },
+        { title: t('Purchase Orders'), href: "/purchase/orders" },
       ],
     },
     {
