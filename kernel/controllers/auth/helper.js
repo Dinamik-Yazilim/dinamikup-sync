@@ -10,6 +10,7 @@ exports.saveSession = async function (organizationDoc, memberDoc, req, loginProv
 			.sort({ _id: -1 })
 			.limit(1)
 
+
 		await db.sessions.updateMany(
 			{ member: memberDoc._id, deviceId: deviceId, closed: false },
 			{ $set: { closed: true } },
@@ -22,11 +23,8 @@ exports.saveSession = async function (organizationDoc, memberDoc, req, loginProv
 
 	return new Promise(async (resolve, reject) => {
 		try {
-			let oldDbId = null
-			const dbList = await db.databases.find({
-				$or: [{ owner: memberDoc._id }, { 'team.teamMember': memberDoc._id }],
-				passive: false
-			}).select('_id name')
+			let oldDbId = ''
+
 			if (oldSessions.length > 0) {
 				if (!lang) lang = oldSessions[0].lang
 				oldDbId = oldSessions[0].db

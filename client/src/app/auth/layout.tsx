@@ -15,7 +15,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
   return (<div className="container relative  h-[92vh] flex-col justify-center px-6 pb-4 11m-0">
     <div className='w-full flex justify-between'>
       <Link href={'/auth/login'}>
-        <HeaderLogo2 className="h-16 w-30" />
+        <HeaderLogo2 className=" w-40" />
       </Link>
       <div className='flex items-center gap-2 max-h-12'>
         <SelectLang />

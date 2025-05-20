@@ -15,7 +15,8 @@ import { TsnSelect } from "@/components/ui216/tsn-select"
 import { moneyFormat, today } from "@/lib/utils"
 import { TsnSelectRemote } from "@/components/ui216/tsn-select-remote"
 import { TsnGrid } from "@/components/ui216/tsn-grid"
-import { OrderDetail, orderDetailQuery, OrderHeader, orderHeaderQuery } from "@/types/Order"
+import { OrderDetail, orderDetailQuery, OrderHeader, orderHeaderQuery, paymentPlanQuery, responsibilityQuery } from "@/types/Order"
+import { Label } from "@/components/ui/label"
 
 interface Props {
   params: { id: string }
@@ -47,6 +48,7 @@ export default function UserEditPage({ params }: Props) {
     //qwerty
   }
 
+  const OrderCurrency=()=><span className='text-xs text-muted-foreground'>{orderHeader.currency}</span>
 
   const FormHeader = () => {
     return (<TsnPanel name="porder_Header" defaultOpen={true} className="mt-4" trigger={t('Header')} contentClassName="grid grid-cols-1 lg:grid-cols-2 gap-2 w-full">
@@ -72,20 +74,15 @@ export default function UserEditPage({ params }: Props) {
       <div className="flex items-end gap-2">
         <TsnSelectRemote title={t('Payment Plan')} value={orderHeader.paymentPlan} onValueChange={e => setOrderHeader({ ...orderHeader, paymentPlan: e })}
           itemClassName="capitalize"
-          query={`SELECT _id, [name] FROM (
-          SELECT '0' as _id, 'Peşin' as [name]
-          union all
-          SELECT CAST(odp_no as VARCHAR(10)) as _id, LOWER(LTRIM(RTRIM(odp_kodu + ' ' + odp_adi))) as [name]  FROM ODEME_PLANLARI 
-          ) X
-          `} />
+          query={paymentPlanQuery()} />
 
         <TsnSelectRemote title={t('Responsibility')} value={orderHeader.responsibility} onValueChange={e => setOrderHeader({ ...orderHeader, responsibility: e })}
           itemClassName="capitalize" empty
-          query={`SELECT som_kod as _id, LOWER(som_isim) as [name] FROM SORUMLULUK_MERKEZLERI ORDER BY som_isim`} />
+          query={responsibilityQuery()} />
 
         <TsnSelectRemote title={t('Project')} value={orderHeader.project} onValueChange={e => setOrderHeader({ ...orderHeader, project: e })}
           itemClassName="capitalize" empty
-          query={`SELECT pro_kodu as _id, LOWER(pro_adi) as [name] FROM PROJELER ORDER BY pro_adi`} />
+          query={responsibilityQuery()} />
       </div>
     </TsnPanel>)
   }
@@ -104,7 +101,7 @@ export default function UserEditPage({ params }: Props) {
             <div className="text-end">{t('Quantity')}</div>
             <div className="text-end">{t('Price')}</div>
             <div className="text-end">{t('Amount')}</div>
-            <div className="text-end">{t('Discounts')}</div>
+            <div className="text-center">{t('Discounts')}</div>
             <div className="text-end">{t('VAT')}</div>
             <div className="text-end">{t('Net Total')}</div>
           </div>
@@ -129,15 +126,13 @@ export default function UserEditPage({ params }: Props) {
               <div className='flex items-center gap-[3px]'>{moneyFormat(e.amount)} <span className='text-xs text-muted-foreground'>{orderHeader.currency}</span></div>
 
             </div>
-            <div className='flex flex-col items-center text-[10px] rounded border border-dashed p-[2px] bg-blue-500 bg-opacity-15'>
-              <div className='grid grid-cols-3 text-xs text-muted-foreground'>
-                {e.discountRate1! > 0 && <span>%{e.discountRate1} </span>}
-                {e.discountRate2! > 0 && <span>%{e.discountRate2} </span>}
-                {e.discountRate3! > 0 && <span>%{e.discountRate3} </span>}
-                {e.discountRate4! > 0 && <span>%{e.discountRate4} </span>}
-                {e.discountRate5! > 0 && <span>%{e.discountRate5} </span>}
-                {e.discountRate6! > 0 && <span>%{e.discountRate6} </span>}
-              </div>
+            <div className='grid grid-cols-3 text-end justify-end px-2 text-xs text-muted-foreground'>
+              {e.discountRate1! > 0 && <div>%{e.discountRate1} </div>}
+              {e.discountRate2! > 0 && <div>%{e.discountRate2} </div>}
+              {e.discountRate3! > 0 && <div>%{e.discountRate3} </div>}
+              {e.discountRate4! > 0 && <div>%{e.discountRate4} </div>}
+              {e.discountRate5! > 0 && <div>%{e.discountRate5} </div>}
+              {e.discountRate6! > 0 && <div>%{e.discountRate6} </div>}
             </div>
             <div className='flex items-center justify-end gap-[3px]'>
               {moneyFormat(e.vatAmount)}<span className='text-xs text-muted-foreground ms-1'>{orderHeader.currency}</span>
@@ -150,8 +145,29 @@ export default function UserEditPage({ params }: Props) {
   }
 
   const FormFooter = () => {
-    return (<TsnPanel name="porder_Footer" defaultOpen={true} className="mt-4" trigger={t('Totals')} contentClassName="grid grid-cols-1gap-2 w-full">
-      Totals
+    return (<TsnPanel name="porder_Footer" defaultOpen={true} className="mt-4" trigger={t('Totals')} contentClassName="grid grid-cols-1 lg:grid-cols-4 gap-2 w-full">
+      <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-2">
+          <div>{t('Line Total')}</div>
+          <div className="text-end">{moneyFormat(orderHeader.amount)} <OrderCurrency /></div>
+        </div>
+        <div className="grid grid-cols-2">
+          <div>{t('Discount Total')}</div>
+          <div className="text-end">{moneyFormat(orderHeader.discountAmount1!+orderHeader.discountAmount2!+orderHeader.discountAmount3!+orderHeader.discountAmount4!+orderHeader.discountAmount5!+orderHeader.discountAmount6!)} <OrderCurrency /></div>
+        </div>
+        <div className="grid grid-cols-2">
+          <div>{t('Gross Total')}</div>
+          <div className="text-end">{moneyFormat(orderHeader.grossTotal)} <OrderCurrency /></div>
+        </div>
+        <div className="grid grid-cols-2">
+          <div>{t('VAT')}</div>
+          <div className="text-end">{moneyFormat(orderHeader.vatAmount)} <OrderCurrency /></div>
+        </div>
+        <div className="grid grid-cols-2">
+          <div>{t('Net Total')}</div>
+          <div className="text-end">{moneyFormat(orderHeader.netTotal)} <OrderCurrency /></div>
+        </div>
+      </div>
     </TsnPanel>)
   }
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])

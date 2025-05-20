@@ -15,6 +15,7 @@ import Pagination from '@/components/ui216/pagination'
 import { ButtonConfirm } from '@/components/button-confirm'
 import { FilterPanel } from './filter-panel'
 import { emitKeypressEvents } from 'readline'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface OptionProps {
   type?: 'List' | 'Update'
@@ -72,7 +73,7 @@ export function TsnGrid({
   const searchParams = useSearchParams()
 
   const load = (s?: string, f?: any) => {
-    if(!query) return
+    if (!query) return
     setLoading(true)
     let q = query
     q = q.replaceAll('{search}', s || '')
@@ -107,7 +108,7 @@ export function TsnGrid({
 
 
 
-  return (<div className='flex flex-col gap-0'>
+  return (<div className='flex flex-col h-full gap-0'>
     <div className='w-full flex flex-col lg:flex-row lg:justify-between lg:items-center mb-2'>
       <h1 className='text-2xl lg:text-3xl lg:ms-2 flex items-center gap-2'>
         {icon}
@@ -145,27 +146,28 @@ export function TsnGrid({
     </div>
 
     <hr />
-    {!loading && <>
-      <div className='w-full text-[70%] md:text-base lg:text-[110%]'>
-        {onHeaderPaint &&
-          <div className='w-full flex flex-row items-center border-b mb-1 p-1'>
-            <div className='text-slate-500 w-full font-semibold text-sm'>{onHeaderPaint()}</div>
-            {options.type == 'Update' && (options.showEdit || options.showDelete || options.showAddNew) &&
-              <div className='w-20 p-1 flex justify-end lg:justify-center'>
-                {options.showAddNew &&
-                  <div
-                    onClick={() => router.push(`${pathName}/addnew?${searchParams.toString()}`)}
-                    className={`w-8 cursor-pointer px-2 py-2 rounded-md bg-green-800 text-white hover:bg-green-500 hover:text-white`}>
-                    <PlusSquareIcon size={'16px'} />
-                  </div>
-                }
-                {!options.showAddNew &&
-                  (options.showDelete || options.showEdit)
-                  && <>#</>}
-              </div>
-            }
-          </div>
-        }
+
+    <div className='w-full text-[70%] md:text-base lg:text-[110%]'>
+      {onHeaderPaint &&
+        <div className='w-full flex flex-row items-center border-b mb-1 p-1'>
+          <div className='text-slate-500 w-full font-semibold text-sm'>{onHeaderPaint()}</div>
+          {options.type == 'Update' && (options.showEdit || options.showDelete || options.showAddNew) &&
+            <div className='w-20 p-1 flex justify-end lg:justify-center'>
+              {options.showAddNew &&
+                <div
+                  onClick={() => router.push(`${pathName}/addnew?${searchParams.toString()}`)}
+                  className={`w-8 cursor-pointer px-2 py-2 rounded-md bg-green-800 text-white hover:bg-green-500 hover:text-white`}>
+                  <PlusSquareIcon size={'16px'} />
+                </div>
+              }
+              {!options.showAddNew &&
+                (options.showDelete || options.showEdit)
+                && <>#</>}
+            </div>
+          }
+        </div>
+      }
+      {!loading &&
         <div >
           {list && list.map((e, index) => (
             <div key={(e._id || 'grid' + index)} className={`w-full flex flex-row items-center rounded my-1 p-1 text-sm ${index % 2 == 1 ? classBgOdd : classBgEven}`}>
@@ -204,12 +206,22 @@ export function TsnGrid({
             </div>
           ))}
         </div>
+      }
+      {loading && Array.from(Array(8).keys()).map(e => (
+          <div key={e} className='flex mb-4 h-10'>
+            <div className='grid grid-cols-6 w-full h-full gap-2'>
+              <Skeleton className="col-span-1 h11-5 bg-amber-600" />
+              <Skeleton className="col-span-2 h11-5" />
+              <Skeleton className="col-span-1 h11-5 bg-blue-600" />
+              <Skeleton className="col-span-1 h11-5 bg-green-600" />
+              <Skeleton className="col-span-1 h11-5 bg-slate-600" />
+            </div>
 
-      </div>
-    </>}
-    {loading && <div className='flex w-full h-full justify-center items-center'>
-      <Loading />
-    </div>}
+          </div>
+        ))}
+    </div>
+
+    
   </div>)
 }
 
