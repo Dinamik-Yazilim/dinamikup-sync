@@ -15,9 +15,9 @@ export function StandartForm({
   onCancelClick, onSaveClick, loading, id, children, title, icon
 }: Props) {
 
-  return (<div className='flex flex-col gap-4 h-full'>
+  return (<div className='flex flex-col h-full'>
     {!loading &&
-      <div className='flex flex-col gap-4 '>
+      <div className='flex flex-col '>
         <div className='flex justify-between border-b'>
           <h2 className='flex items-center gap-4 border-none text-base lg:text-2xl'>
             {!icon && <>
@@ -40,7 +40,7 @@ export function StandartForm({
     }
     {
       loading &&
-      <div className='flex w-full h-full justify-center items-center'>
+      <div className='flex w-full h-full justify-center  items-center'>
         <Loading />
       </div>
     }

@@ -72,6 +72,7 @@ export function TsnGrid({
   const searchParams = useSearchParams()
 
   const load = (s?: string, f?: any) => {
+    if(!query) return
     setLoading(true)
     let q = query
     q = q.replaceAll('{search}', s || '')

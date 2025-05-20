@@ -45,5 +45,26 @@
   "Net Total": "Net Toplam",
   "Start Date": "Başlangıç Tarihi",
   "End Date": "Bitiş Tarihi",
-  "Warehouse": "Depo"
+  "Warehouse": "Depo",
+  "Line Count": "Satır Sayısı",
+  "Closed?":"Kapalı?",
+  "Closed":"Kapalı",
+  "Open":"Açık",
+  "New Order":"Yeni Sipariş",
+  "Edit Order":"Sipariş Düzelt",
+  "Document Serial":"Evrak Seri",
+  "Document Sequence":"Evrak Sıra",
+  "search...": "ara...",
+  "Document Number": "Belge Numarasi",
+  "Document Date": "Belge Tarihi",
+  "Header": "Başlık",
+  "Payment Plan": "Ödeme Planı",
+  "CASH": "Peşin",
+  "Responsibility": "Sorumluluk",
+  "Project": "Proje",
+  "Lines": "Satırlar",
+  "Totals": "Toplamlar",
+  "Price": "Fiyat",
+  "Line Total": "Satır Toplam"
+
 }

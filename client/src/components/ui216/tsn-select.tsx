@@ -18,9 +18,12 @@ export interface TsnSelectProps extends SelectPrimitive.SelectProps {
   className?: string
   itemClassName?: string
   autoFocus?: boolean
-
+empty?:boolean
 }
-export function TsnSelect({ all, list, title, onValueChange, autoFocus, itemClassName, ...props }: TsnSelectProps) {
+export function TsnSelect({ all, empty, list, title, onValueChange, autoFocus, itemClassName, ...props }: TsnSelectProps) {
+  if(empty){
+    list=[{_id:' ', name:'---'}].concat(list)
+  }
   useEffect(() => {
     if (props.defaultValue && list) {
       const findex = list.findIndex(e => e._id == props.defaultValue)
@@ -45,11 +48,11 @@ export function TsnSelect({ all, list, title, onValueChange, autoFocus, itemClas
       }}
       {...props}
     >
-      <SelectTrigger className="w-full" autoFocus={autoFocus} suppressHydrationWarning>
+      <SelectTrigger className={`w-full ${itemClassName}`} autoFocus={autoFocus} suppressHydrationWarning>
         {!all && <SelectValue placeholder="---" />}
         {all && <SelectValue placeholder="*" />}
       </SelectTrigger>
-      <SelectContent className='w-fu11ll min-w1-22'>
+      <SelectContent className=''>
         {all &&
           <SelectGroup>
             <SelectItem value=" ">*</SelectItem>

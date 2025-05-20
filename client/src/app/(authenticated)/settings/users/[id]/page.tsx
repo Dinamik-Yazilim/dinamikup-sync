@@ -56,6 +56,7 @@ export default function UserEditPage({ params }: Props) {
     title={params.id == 'addnew' ? t('New User') : t('Edit User')}
     onSaveClick={save}
     onCancelClick={()=>router.back()}
+    loading={loading}
   >
     <TsnInput title={t('Username')} defaultValue={member?.username} onBlur={e => setMember({ ...member, username: e.target.value })} />
     <TsnInput title={t('Name')} defaultValue={member?.name} onBlur={e => setMember({ ...member, name: e.target.value })} />
