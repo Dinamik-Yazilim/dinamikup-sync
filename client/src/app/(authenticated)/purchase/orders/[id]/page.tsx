@@ -92,7 +92,7 @@ export default function UserEditPage({ params }: Props) {
       <TsnGrid
         apiPath="/mikro/get"
         query={params.id != 'addnew' ? orderDetailQuery(params.id) : ''}
-        options={{ showSearch: false }}
+        options={{ showSearch: false, showAddNew:true, showEdit:true, showDelete:true }}
         onHeaderPaint={() => <div className="flex  w-full gap-2">
           <div className="text-xs text-nowrap mt-2 text-muted-foreground">#</div>
           <div className="grid grid-cols-8 gap-1 w-full">

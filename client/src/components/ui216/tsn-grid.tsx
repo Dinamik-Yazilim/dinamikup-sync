@@ -33,13 +33,16 @@ interface Props {
   query?: string,
   onHeaderPaint?: () => ReactNode
   onRowPaint?: (e: any, colIndex: number) => ReactNode
-  onDelete?: (e: any) => void
   options?: OptionProps
   title?: any
   onFilterPanel?: (e: any, setFilter: (a: any) => void) => ReactNode
   defaultFilter?: any
   params?: any
   icon?: React.ReactNode
+  onAddNew?: () => void
+  onDelete?: (e: any) => void
+
+  onEdit?: (e: any, rowIndex: number) => void
 }
 export function TsnGrid({
   // headers = [],
@@ -59,7 +62,9 @@ export function TsnGrid({
   onFilterPanel,
   defaultFilter = {},
   params,
-  icon
+  icon,
+  onAddNew,
+  onEdit
 }: Props) {
   const [list, setList] = useState<any[]>([])
   const [filter, setFilter] = useState<any>(defaultFilter)
@@ -155,7 +160,13 @@ export function TsnGrid({
             <div className='w-20 p-1 flex justify-end lg:justify-center'>
               {options.showAddNew &&
                 <div
-                  onClick={() => router.push(`${pathName}/addnew?${searchParams.toString()}`)}
+                  onClick={() => {
+                    if(onAddNew){
+                      onAddNew()
+                    }else{
+                      router.push(`${pathName}/addnew?${searchParams.toString()}}`)
+                    }
+                  }}
                   className={`w-8 cursor-pointer px-2 py-2 rounded-md bg-green-800 text-white hover:bg-green-500 hover:text-white`}>
                   <PlusSquareIcon size={'16px'} />
                 </div>
@@ -208,20 +219,20 @@ export function TsnGrid({
         </div>
       }
       {loading && Array.from(Array(8).keys()).map(e => (
-          <div key={e} className='flex mb-4 h-10'>
-            <div className='grid grid-cols-6 w-full h-full gap-2'>
-              <Skeleton className="col-span-1 h11-5 bg-amber-600" />
-              <Skeleton className="col-span-2 h11-5" />
-              <Skeleton className="col-span-1 h11-5 bg-blue-600" />
-              <Skeleton className="col-span-1 h11-5 bg-green-600" />
-              <Skeleton className="col-span-1 h11-5 bg-slate-600" />
-            </div>
-
+        <div key={e} className='flex mb-4 h-10'>
+          <div className='grid grid-cols-6 w-full h-full gap-2'>
+            <Skeleton className="col-span-1 h11-5 bg-amber-600" />
+            <Skeleton className="col-span-2 h11-5" />
+            <Skeleton className="col-span-1 h11-5 bg-blue-600" />
+            <Skeleton className="col-span-1 h11-5 bg-green-600" />
+            <Skeleton className="col-span-1 h11-5 bg-slate-600" />
           </div>
-        ))}
+
+        </div>
+      ))}
     </div>
 
-    
+
   </div>)
 }
 
