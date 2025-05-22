@@ -1,7 +1,5 @@
 "use client"
 
-import { ButtonConfirm } from '@/components/button-confirm'
-// import * as React from "react"
 
 import { Button } from "@/components/ui/button"
 import { useLanguage } from '@/i18n'

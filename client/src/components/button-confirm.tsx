@@ -16,7 +16,7 @@ import { CheckIcon, XIcon } from 'lucide-react'
 
 interface Props {
   className?: string
-  text?: string
+  title?: string
   description?: any
   children?: any
   onOk?: () => void
@@ -25,7 +25,7 @@ interface Props {
 
 export function ButtonConfirm({
   className = "",
-  text = "?",
+  title = "?",
   description = undefined,
   children = undefined,
   onOk = undefined,
@@ -38,7 +38,7 @@ export function ButtonConfirm({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{text}</AlertDialogTitle>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
           {description && <AlertDialogDescription>
             {description}
           </AlertDialogDescription>}

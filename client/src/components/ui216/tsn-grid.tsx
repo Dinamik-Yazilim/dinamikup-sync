@@ -32,7 +32,7 @@ interface Props {
   apiPath?: string,
   query?: string,
   onHeaderPaint?: () => ReactNode
-  onRowPaint?: (e: any, colIndex: number) => ReactNode
+  onRowPaint?: (e: any, rowIndex: number) => ReactNode
   options?: OptionProps
   title?: any
   onFilterPanel?: (e: any, setFilter: (a: any) => void) => ReactNode
@@ -40,9 +40,10 @@ interface Props {
   params?: any
   icon?: React.ReactNode
   onAddNew?: () => void
-  onDelete?: (e: any) => void
+  onDelete?: (e: any, rowIndex:number) => void
 
   onEdit?: (e: any, rowIndex: number) => void
+  onLoadingChange?:(e:boolean)=>void
 }
 export function TsnGrid({
   // headers = [],
@@ -64,7 +65,9 @@ export function TsnGrid({
   params,
   icon,
   onAddNew,
-  onEdit
+  onEdit,
+  onLoadingChange,
+  
 }: Props) {
   const [list, setList] = useState<any[]>([])
   const [filter, setFilter] = useState<any>(defaultFilter)
@@ -110,6 +113,7 @@ export function TsnGrid({
 
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
   useEffect(() => { token && load('', filter) }, [token])
+  useEffect(() => { onLoadingChange && onLoadingChange(loading) }, [loading])
 
 
 
@@ -159,17 +163,13 @@ export function TsnGrid({
           {options.type == 'Update' && (options.showEdit || options.showDelete || options.showAddNew) &&
             <div className='w-20 p-1 flex justify-end lg:justify-center'>
               {options.showAddNew &&
-                <div
-                  onClick={() => {
-                    if(onAddNew){
-                      onAddNew()
-                    }else{
-                      router.push(`${pathName}/addnew?${searchParams.toString()}}`)
-                    }
-                  }}
-                  className={`w-8 cursor-pointer px-2 py-2 rounded-md bg-green-800 text-white hover:bg-green-500 hover:text-white`}>
-                  <PlusSquareIcon size={'16px'} />
-                </div>
+                <TsnGridButtonAddNew onClick={() => {
+                  if (onAddNew)
+                    onAddNew()
+                  else
+                    router.push(`${pathName}/addnew?${searchParams.toString()}}`)
+                }} />
+
               }
               {!options.showAddNew &&
                 (options.showDelete || options.showEdit)
@@ -187,30 +187,34 @@ export function TsnGrid({
               {options.type == 'Update' && (options.showEdit || options.showDelete) &&
                 <div className='w-20 flex flex-row items-end justify-end mx-2 gap-2'>
                   {options.type == 'Update' && options.showEdit && e._id && <>
-                    <div
+                    <TsnGridButtonEdit
+                      onClick={() => {
+                        if (onEdit)
+                          onEdit(e, index)
+                        else
+                          router.push(`${pathName}/${e._id}?${searchParams.toString()}`)
+                      }}
+                    />
+                    {/* <div
                       onClick={() => router.push(`${pathName}/${e._id}?${searchParams.toString()}`)}
                       className={`cursor-pointer px-2 py-2 rounded-md bg-blue-800 text-white hover:bg-blue-500 hover:text-white`}>
                       <EditIcon size={'16px'} />
-                    </div>
+                    </div> */}
                   </>}
 
                   {options.type == 'Update' && options.showDelete && e._id &&
-                    <ButtonConfirm
+                    <TsnGridButtonDelete
+                      t={t}
+                      title={t('Do you want to delete the record?')}
+                      description={e.name || e.itemName || e.itemCode || e.code || e.description || e.documentNumber || e.issueDate || e._id}
                       onOk={() => {
                         if (onDelete) {
-                          onDelete(e)
+                          onDelete(e, index)
                         } else if (e._id) {
                           deleteRecord(e._id)
                         }
                       }}
-                      text={t('Do you want to delete the record?')}
-                      description={<span className='text-lg'>{e.name || e.description || e.documentNumber || e.issueDate || e._id}</span>}
-
-                    >
-                      <div className='px-2 py-2 rounded-md bg-red-800 text-white hover:bg-red-500 hover:text-white'>
-                        <Trash2Icon size={'16px'} />
-                      </div>
-                    </ButtonConfirm>
+                    />
                   }
                 </div>
               }
@@ -237,3 +241,40 @@ export function TsnGrid({
 }
 
 
+interface TsnGridButtonProps {
+  onClick?: () => void
+}
+export function TsnGridButtonAddNew({ onClick }: TsnGridButtonProps) {
+  return (<div onClick={() => onClick && onClick()}
+    className={`w-8 cursor-pointer px-2 py-2 rounded-md bg-green-800 text-white hover:bg-green-500 hover:text-white`}>
+    <PlusSquareIcon size={'16px'} />
+  </div>)
+}
+
+export function TsnGridButtonEdit({ onClick }: TsnGridButtonProps) {
+  return (<div onClick={() => onClick && onClick()}
+    className={`cursor-pointer px-2 py-2 rounded-md bg-blue-800 text-white hover:bg-blue-500 hover:text-white`}>
+    <EditIcon size={'16px'} />
+  </div>)
+}
+
+interface TsnGridButtonDeleteProps {
+  onOk?: () => void
+  onCancel?: () => void
+  t: (text: string) => string
+  description?: string
+  title?: string
+}
+export function TsnGridButtonDelete({ onOk, onCancel, t, title, description }: TsnGridButtonDeleteProps) {
+
+  return (<ButtonConfirm
+    onOk={() => onOk && onOk()}
+    onCancel={() => onCancel && onCancel()}
+    title={t(title || '')}
+    description={<span className='text-lg'>{t(description || '')}</span>}
+  >
+    <div className='px-2 py-2 rounded-md bg-red-800 text-white hover:bg-red-500 hover:text-white'>
+      <Trash2Icon size={'16px'} />
+    </div>
+  </ButtonConfirm>)
+}

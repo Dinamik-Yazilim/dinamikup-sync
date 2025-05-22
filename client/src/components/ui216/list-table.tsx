@@ -209,7 +209,7 @@ export function ListTable({
                           deleteRecord(e._id)
                         }
                       }}
-                      text={t('Do you want to delete the record?')}
+                      title={t('Do you want to delete the record?')}
                       description={<span className='text-lg'>{e.name || e.description || e.documentNumber || e.issueDate || e._id}</span>}
 
                     >

@@ -47,7 +47,7 @@ export default function VerifyPage() {
   return (
     <div className="relative h-full flex flex-col justify-center items-center gap-4">
       <div className="flex justify-center">
-        <HeaderLogo2 />
+        <HeaderLogo2 className='w-40'/>
       </div>
       <div className="flex flex-col justify-between gap-4 w-full h-full  mb-6 text-2xl max-w-[350px] max-h-[240px] rounded-lg border border-dashed border-opacity-50 border-slate-400 p-4">
         <div className="flex flex-col gap-2 items-center">

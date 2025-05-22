@@ -68,7 +68,13 @@ export function postItem(path: string, token?: string, item?: any) {
         } else {
           reject(result.error)
         }
-      }).catch(err => reject(err.message || err || 'error'))
+      }).catch(err => {
+        if(err=='aborted' || (err.message && err.message=='aborted')){
+          resolve(undefined)
+        }else{
+          reject(err.message || err || 'error')
+        }
+      })
   })
 }
 export function deleteItem(path: string, token?: string) {
