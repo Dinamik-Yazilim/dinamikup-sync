@@ -32,6 +32,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { TsnLineGrid } from "@/components/ui216/tsn-line-grid"
+import { OrderLineDialog } from "./order-line-dialog"
 
 interface Props {
   params: { id: string }
@@ -165,13 +166,8 @@ export default function UserEditPage({ params }: Props) {
 
             </div>
             <div className='w-20 flex flex-row items-end justify-end mx-2 gap-2'>
-              {/* <OrderLineDialog trigger={()=><div>Edit</div>} line={e} lineIndex={rowIndex} onOk={(e)=>alert('ok')} onCancel={()=>alert('cancel')} /> */}
-              {/* {OrderLineDialog({
-                t: t,
-                trigger: <div className="cursor-pointer bg-indigo-600 px-[5px] py-[4px] rounded-md" ><EditIcon width={'20px'} /></div>,
-                title: t('Edit Line'), orderLine: e, rowIndex: rowIndex
-              })} */}
-              {OrderLineDialog(rowIndex)}
+              
+              <OrderLineDialog t={t}  orderDetails={orderDetails} setOrderDetails={setOrderDetails} rowIndex={rowIndex} />
               <TsnGridButtonDelete t={t} title={'delete line?'} />
             </div>
           </div>
@@ -209,64 +205,6 @@ export default function UserEditPage({ params }: Props) {
     </TsnPanel>)
   }
 
-  const OrderLineDialog = (rowIndex: number) => {
-    const line = rowIndex >= 0 ? orderDetails[rowIndex] : {}
-    return (
-      <Sheet>
-        <SheetTrigger asChild>
-          <div className="cursor-pointer bg-indigo-600 px-[5px] py-[4px] rounded-md" ><EditIcon width={'20px'} /></div>
-
-        </SheetTrigger>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>
-              {rowIndex >= 0 && <>Satir Duzelt</>}
-              {rowIndex < 0 && <>Yeni Satir</>}
-            </SheetTitle>
-            <SheetDescription>Açıklama alanı</SheetDescription>
-          </SheetHeader>
-          <div className="flex flex-col">
-            <div>itemCode:{line?.itemCode}</div>
-            <div>itemName:{line?.itemName}</div>
-            <TsnInput type={'number'} title={t('Quantity')} defaultValue={line?.quantity} onBlur={e => {
-              const q = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
-              setOrderDetails(orderDetails.map((e, index) => {
-                if (rowIndex == index) {
-                  e.quantity = q
-                }
-                return e
-              }))
-              // setLine({ ...line, quantity: !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0 })
-              // calcAmount(Number(e.target.value), line.price)
-            }} />
-            <TsnInput type={'number'} title={t('Price')} defaultValue={line?.price} onBlur={e => {
-              const p = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
-              setOrderDetails(orderDetails.map((e, index) => {
-                if (rowIndex == index) {
-                  e.price = p
-                }
-                return e
-              }))
-
-              // setLine({ ...line, price: !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0 })
-              // calcAmount(line.quantity, Number(e.target.value))
-            }} />
-
-            <div>{line?.amount}</div>
-            <div>Kdv%{line?.vatRate}</div>
-          </div>
-          <SheetFooter>
-            {/* <AlertDialogAction className='bg-blue-600 text-white hover:bg-blue-800 hover:text-white' onClick={() => onOk && onOk()}><CheckIcon /></AlertDialogAction>
-          <AlertDialogCancel className='bg-gray-600 text-white hover:bg-gray-800 hover:text-white' onClick={() => onCancel && onCancel()}><XIcon /></AlertDialogCancel> */}
-            <SheetClose asChild>
-              <Button><CheckIcon /></Button>
-              {/* <Button variant={'secondary'}><XIcon /></Button> */}
-            </SheetClose>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
-    )
-  }
 
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
   useEffect(() => { token && params.id != 'addnew' && load() }, [token])
@@ -282,8 +220,6 @@ export default function UserEditPage({ params }: Props) {
       {FormHeader()}
       {FormDetail()}
       {FormFooter()}
-      {/* {showOrderLineDialog && <OrderLineDialog />} */}
-      {/* <pre>{JSON.stringify(orderDetails, null, 2)}</pre> */}
     </div>
 
   </StandartForm>)

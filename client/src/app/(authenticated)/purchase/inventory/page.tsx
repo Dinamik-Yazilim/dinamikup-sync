@@ -78,7 +78,7 @@ export default function InventoryPage() {
           <div className='text-end'>{t('Quantity')}</div>
         </div>
       </>}
-      onRowPaint={(e: Inventory, colIndex) => <div className='grid grid-cols-8 w-full'>
+      onRowPaint={(e: Inventory, rowIndex) => <div className='grid grid-cols-8 w-full'>
         <div className='col-span-2 flex flex-col gap-1 items-start'>
           <div>{e.itemCode}</div>
           <div className='text-[10px] p-[1px] px-[3px] bg-green-800 text-white rounded capitalize '>{e.brand?.toLowerCase()}</div>
