@@ -12,7 +12,8 @@ export interface Item {
   purchaseConditionPrice?: number
   purchaseConditionGrossPrice?: number
   salesPrice?: number
-
+  vatRate?:number
+  vatNo?:number
 }
 
 export function itemListQuery(top:number=100){
@@ -27,7 +28,8 @@ ISNULL(MRK.mrk_ismi,'') as brand ,
 	FROM STOK_HAREKETLERI WHERE sth_stok_kod=S.sto_kod AND sth_tip=0 AND sth_cins=0 AND sth_miktar>0 AND sth_normal_iade=0 ORDER BY sth_create_date DESC
 ) as lastPurchase
 , SAS.Fiyat as purchaseConditionPrice, SAS.sas_brut_fiyat as purchaseConditionGrossPrice,
-dbo.fn_StokSatisFiyati(S.sto_kod,1,0,1) as salesPrice
+dbo.fn_StokSatisFiyati(S.sto_kod,1,0,1) as salesPrice,
+S.sto_toptan_vergi as vatNo, dbo.fn_VergiYuzde(S.sto_toptan_vergi) as vatRate
 FROM STOKLAR S LEFT OUTER JOIN
 STOK_ANA_GRUPLARI SAN ON S.sto_anagrup_kod=SAN.san_kod LEFT OUTER JOIN
 STOK_ALT_GRUPLARI STA ON S.sto_altgrup_kod=STA.sta_kod LEFT OUTER JOIN
