@@ -1,5 +1,6 @@
-import { CheckIcon, ListTreeIcon, PlusCircleIcon, PlusIcon, PlusSquareIcon, XIcon } from 'lucide-react'
+import { CheckIcon, ListCheckIcon, ListTreeIcon, PlusCircleIcon, PlusIcon, PlusSquareIcon, TextSelectionIcon, XIcon } from 'lucide-react'
 import { Button } from './ui/button'
+import { SelectIcon } from '@radix-ui/react-select'
 
 interface ButtonProps {
   className?: string
@@ -17,6 +18,20 @@ export function ButtonOK({ className, onClick }: ButtonProps) {
     </Button>
   )
 }
+
+export function ButtonSelect({ className, onClick }: ButtonProps) {
+  return (
+    <Button
+      className={`bg-amber-600 text-white hover:bg-amber-800 hover:text-white px-2 ${className}`}
+      variant={'outline'}
+      size={'sm'}
+      onClick={() => onClick && onClick()}
+    >
+      <ListCheckIcon size={'22px'} />
+    </Button>
+  )
+}
+
 
 export function ButtonCancel({ className, onClick }: ButtonProps) {
   return (

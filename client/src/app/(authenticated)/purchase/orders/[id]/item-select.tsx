@@ -22,13 +22,14 @@ import { Input } from "@/components/ui/input"
 import { cn, moneyFormat } from "@/lib/utils"
 import { TsnPanel } from "@/components/ui216/tsn-panel"
 import React from "react"
-import {TsnDialogSelectButton} from "@/components/ui216/tsn-dialog-selectbutton"
+import { TsnDialogSelectButton } from "@/components/ui216/tsn-dialog-selectbutton"
 
 interface ItemSelectProps {
   t: (text: string) => string
   children?: React.ReactNode | any
+  onSelect?: (e: Item) => void
 }
-export function ItemSelect({ t, children }: ItemSelectProps) {
+export function ItemSelect({ t, children, onSelect }: ItemSelectProps) {
   const [filter, setFilter] = useState<any>({ mainGroup: '', subGroup: '', category: '', brand: '', rayon: '' })
   const [search, setSearch] = useState('')
   const [mainLoading, setMainLoading] = useState(false)
@@ -55,11 +56,11 @@ export function ItemSelect({ t, children }: ItemSelectProps) {
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
   useEffect(() => { token && load('', filter) }, [token])
   useEffect(() => { token && load(search, filter) }, [filter])
-  
+
   // const DialogSelectButton = React.forwardRef<React.ElementRef<typeof AlertDialogPrimitive.Cancel>, React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel>>(({ className, ...props }, ref) => (
   //   <AlertDialogPrimitive.Cancel ref={ref} className={cn("mt-2 sm:mt-0", className )} {...props}  />
   // ))
-// AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName
+  // AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName
 
   return (
     <AlertDialog >
@@ -86,7 +87,7 @@ export function ItemSelect({ t, children }: ItemSelectProps) {
               onKeyDown={e => e.code == 'Enter' && load(search, filter)}
             />
           </div>
-          <TsnPanel name="itemSelect_filter" trigger={t('Group/Category/Brand/Rayon')} defaultOpen={false} className="pe-4">
+          <TsnPanel name="itemSelect_filter" trigger={<>{t('Group')}/{t('Category')}/{t('Brand')}/{t('Rayon')} </>} defaultOpen={false} className="pe-4">
             <TsnSelectRemote all title={t('Main Group')} value={filter.mainGroup}
               onValueChange={e => {
                 setMainLoading(true)
@@ -101,24 +102,14 @@ export function ItemSelect({ t, children }: ItemSelectProps) {
             {filter.mainGroup && !mainLoading && <TsnSelectRemote all title={t('Rayon')} value={filter.rayon} onValueChange={e => setFilter({ ...filter, rayon: e })} query={`SELECT ryn_kod as _id, ryn_ismi as name FROM STOK_REYONLARI WHERE ryn_kod IN (SELECT DISTINCT sto_reyon_kodu FROM STOKLAR WHERE sto_anagrup_kod='${filter.mainGroup}')  ORDER BY ryn_ismi`} />}
           </TsnPanel>
           <div className='grid grid-cols-5 w-full text-xs lg:text-sm border-b mb-2 ps-2 pe-5'>
-            <div className='col-span-2 flex flex-row gap-1'>
-              <div>{t('Code')}</div>
-              {/* <div>{t('Brand')}</div>
-              <div>{t('Category')}</div>
-              <div>{t('Rayon')}</div> */}
-            </div>
-            <div className='col-span-2 flex flex-row gap-1'>
-              <div>{t('Name')}</div>
-              {/* <div>{t('Main Group')}</div>
-              <div>{t('Sub Group')}</div> */}
-            </div>
+            <div className='col-span-2 flex flex-row gap-1'>{t('Code')}</div>
+            <div className='col-span-2 flex flex-row gap-1'>{t('Name')}</div>
             <div className='text-end'>{t('Price')}</div>
           </div>
           <div className="w-fu11ll overflow-y-auto h-[450px] ps-2 pe-2 lg:pe-4">
-            {list && list.map((e: Item, rowIndex) => <TsnDialogSelectButton onClick={(event:any)=>{
-              event.preventDefault()
-              alert(e.itemName)
-            }} className={`flex-none p-0 border-none grid grid-cols-5 gap-1 w-full hover:bg-amber-500 hover:bg-opacity-15 cursor-pointer ${rowIndex%2==1?'bg-slate-500 bg-opacity-15':''} `}>
+            {list && list.map((e: Item, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}
+              onClick={(event: any) => onSelect && onSelect(e)}
+              className={`flex-none p-0 border-none grid grid-cols-5 gap-1 w-full hover:bg-amber-500 hover:bg-opacity-15 cursor-pointer ${rowIndex % 2 == 1 ? 'bg-slate-500 bg-opacity-15' : ''} `}>
               <div className='col-span-2 flex flex-col gap-[2px] items-start text-xs lg:text-sm'>
                 <div>{e.itemCode}</div>
                 <div className='text-[80%] p-[1px] px-[3px] bg-green-800 text-white rounded capitalize truncate max-w-28 lg:max-w-48'>{e.brand?.toLowerCase()}</div>
@@ -147,7 +138,7 @@ export function ItemSelect({ t, children }: ItemSelectProps) {
             </TsnDialogSelectButton>)}
           </div>
         </div>
-        
+
         {/* <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction>Continue</AlertDialogAction>

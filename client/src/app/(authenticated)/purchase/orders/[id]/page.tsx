@@ -117,8 +117,8 @@ export default function UserEditPage({ params }: Props) {
           <div className="flex  w-full gap-2">
             <div className="text-xs text-nowrap mt-2 text-muted-foreground">#</div>
             <div className="grid grid-cols-8 gap-1 w-full items-center">
-              <div>{t('Item Code')}</div>
-              <div>{t('Item Name')}</div>
+              <div>{t('Code')}</div>
+              <div>{t('Name')}</div>
               <div className="text-end">{t('Quantity')}</div>
               <div className="text-end">{t('Price')}</div>
               <div className="text-end">{t('Amount')}</div>
@@ -139,7 +139,7 @@ export default function UserEditPage({ params }: Props) {
                 <div>{e.itemCode}</div>
                 <div className="text-xs text-muted-foreground">{e.barcode}</div>
               </div>
-              <div>{e.itemName}</div>
+              <div className="capitalize">{e.itemName?.toLowerCase()}</div>
               <div className='flex flex-col items-end'>
                 <div className="flex items-center gap-[3px]">{e.quantity}  <span className='text-xs text-muted-foreground capitalize'>{e.unit?.toLowerCase()}</span></div>
                 <div className='text-muted-foreground text-xs'>{e.delivered}/{e.remainder}</div>
