@@ -64,6 +64,9 @@
   "Lines": "Lines",
   "Totals": "Totals",
   "Price": "Price",
-  "Line Total": "Line Total"
+  "Line Total": "Line Total",
+  "Select warehouse": "Select warehouse",
+  "Select firm": "Select firm",
+  "Select item": "Select item"
   
 }

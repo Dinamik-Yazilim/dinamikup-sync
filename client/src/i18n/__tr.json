@@ -65,6 +65,9 @@
   "Lines": "Satırlar",
   "Totals": "Toplamlar",
   "Price": "Fiyat",
-  "Line Total": "Satır Toplam"
+  "Line Total": "Satır Toplam",
+  "Select warehouse": "Depo seç",
+  "Select firm": "Firma seç",
+  "Select item": "Kalem Seç"
 
 }

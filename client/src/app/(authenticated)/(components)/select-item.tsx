@@ -2,8 +2,7 @@ import { useEffect, useState } from "react"
 
 import {
   AlertDialog,
-  // AlertDialogAction,
-  // AlertDialogCancel,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -12,7 +11,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-import { Button } from "@/components/ui/button"
 import { TsnSelectRemote } from "@/components/ui216/tsn-select-remote"
 import { postItem } from "@/lib/fetch"
 import { useToast } from "@/components/ui/use-toast"
@@ -57,20 +55,17 @@ export function SelectItem({ t, children, onSelect }: ItemSelectProps) {
   useEffect(() => { token && load('', filter) }, [token])
   useEffect(() => { token && load(search, filter) }, [filter])
 
-  // const DialogSelectButton = React.forwardRef<React.ElementRef<typeof AlertDialogPrimitive.Cancel>, React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel>>(({ className, ...props }, ref) => (
-  //   <AlertDialogPrimitive.Cancel ref={ref} className={cn("mt-2 sm:mt-0", className )} {...props}  />
-  // ))
-  // AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName
-
   return (
     <AlertDialog >
       <AlertDialogTrigger>{children}</AlertDialogTrigger>
       <AlertDialogContent className=" px-3 py-1 lg:max-w-[900px]">
         <AlertDialogHeader className="p-0 m-0">
-          <AlertDialogTitle className="p-0">{t('Select an item')}</AlertDialogTitle>
-          {/* <AlertDialogDescription>
-
-          </AlertDialogDescription> */}
+          <AlertDialogTitle className="p-0">
+            <div className="flex justify-between">
+            <span>{t('Select item')}</span>
+            <AlertDialogCancel>X</AlertDialogCancel>
+            </div>
+          </AlertDialogTitle>
         </AlertDialogHeader>
         <div className="overflow-y-auto h-[600px]">
           <div className="relative w-full pe-4">

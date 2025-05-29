@@ -20,6 +20,7 @@ import { OrderLineDialog } from "./order-line-dialog"
 import { SelectFirm } from "@/app/(authenticated)/(components)/select-firm"
 import { ButtonSelect } from "@/components/icon-buttons"
 import { Label } from "@/components/ui/label"
+import { SelectWarehouse } from "@/app/(authenticated)/(components)/select-warehouse"
 
 interface Props {
   params: { id: string }
@@ -57,10 +58,10 @@ export default function UserEditPage({ params }: Props) {
     //qwerty
   }
 
-  const deleteLine = (rowIndex:number) => {
-    let l=orderDetails
-    l.splice(rowIndex,1)
-    setOrderDetails(l.map(e=>e))
+  const deleteLine = (rowIndex: number) => {
+    let l = orderDetails
+    l.splice(rowIndex, 1)
+    setOrderDetails(l.map(e => e))
   }
 
   const OrderCurrency = () => <span className='text-xs text-muted-foreground'>{orderHeader.currency}</span>
@@ -80,18 +81,28 @@ export default function UserEditPage({ params }: Props) {
           onBlur={e => setOrderHeader({ ...orderHeader, documentNumber: e.target.value })} />
         <TsnInput type='date' title={t('Document Date')} defaultValue={orderHeader.issueDate?.substring(0, 10)}
           onBlur={e => setOrderHeader({ ...orderHeader, documentDate: e.target.value })} />
-        <TsnSelectRemote all title={t('Warehouse')} itemClassName='capitalize' value={orderHeader.warehouseCode} onValueChange={e => setOrderHeader({ ...orderHeader, warehouseCode: e })} query={`SELECT dep_no as _id, LOWER(dep_adi) as [name], * FROM DEPOLAR WHERE dep_envanter_harici_fl=0 ORDER BY dep_adi`} />
       </div>
       <div className="flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
         <div className="flex flex-col gap-1">
           <Label>{t('Firm')}</Label>
-        <div className="capitalize">{orderHeader.firmCode} - {orderHeader.firmName?.toLowerCase()}</div>
+          <div className="capitalize">{orderHeader.firmCode} - {orderHeader.firmName?.toLowerCase()}</div>
         </div>
-        <SelectFirm t={t} onSelect={e=>{
-          setOrderHeader({...orderHeader, firmCode:e.firmCode, firmName:e.firmName})
+        <SelectFirm t={t} onSelect={e => {
+          setOrderHeader({ ...orderHeader, firmCode: e.firmCode, firmName: e.firmName })
         }} ><ButtonSelect /></SelectFirm>
 
       </div>
+      <div className="flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
+        <div className="flex flex-col gap-1">
+          <Label>{t('Warehouse')}</Label>
+          <div className="capitalize">{orderHeader.warehouse}</div>
+        </div>
+        <SelectWarehouse t={t} onSelect={e => {
+          setOrderHeader({ ...orderHeader, warehouseId: e._id, warehouse: e.name })
+        }} ><ButtonSelect /></SelectWarehouse>
+
+      </div>
+
       <div className="flex items-end gap-2">
         <TsnSelectRemote title={t('Payment Plan')} value={orderHeader.paymentPlan} onValueChange={e => setOrderHeader({ ...orderHeader, paymentPlan: e })}
           itemClassName="capitalize"
@@ -167,11 +178,11 @@ export default function UserEditPage({ params }: Props) {
 
             </div>
             <div className='w-20 flex flex-row items-end justify-end mx-2 gap-2'>
-              
-              <OrderLineDialog ioType={1} t={t}  orderDetails={orderDetails} setOrderDetails={setOrderDetails} rowIndex={rowIndex} >
+
+              <OrderLineDialog ioType={1} t={t} orderDetails={orderDetails} setOrderDetails={setOrderDetails} rowIndex={rowIndex} >
                 <div className="cursor-pointer bg-indigo-600 text-white px-[5px] py-[4px] rounded-md" ><EditIcon width={'20px'} /></div>
               </OrderLineDialog>
-              <TsnGridButtonDelete t={t} title={'delete line?'} onOk={()=>deleteLine(rowIndex)} />
+              <TsnGridButtonDelete t={t} title={'delete line?'} onOk={() => deleteLine(rowIndex)} />
             </div>
           </div>
         }

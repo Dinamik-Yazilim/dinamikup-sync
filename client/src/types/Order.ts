@@ -9,10 +9,13 @@ export interface OrderHeader {
   documentDate?: string
   firmCode?: string
   firmName?: string
-  warehouseCode?: string
-  warehouseName?: string
+  warehouseId?: string
+  warehouse?: string
+  paymentPlanId?: string
   paymentPlan?: string
+  projectId?: string
   project?: string
+  responsibilityId?: string
   responsibility?: string
   quantity?: number
   delivered?: number
@@ -70,8 +73,8 @@ export interface OrderDetail {
   lineNetTotal?:number
 }
 
-export function orderListQuery(){
-  return `SELECT TOP 200 orderNumber as _id, *
+export function orderListQuery(top:number=100){
+  return `SELECT TOP ${top} orderNumber as _id, *
 , ROUND(100*CASE WHEN amount>0 THEN discountAmount1/amount ELSE 0 END,2) as discountRate1 
 , ROUND(100*CASE WHEN (amount-discountAmount1)>0 THEN discountAmount2/(amount-discountAmount1) ELSE 0 END,2) as discountRate2 
 , ROUND(100*CASE WHEN (amount-discountAmount1-discountAmount2)>0 THEN discountAmount3/(amount-discountAmount1-discountAmount2) ELSE 0 END,2) as discountRate3 
@@ -86,7 +89,7 @@ SELECT SIP.sip_tarih as issueDate, SIP.sip_evrakno_seri + CAST(SIP.sip_evrakno_s
 SIP.sip_belgeno as documentNumber,
 dbo.fn_SiparisCins(SIP.sip_cins) as orderType,
 SIP.sip_musteri_kod as firmCode, CARI.cari_unvan1 as firmName,
-CAST(SIP.sip_depono as VARCHAR(10)) as warehouseCode, dbo.fn_DepoIsmi(SIP.sip_depono) as warehouseName, 
+CAST(SIP.sip_depono as VARCHAR(10)) as warehouseId, CAST(SIP.sip_depono as VARCHAR(10)) + ' - ' + dbo.fn_DepoIsmi(SIP.sip_depono) as warehouse,
 SUM(SIP.sip_miktar) as quantity, SUM(SIP.sip_teslim_miktar) as delivered,
 ROUND(SUM(SIP.sip_tutar),2) as amount,
 ROUND(SUM(SIP.sip_iskonto_1),2) as discountAmount1, ROUND(SUM(SIP.sip_iskonto_2),2) as discountAmount2, ROUND(SUM(SIP.sip_iskonto_3),2)  as discountAmount3,
@@ -137,7 +140,7 @@ export function orderHeaderQuery(orderId: string) {
     (SIP.sip_evrakno_seri + CAST(SIP.sip_evrakno_sira as varchar(10))) as orderNumber,
     SIP.sip_belgeno as documentNumber, SIP.sip_belge_tarih as documentDate,
     CARI.cari_kod as firmCode, CARI.cari_unvan1 as firmName,
-    CAST(SIP.sip_depono as VARCHAR(10)) as warehouseCode, dbo.fn_DepoIsmi(SIP.sip_depono) as warehouseName,
+    CAST(SIP.sip_depono as VARCHAR(10)) as warehouseId, CAST(SIP.sip_depono as VARCHAR(10)) + ' - ' + dbo.fn_DepoIsmi(SIP.sip_depono) as warehouse,
     SIP.sip_adresno,
     SUM(SIP.sip_miktar) as quantity, SUM(SIP.sip_teslim_miktar) as delivered,
     ROUND(SUM(SIP.sip_tutar),2) as amount,
