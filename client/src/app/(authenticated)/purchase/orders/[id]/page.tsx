@@ -6,33 +6,20 @@ import { useLanguage } from "@/i18n"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Cookies from 'js-cookie'
-import { getItem, postItem, putItem } from "@/lib/fetch"
-import { getRoleList, Member } from "@/types/Member"
+import { postItem, putItem } from "@/lib/fetch"
 import { TsnInput } from "@/components/ui216/tsn-input"
-import { TsnSwitch } from "@/components/ui216/tsn-switch"
 import { TsnPanel } from "@/components/ui216/tsn-panel"
-import { TsnSelect } from "@/components/ui216/tsn-select"
 import { moneyFormat, today } from "@/lib/utils"
 import { TsnSelectRemote } from "@/components/ui216/tsn-select-remote"
-import { TsnGrid, TsnGridButtonAddNew, TsnGridButtonDelete, TsnGridButtonEdit } from "@/components/ui216/tsn-grid"
+import { TsnGridButtonDelete } from "@/components/ui216/tsn-grid"
 import { OrderDetail, orderDetailQuery, OrderHeader, orderHeaderQuery, paymentPlanQuery, responsibilityQuery } from "@/types/Order"
-import { Label } from "@/components/ui/label"
-// import { OrderLineDialog } from "./order-line-dialog"
-import { Button } from "@/components/ui/button"
-import { CheckIcon, Edit2Icon, EditIcon, PlusSquareIcon } from "lucide-react"
-import { ButtonCancel, ButtonOK } from "@/components/icon-buttons"
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+import { EditIcon, PlusSquareIcon } from "lucide-react"
+
 import { TsnLineGrid } from "@/components/ui216/tsn-line-grid"
 import { OrderLineDialog } from "./order-line-dialog"
+import { SelectFirm } from "@/app/(authenticated)/(components)/select-firm"
+import { ButtonSelect } from "@/components/icon-buttons"
+import { Label } from "@/components/ui/label"
 
 interface Props {
   params: { id: string }
@@ -46,7 +33,7 @@ export default function UserEditPage({ params }: Props) {
   const { t } = useLanguage()
   const [orderHeader, setOrderHeader] = useState<OrderHeader>({ issueDate: today() })
   const [orderDetails, setOrderDetails] = useState<OrderDetail[]>([])
-  const [detailLoading, setDetailLoading] = useState(false)
+  // const [detailLoading, setDetailLoading] = useState(false)
   const load = () => {
     setLoading(true)
     postItem(`/mikro/get`, token, { query: orderHeaderQuery(params.id) })
@@ -70,6 +57,12 @@ export default function UserEditPage({ params }: Props) {
     //qwerty
   }
 
+  const deleteLine = (rowIndex:number) => {
+    let l=orderDetails
+    l.splice(rowIndex,1)
+    setOrderDetails(l.map(e=>e))
+  }
+
   const OrderCurrency = () => <span className='text-xs text-muted-foreground'>{orderHeader.currency}</span>
 
   const FormHeader = () => {
@@ -89,8 +82,14 @@ export default function UserEditPage({ params }: Props) {
           onBlur={e => setOrderHeader({ ...orderHeader, documentDate: e.target.value })} />
         <TsnSelectRemote all title={t('Warehouse')} itemClassName='capitalize' value={orderHeader.warehouseCode} onValueChange={e => setOrderHeader({ ...orderHeader, warehouseCode: e })} query={`SELECT dep_no as _id, LOWER(dep_adi) as [name], * FROM DEPOLAR WHERE dep_envanter_harici_fl=0 ORDER BY dep_adi`} />
       </div>
-      <div className="flex items-end gap-2">
-        <TsnSelectRemote all title={t('Firm')} itemClassName='capitalize' value={orderHeader.firmCode} onValueChange={e => setOrderHeader({ ...orderHeader, firmCode: e })} query={`SELECT cari_kod as _id, LOWER(cari_unvan1) + ' (' + cari_kod + ')' as [name] FROM CARI_HESAPLAR WHERE cari_baglanti_tipi=1 and cari_hareket_tipi in (0,2) ORDER BY cari_unvan1`} />
+      <div className="flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
+        <div className="flex flex-col gap-1">
+          <Label>{t('Firm')}</Label>
+        <div className="capitalize">{orderHeader.firmCode} - {orderHeader.firmName?.toLowerCase()}</div>
+        </div>
+        <SelectFirm t={t} onSelect={e=>{
+          setOrderHeader({...orderHeader, firmCode:e.firmCode, firmName:e.firmName})
+        }} ><ButtonSelect /></SelectFirm>
 
       </div>
       <div className="flex items-end gap-2">
@@ -127,7 +126,9 @@ export default function UserEditPage({ params }: Props) {
               <div className="text-end">{t('Net Total')}</div>
             </div>
             <div className='w-20 p-1 flex justify-end lg:justify-end'>
-              <TsnGridButtonAddNew onClick={() => alert('qwerty')} />
+              <OrderLineDialog ioType={1} t={t} orderDetails={orderDetails} setOrderDetails={setOrderDetails} rowIndex={-1} >
+                <div className="cursor-pointer bg-green-600 px-[5px] py-[4px] text-white rounded-md" ><PlusSquareIcon width={'24px'} /></div>
+              </OrderLineDialog>
             </div>
           </div>
         }
@@ -167,8 +168,10 @@ export default function UserEditPage({ params }: Props) {
             </div>
             <div className='w-20 flex flex-row items-end justify-end mx-2 gap-2'>
               
-              <OrderLineDialog t={t}  orderDetails={orderDetails} setOrderDetails={setOrderDetails} rowIndex={rowIndex} />
-              <TsnGridButtonDelete t={t} title={'delete line?'} />
+              <OrderLineDialog ioType={1} t={t}  orderDetails={orderDetails} setOrderDetails={setOrderDetails} rowIndex={rowIndex} >
+                <div className="cursor-pointer bg-indigo-600 text-white px-[5px] py-[4px] rounded-md" ><EditIcon width={'20px'} /></div>
+              </OrderLineDialog>
+              <TsnGridButtonDelete t={t} title={'delete line?'} onOk={()=>deleteLine(rowIndex)} />
             </div>
           </div>
         }

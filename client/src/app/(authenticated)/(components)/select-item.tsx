@@ -29,7 +29,7 @@ interface ItemSelectProps {
   children?: React.ReactNode | any
   onSelect?: (e: Item) => void
 }
-export function ItemSelect({ t, children, onSelect }: ItemSelectProps) {
+export function SelectItem({ t, children, onSelect }: ItemSelectProps) {
   const [filter, setFilter] = useState<any>({ mainGroup: '', subGroup: '', category: '', brand: '', rayon: '' })
   const [search, setSearch] = useState('')
   const [mainLoading, setMainLoading] = useState(false)
