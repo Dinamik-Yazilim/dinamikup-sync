@@ -167,7 +167,7 @@ export function TsnGrid({
                   if (onAddNew)
                     onAddNew()
                   else
-                    router.push(`${pathName}/addnew?${searchParams.toString()}}`)
+                    router.push(`${pathName}/addnew${searchParams?'?':''}${searchParams.toString()}`)
                 }} />
 
               }

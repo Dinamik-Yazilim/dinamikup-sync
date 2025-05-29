@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input"
 import React from "react"
 import { TsnDialogSelectButton } from "@/components/ui216/tsn-dialog-selectbutton"
 import { Warehouse, warehouseListQuery } from "@/types/Warehouse"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface Props {
   t: (text: string) => string
@@ -32,11 +33,8 @@ export function SelectWarehouse({ t, children, onSelect }: Props) {
   const [loading, setLoading] = useState(false)
   const [list, setList] = useState<Warehouse[]>([])
   const load = (s?: string) => {
-    let q = warehouseListQuery()
-    q = q.replaceAll('{search}', s || '')
-   
     setLoading(true)
-    postItem(`/mikro/get`, token, { query: q })
+    postItem(`/mikro/get`, token, { query: warehouseListQuery({search:s}) })
       .then(result => {
         setList(result as Warehouse[])
       })
@@ -46,14 +44,14 @@ export function SelectWarehouse({ t, children, onSelect }: Props) {
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
 
   return (
-    <AlertDialog onOpenChange={e=>e && load(search)} >
+    <AlertDialog onOpenChange={e => e && load(search)} >
       <AlertDialogTrigger>{children}</AlertDialogTrigger>
       <AlertDialogContent className=" px-3 py-1 lg:max-w-[900px]">
         <AlertDialogHeader className="p-0 m-0 ">
           <AlertDialogTitle className="p-0">
             <div className="flex justify-between">
-            <span>{t('Select warehouse')}</span>
-            <AlertDialogCancel>X</AlertDialogCancel>
+              <span>{t('Select warehouse')}</span>
+              <AlertDialogCancel>X</AlertDialogCancel>
             </div>
           </AlertDialogTitle>
           <AlertDialogDescription></AlertDialogDescription>
@@ -73,17 +71,17 @@ export function SelectWarehouse({ t, children, onSelect }: Props) {
               onKeyDown={e => e.code == 'Enter' && load(search)}
             />
           </div>
-         
-          <div className='grid grid-cols-5 w-full text-xs lg:text-sm border-b mb-2 ps-2 pe-5'>
+
+          <div className='grid grid-cols-5 w-full text-xs lg:text-sm border-b my-2 ps-2 pe-5'>
             <div className='col-span-2 flex flex-row gap-1'>{t('Warehouse')}</div>
             <div className=''>{t('Type')}</div>
-            <div className='text-end'>{t('Responsibility')}</div>
-            <div className='text-end'>{t('Project')}</div>
+            <div className=''>{t('Responsibility')}</div>
+            <div className=''>{t('Project')}</div>
           </div>
           <div className="w-fu11ll overflow-y-auto h-[450px] ps-2 pe-2 lg:pe-4">
-            {list && list.map((e: Warehouse, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}
+            {!loading && list && list.map((e: Warehouse, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}
               onClick={(event: any) => onSelect && onSelect(e)}
-              className={`flex-none p-0 border-none grid grid-cols-5 space-y-2 gap-1 w-full hover:bg-amber-500 hover:bg-opacity-15 cursor-pointer ${rowIndex % 2 == 1 ? 'bg-slate-500 bg-opacity-15' : ''} `}>
+              className={`flex-none p-0 border-none grid grid-cols-5 space-y-2 text-start gap-1 w-full hover:bg-amber-500 hover:bg-opacity-15 cursor-pointer ${rowIndex % 2 == 1 ? 'bg-slate-500 bg-opacity-15' : ''} `}>
               <div className='col-span-2 flex flex-col gap-[2px] items-start text-xs lg:text-base capitalize'>
                 {e.name?.toLowerCase()}
               </div>
@@ -97,6 +95,16 @@ export function SelectWarehouse({ t, children, onSelect }: Props) {
                 {e.project}
               </div>
             </TsnDialogSelectButton>)}
+            {loading && Array.from(Array(12).keys()).map(e => (
+              <div key={e} className='flex h-6 my-2'>
+                <div className='grid grid-cols-5 w-full h-full gap-1'>
+                  <Skeleton className="col-span-2 bg-amber-600" />
+                  <Skeleton className="col-span-1 bg-blue-600" />
+                  <Skeleton className="col-span-1 bg-orange-600" />
+                  <Skeleton className="col-span-1 bg-slate-600" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

@@ -22,10 +22,10 @@ export function ButtonOK({ className, onClick }: ButtonProps) {
 export function ButtonSelect({ className, onClick }: ButtonProps) {
   return (
     <div
-      className={`bg-amber-600 text-white hover:bg-amber-800 hover:text-white px-[7px] py-[5px] rounded-md ${className}`}
+      className={`bg-sla11te-600 border-slate-500 border border-opacity-25 text-white hover:bg-amber-800 hover:text-white px-[7px] py-[5px] rounded-md ${className}`}
       onClick={() => onClick && onClick()}
     >
-      <ListCheckIcon size={'22px'} />
+      <ListCheckIcon size={'22px'} className='opacity-50' />
     </div>
   )
 }

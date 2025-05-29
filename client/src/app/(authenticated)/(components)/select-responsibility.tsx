@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input"
 import React from "react"
 import { TsnDialogSelectButton } from "@/components/ui216/tsn-dialog-selectbutton"
 import { Responsibility, responsibilityListQuery } from "@/types/Responsibility"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface Props {
   t: (text: string) => string
@@ -30,12 +31,9 @@ export function SelectResponsibility({ t, children, onSelect }: Props) {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [list, setList] = useState<Responsibility[]>([])
-  const load = (s?: string) => {
-    let q = responsibilityListQuery()
-    q = q.replaceAll('{search}', s || '')
-   
+  const load = (s?: string) => {  
     setLoading(true)
-    postItem(`/mikro/get`, token, { query: q })
+    postItem(`/mikro/get`, token, { query: responsibilityListQuery({search:s}) })
       .then(result => {
         setList(result as Responsibility[])
       })
@@ -74,11 +72,11 @@ export function SelectResponsibility({ t, children, onSelect }: Props) {
             />
           </div>
          
-          <div className='grid grid-cols-1 w-full text-xs lg:text-sm border-b mb-2 ps-2 pe-5'>
+          <div className='grid grid-cols-1 w-full text-xs lg:text-sm border-b my-2 ps-2 pe-5'>
             <div className=''>{t('Responsibility')}</div>
           </div>
           <div className="w-fu11ll overflow-y-auto h-[450px] ps-2 pe-2 lg:pe-4">
-            {list && list.map((e: Responsibility, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}
+            {!loading && list && list.map((e: Responsibility, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}
               onClick={(event: any) => onSelect && onSelect(e)}
               className={`flex-none p-0 border-none grid grid-cols-1 space-y-2 gap-1 w-full hover:bg-amber-500 hover:bg-opacity-15 cursor-pointer ${rowIndex % 2 == 1 ? 'bg-slate-500 bg-opacity-15' : ''} `}>
               <div className='flex flex-col gap-[2px] items-start text-xs lg:text-base capitalize'>
@@ -86,6 +84,13 @@ export function SelectResponsibility({ t, children, onSelect }: Props) {
               </div>
               
             </TsnDialogSelectButton>)}
+            {loading && Array.from(Array(12).keys()).map(e => (
+              <div key={e} className='flex h-6 my-2'>
+                <div className='grid grid-cols-1 w-full h-full gap-1'>
+                  <Skeleton className="bg-slate-600" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

@@ -21,6 +21,7 @@ import { cn, moneyFormat } from "@/lib/utils"
 import { TsnPanel } from "@/components/ui216/tsn-panel"
 import React from "react"
 import { TsnDialogSelectButton } from "@/components/ui216/tsn-dialog-selectbutton"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface ItemSelectProps {
   t: (text: string) => string
@@ -36,15 +37,8 @@ export function SelectItem({ t, children, onSelect }: ItemSelectProps) {
   const [loading, setLoading] = useState(false)
   const [list, setList] = useState<Item[]>([])
   const load = (s?: string, f?: any) => {
-    let q = itemListQuery(50)
-    q = q.replaceAll('{search}', s || '')
-    if (f) {
-      Object.keys(f).forEach(key => {
-        q = q.replaceAll(`{${key}}`, f[key])
-      })
-    }
     setLoading(true)
-    postItem(`/mikro/get`, token, { query: q })
+    postItem(`/mikro/get`, token, { query: itemListQuery({ ...filter, search: s }) })
       .then(result => {
         setList(result as Item[])
       })
@@ -56,14 +50,14 @@ export function SelectItem({ t, children, onSelect }: ItemSelectProps) {
   useEffect(() => { token && load(search, filter) }, [filter])
 
   return (
-    <AlertDialog onOpenChange={e=>e && load(search)} >
+    <AlertDialog onOpenChange={e => e && load(search)} >
       <AlertDialogTrigger>{children}</AlertDialogTrigger>
       <AlertDialogContent className=" px-3 py-1 lg:max-w-[900px]">
         <AlertDialogHeader className="p-0 m-0">
           <AlertDialogTitle className="p-0">
             <div className="flex justify-between">
-            <span>{t('Select item')}</span>
-            <AlertDialogCancel>X</AlertDialogCancel>
+              <span>{t('Select item')}</span>
+              <AlertDialogCancel>X</AlertDialogCancel>
             </div>
           </AlertDialogTitle>
           <AlertDialogDescription></AlertDialogDescription>
@@ -97,23 +91,22 @@ export function SelectItem({ t, children, onSelect }: ItemSelectProps) {
             {filter.mainGroup && !mainLoading && <TsnSelectRemote all title={t('Brand')} value={filter.brand} onValueChange={e => setFilter({ ...filter, brand: e })} query={`SELECT mrk_kod as _id, mrk_ismi as name FROM STOK_MARKALARI WHERE mrk_kod IN (SELECT DISTINCT sto_marka_kodu FROM STOKLAR WHERE sto_anagrup_kod='${filter.mainGroup}') ORDER BY mrk_ismi`} />}
             {filter.mainGroup && !mainLoading && <TsnSelectRemote all title={t('Rayon')} value={filter.rayon} onValueChange={e => setFilter({ ...filter, rayon: e })} query={`SELECT ryn_kod as _id, ryn_ismi as name FROM STOK_REYONLARI WHERE ryn_kod IN (SELECT DISTINCT sto_reyon_kodu FROM STOKLAR WHERE sto_anagrup_kod='${filter.mainGroup}')  ORDER BY ryn_ismi`} />}
           </TsnPanel>
-          <div className='grid grid-cols-5 w-full text-xs lg:text-sm border-b mb-2 ps-2 pe-5'>
-            <div className='col-span-2 flex flex-row gap-1'>{t('Code')}</div>
-            <div className='col-span-2 flex flex-row gap-1'>{t('Name')}</div>
+          <div className='grid grid-cols-6 w-full text-xs lg:text-sm border-b mb-2 ps-2 pe-5'>
+            <div className='col-span-3 flex flex-row gap-1'>{t('Item')}</div>
+            <div className='col-span-2 flex flex-row gap-1'>{t('Group')}</div>
             <div className='text-end'>{t('Price')}</div>
           </div>
           <div className="w-fu11ll overflow-y-auto h-[450px] ps-2 pe-2 lg:pe-4">
-            {list && list.map((e: Item, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}
+            {!loading && list && list.map((e: Item, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}
               onClick={(event: any) => onSelect && onSelect(e)}
-              className={`flex-none p-0 border-none grid grid-cols-5 gap-1 w-full hover:bg-amber-500 hover:bg-opacity-15 cursor-pointer ${rowIndex % 2 == 1 ? 'bg-slate-500 bg-opacity-15' : ''} `}>
-              <div className='col-span-2 flex flex-col gap-[2px] items-start text-xs lg:text-sm'>
-                <div>{e.itemCode}</div>
+              className={`flex-none p-0 border-none grid grid-cols-6 gap-1 w-full hover:bg-amber-500 hover:bg-opacity-15 cursor-pointer ${rowIndex % 2 == 1 ? 'bg-slate-500 bg-opacity-15' : ''} `}>
+              <div className='col-span-3 flex flex-col gap-[2px] items-start text-xs lg:text-sm'>
+                <div className='capitalize text-start'>{e.name?.toLowerCase()}</div>
                 <div className='text-[80%] p-[1px] px-[3px] bg-green-800 text-white rounded capitalize truncate max-w-28 lg:max-w-48'>{e.brand?.toLowerCase()}</div>
-                <div className='text-[80%] p-[1px] px-[3px] bg-purple-600 text-white rounded capitalize truncate max-w-28 lg:max-w-48'>{e.category?.toLowerCase()}</div>
                 <div className='text-[80%] p-[1px] px-[3px] bg-amber-800 text-white rounded capitalize truncate max-w-28 lg:max-w-48'>{e.rayon?.toLowerCase()}</div>
               </div>
               <div className='col-span-2 flex flex-col gap-[2px] items-start text-xs lg:text-sm'>
-                <div className='capitalize text-start'>{e.itemName?.toLowerCase()}</div>
+                <div className='text-[80%] p-[1px] px-[3px] bg-purple-600 text-white rounded capitalize truncate max-w-28 lg:max-w-48'>{e.category?.toLowerCase()}</div>
                 <div className='text-[80%] p-[1px] px-[3px] bg-blue-800 text-white rounded capitalize  truncate max-w-28 lg:max-w-48'>{e.mainGroup?.toLowerCase()}</div>
                 <div className='text-[80%] p-[1px] px-[3px] bg-slate-500 text-white rounded capitalize  truncate max-w-28 lg:max-w-48'>{e.subGroup?.toLowerCase()}</div>
               </div>
@@ -132,6 +125,16 @@ export function SelectItem({ t, children, onSelect }: ItemSelectProps) {
                 </div>
               </div>
             </TsnDialogSelectButton>)}
+            {loading && Array.from(Array(8).keys()).map(e => (
+              <div key={e} className='flex mb-4 h-10'>
+                <div className='grid grid-cols-6 w-full h-full gap-4'>
+                  <Skeleton className="col-span-3 h-6 bg-amber-600" />
+                  <Skeleton className="col-span-2 h-6 bg-blue-600" />
+                  <Skeleton className="col-span-1 h-6 bg-slate-600" />
+                </div>
+
+              </div>
+            ))}
           </div>
         </div>
 

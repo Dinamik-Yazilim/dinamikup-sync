@@ -15,7 +15,16 @@ export interface Item {
   vatNo?:number
 }
 
-export function itemListQuery(top:number=100){
+interface itemListQueryProps {
+	top?:number
+	search?:string
+	mainGroup?:string
+	subGroup?:string
+	category?:string
+	brand?:string
+	rayon?:string
+}
+export function itemListQuery({top=100,search='',mainGroup='',subGroup='',category='',brand='', rayon=''}:itemListQueryProps){
   return `SELECT top ${top} S.sto_kod as _id, S.sto_kod + ' - ' + S.sto_isim as name, S.sto_birim1_ad as unit,
 ISNULL(SAN.san_isim,'') as mainGroup, ISNULL(STA.sta_isim,'') as [subGroup],
 ISNULL(KTG.ktg_isim,'') as category ,
@@ -49,11 +58,11 @@ STOK_MARKALARI MRK ON S.sto_marka_kodu=MRK.mrk_kod LEFT OUTER JOIN
 	WHERE sas_bitis_tarih>=GETDATE() AND sas_depo_no=0
 	) SAS ON S.sto_kod= SAS.sas_stok_kod
 
- WHERE  (S.sto_kod like '%{search}%' or S.sto_isim like '%{search}%') AND
- (S.sto_anagrup_kod='{mainGroup}' OR '{mainGroup}'='') AND
- (S.sto_altgrup_kod='{subGroup}' OR '{subGroup}'='') AND
- (S.sto_kategori_kodu='{category}' OR '{category}'='') AND
- (S.sto_marka_kodu='{brand}' OR '{brand}'='') AND
- (S.sto_reyon_kodu='{rayon}' OR '{rayon}'='')
+ WHERE  (S.sto_kod like '%${search}%' or S.sto_isim like '%${search}%') AND
+ (S.sto_anagrup_kod='${mainGroup}' OR '${mainGroup}'='') AND
+ (S.sto_altgrup_kod='${subGroup}' OR '${subGroup}'='') AND
+ (S.sto_kategori_kodu='${category}' OR '${category}'='') AND
+ (S.sto_marka_kodu='${brand}' OR '${brand}'='') AND
+ (S.sto_reyon_kodu='${rayon}' OR '${rayon}'='')
 `
 }

@@ -23,24 +23,30 @@ import { SelectWarehouse } from "@/app/(authenticated)/(components)/select-wareh
 import { SelectResponsibility } from "@/app/(authenticated)/(components)/select-responsibility"
 import { SelectPaymentPlan } from "@/app/(authenticated)/(components)/select-paymentPlan"
 import { SelectProject } from "@/app/(authenticated)/(components)/select-project"
+import { SelectSalesperson } from "@/app/(authenticated)/(components)/select-salesperson"
 
 interface Props {
   params: { id: string }
 }
 
 export default function OrderPage({ params }: Props) {
-  const ioType=1
+  const ioType = 1
   const [token, setToken] = useState('')
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { t } = useLanguage()
-  const [orderHeader, setOrderHeader] = useState<OrderHeader>({ issueDate: today() })
+  const [orderHeader, setOrderHeader] = useState<OrderHeader>({
+    issueDate: today(),
+    ioType: 1,
+    documentDate: today(),
+    docNoSequence:0
+  })
   const [orderDetails, setOrderDetails] = useState<OrderDetail[]>([])
-  // const [detailLoading, setDetailLoading] = useState(false)
+
   const load = () => {
     setLoading(true)
-    postItem(`/mikro/get`, token, { query: orderHeaderQuery(params.id,ioType) })
+    postItem(`/mikro/get`, token, { query: orderHeaderQuery(params.id, ioType) })
       .then(result => {
         setOrderHeader(result[0] as OrderHeader)
         postItem(`/mikro/get`, token, { query: orderDetailQuery(params.id, ioType) })
@@ -58,11 +64,11 @@ export default function OrderPage({ params }: Props) {
 
 
   const save = () => {
-    saveOrder(token,orderHeader,orderDetails)
-    .then(()=>{
-      toast({ title: `🙂 ${t('Success')}`, description: t('Document has been saved successfuly')})
-    })
-    .catch(err=>toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+    saveOrder(token, orderHeader, orderDetails)
+      .then(() => {
+        toast({ title: `🙂 ${t('Success')}`, description: t('Document has been saved successfuly') })
+      })
+      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
   }
 
   const deleteLine = (rowIndex: number) => {
@@ -75,10 +81,10 @@ export default function OrderPage({ params }: Props) {
 
   const FormHeader = () => {
     return (<TsnPanel name="porder_Header" defaultOpen={true} className="mt-4" trigger={t('Header')} contentClassName="grid grid-cols-1 lg:grid-cols-6 gap-2 w-full">
-      <div className="col-span-6 flex items-center gap-2">
+      <div className="col-span-1 lg:col-span-6 grid grid-cols-1 lg:grid-cols-5 w-full items-center gap-2">
         <TsnInput title={t('Document Serial')} defaultValue={orderHeader.docNoSerial}
           onBlur={e => setOrderHeader({ ...orderHeader, docNoSerial: e.target.value })} />
-        <TsnInput type='number' min={1} title={t('Document Sequence')} defaultValue={orderHeader.docNoSequence}
+        <TsnInput type='number' min={0} title={t('Document Sequence')} defaultValue={orderHeader.docNoSequence}
           onBlur={e => setOrderHeader({ ...orderHeader, docNoSequence: !isNaN(Number(e.target.value)) ? Number(e.target.value) : 1 })} />
         <TsnInput type='date' title={t('Date')} defaultValue={orderHeader.issueDate?.substring(0, 10)}
           onBlur={e => setOrderHeader({ ...orderHeader, issueDate: e.target.value })} />
@@ -87,7 +93,7 @@ export default function OrderPage({ params }: Props) {
         <TsnInput type='date' title={t('Document Date')} defaultValue={orderHeader.issueDate?.substring(0, 10)}
           onBlur={e => setOrderHeader({ ...orderHeader, documentDate: e.target.value })} />
       </div>
-      <div className="col-span-4 w-full flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
+      <div className="col-span-1 lg:col-span-4 w-full p-2 pe-4 flex items-center  border rounded-md border-dashed">
         <div className="flex flex-col gap-1">
           <Label>{t('Firm')}</Label>
           <div className="capitalize">{orderHeader.firm?.toLowerCase()}</div>
@@ -97,7 +103,7 @@ export default function OrderPage({ params }: Props) {
         }} ><ButtonSelect /></SelectFirm>
 
       </div>
-      <div className="col-span-2 w-full flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
+      <div className="col-span-1 lg:col-span-2 w-full flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
         <div className="flex flex-col gap-1">
           <Label>{t('Warehouse')}</Label>
           <div className="capitalize">{orderHeader.warehouse}</div>
@@ -108,7 +114,7 @@ export default function OrderPage({ params }: Props) {
 
       </div>
 
-      <div className="col-span-6 flex justify-between gap-2">
+      <div className="col-span-1 lg:col-span-6 grid grid-cols-1 lg:grid-cols-4 justify-between gap-2">
         <div className="w-full flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
           <div className="flex flex-col gap-1">
             <Label>{t('Payment Plan')}</Label>
@@ -138,7 +144,7 @@ export default function OrderPage({ params }: Props) {
             <Label>{t('Salesperson')}</Label>
             <div className="capitalize">{orderHeader.salesperson}</div>
           </div>
-          <SelectResponsibility t={t} onSelect={e => { setOrderHeader({ ...orderHeader, salespersonId: e._id, salesperson: e.name }) }} ><ButtonSelect /></SelectResponsibility>
+          <SelectSalesperson t={t} onSelect={e => { setOrderHeader({ ...orderHeader, salespersonId: e._id, salesperson: e.name }) }} ><ButtonSelect /></SelectSalesperson>
 
         </div>
       </div>

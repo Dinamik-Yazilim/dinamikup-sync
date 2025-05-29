@@ -17,25 +17,25 @@ import Cookies from "js-cookie"
 import { Input } from "@/components/ui/input"
 import React from "react"
 import { TsnDialogSelectButton } from "@/components/ui216/tsn-dialog-selectbutton"
-import { Project, projectListQuery } from "@/types/Project"
+import { DeliveryType, deliveryTypeListQuery } from "@/types/DeliveryType"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface Props {
   t: (text: string) => string
   children?: React.ReactNode | any
-  onSelect?: (e: Project) => void
+  onSelect?: (e: DeliveryType) => void
 }
-export function SelectProject({ t, children, onSelect }: Props) {
+export function SelectDeliveryType({ t, children, onSelect }: Props) {
   const [search, setSearch] = useState('')
   const [token, setToken] = useState('')
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
-  const [list, setList] = useState<Project[]>([])
+  const [list, setList] = useState<DeliveryType[]>([])
   const load = (s?: string) => {
     setLoading(true)
-    postItem(`/mikro/get`, token, { query: projectListQuery({ search: s }) })
+    postItem(`/mikro/get`, token, { query: deliveryTypeListQuery({search:s}) })
       .then(result => {
-        setList(result as Project[])
+        setList(result as DeliveryType[])
       })
       .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
       .finally(() => setLoading(false))
@@ -72,12 +72,12 @@ export function SelectProject({ t, children, onSelect }: Props) {
           </div>
 
           <div className='grid grid-cols-1 w-full text-xs lg:text-sm border-b my-2 ps-2 pe-5'>
-            <div className=''>{t('Project')}</div>
+            <div className=''>{t('DeliveryType')}</div>
           </div>
           <div className="w-fu11ll overflow-y-auto h-[450px] ps-2 pe-2 lg:pe-4">
-            {!loading && list && list.map((e: Project, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}
+            {!loading && list && list.map((e: DeliveryType, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}
               onClick={(event: any) => onSelect && onSelect(e)}
-              className={`flex-none p-0 border-none grid grid-cols-1 space-y-2 text-start gap-1 w-full hover:bg-amber-500 hover:bg-opacity-15 cursor-pointer ${rowIndex % 2 == 1 ? 'bg-slate-500 bg-opacity-15' : ''} `}>
+              className={`flex-none p-0 border-none grid grid-cols-1 space-y-2 gap-1 w-full hover:bg-amber-500 hover:bg-opacity-15 cursor-pointer ${rowIndex % 2 == 1 ? 'bg-slate-500 bg-opacity-15' : ''} `}>
               <div className='flex flex-col gap-[2px] items-start text-xs lg:text-base capitalize'>
                 {e.name?.toLowerCase()}
               </div>

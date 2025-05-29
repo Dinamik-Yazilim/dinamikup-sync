@@ -168,14 +168,20 @@ export function orderHeaderQuery(orderId: string, ioType: number) {
     SUM(SIP.sip_Otv_Vergi),SUM(SIP.sip_otvtutari),0,0, 1,0,0),2) as grossTotal,
     ROUND(SUM(SIP.sip_vergi),2) as vatAmount , dbo.fn_DovizSembolu(SIP.sip_doviz_cinsi) as currency,
     COUNT(*) as lineCount , CAST(SIP.sip_opno as VARCHAR(10)) as paymentPlanId, ISNULL(ODP.odp_kodu + '-' + ODP.odp_adi,'Peşin') as paymentPlan
-    ,SIP.sip_stok_sormerk as responsibility , SIP.sip_projekodu as project
+    ,SIP.sip_stok_sormerk as responsibilityId , ISNULL(SOM.som_kod + '-' + SOM.som_isim,'') as responsibility
+	,SIP.sip_projekodu as projectId, ISNULL(PRO.pro_kodu + '-' + PRO.pro_adi,'') as project
+	,SIP.sip_teslimturu as deliveryTypeId, ISNULL(TSLT.tslt_kod + '-' + TSLT.tslt_ismi,'') as deliveryType
     FROM SIPARISLER SIP INNER JOIN
     CARI_HESAPLAR CARI ON SIP.sip_musteri_kod=CARI.cari_kod LEFT OUTER JOIN
-    ODEME_PLANLARI ODP ON SIP.sip_opno= ODP.odp_no
+    ODEME_PLANLARI ODP ON SIP.sip_opno= ODP.odp_no  LEFT OUTER JOIN
+    TESLIM_TURLERI TSLT ON SIP.sip_teslimturu = TSLT.tslt_kod  LEFT OUTER JOIN
+	PROJELER PRO ON SIP.sip_projekodu = PRO.pro_kodu LEFT OUTER JOIN
+	SORUMLULUK_MERKEZLERI SOM ON SIP.sip_cari_sormerk=SOM.som_kod
     WHERE SIP.sip_tip=1
     GROUP BY SIP.sip_tarih,SIP.sip_belgeno,SIP.sip_evrakno_seri,SIP.sip_evrakno_sira,SIP.sip_belge_tarih,
     SIP.sip_depono,CARI.cari_kod, CARI.cari_unvan1, SIP.sip_adresno, SIP.sip_doviz_cinsi, SIP.sip_cins,
-    SIP.sip_opno,ODP.odp_kodu, ODP.odp_adi,SIP.sip_stok_sormerk, SIP.sip_projekodu, SIP.sip_tip
+    SIP.sip_opno,ODP.odp_kodu, ODP.odp_adi,SIP.sip_stok_sormerk, SIP.sip_projekodu, SIP.sip_tip,SIP.sip_stok_sormerk,
+	SOM.som_kod,SOM.som_isim,PRO.pro_kodu, PRO.pro_adi,SIP.sip_teslimturu,TSLT.tslt_kod, TSLT.tslt_ismi
     ) X
     WHERE orderNumber='${orderId}';`
 }
