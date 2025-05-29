@@ -1,7 +1,6 @@
 export interface Item {
   _id?:string
-  itemCode?:string
-  itemName?:string
+  name?:string
   unit?:string
   mainGroup?:string
   subGroup?:string
@@ -17,7 +16,7 @@ export interface Item {
 }
 
 export function itemListQuery(top:number=100){
-  return `SELECT top ${top} S.sto_kod as _id, S.sto_kod as itemCode, S.sto_isim as itemName, S.sto_birim1_ad as unit,
+  return `SELECT top ${top} S.sto_kod as _id, S.sto_kod + ' - ' + S.sto_isim as name, S.sto_birim1_ad as unit,
 ISNULL(SAN.san_isim,'') as mainGroup, ISNULL(STA.sta_isim,'') as [subGroup],
 ISNULL(KTG.ktg_isim,'') as category ,
 ISNULL(RYN.ryn_ismi,'') as rayon ,

@@ -11,38 +11,33 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-import { Button } from "@/components/ui/button"
-import { TsnSelectRemote } from "@/components/ui216/tsn-select-remote"
 import { postItem } from "@/lib/fetch"
 import { useToast } from "@/components/ui/use-toast"
-import { Firm, firmListQuery } from "@/types/Firm"
 import Cookies from "js-cookie"
 import { Input } from "@/components/ui/input"
-import { cn, moneyFormat } from "@/lib/utils"
-import { TsnPanel } from "@/components/ui216/tsn-panel"
 import React from "react"
 import { TsnDialogSelectButton } from "@/components/ui216/tsn-dialog-selectbutton"
+import { PaymentPlan, paymentPlanListQuery } from "@/types/PaymentPlan"
 
 interface Props {
   t: (text: string) => string
   children?: React.ReactNode | any
-  onSelect?: (e: Firm) => void
+  onSelect?: (e: PaymentPlan) => void
 }
-export function SelectFirm({ t, children, onSelect }: Props) {
+export function SelectPaymentPlan({ t, children, onSelect }: Props) {
   const [search, setSearch] = useState('')
-  const [mainLoading, setMainLoading] = useState(false)
   const [token, setToken] = useState('')
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
-  const [list, setList] = useState<Firm[]>([])
+  const [list, setList] = useState<PaymentPlan[]>([])
   const load = (s?: string) => {
-    let q = firmListQuery(50)
+    let q = paymentPlanListQuery()
     q = q.replaceAll('{search}', s || '')
-    
+   
     setLoading(true)
     postItem(`/mikro/get`, token, { query: q })
       .then(result => {
-        setList(result as Firm[])
+        setList(result as PaymentPlan[])
       })
       .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
       .finally(() => setLoading(false))
@@ -56,11 +51,11 @@ export function SelectFirm({ t, children, onSelect }: Props) {
         <AlertDialogHeader className="p-0 m-0 ">
           <AlertDialogTitle className="p-0">
             <div className="flex justify-between">
-            <span>{t('Select firm')}</span>
+            <span>{t('Select payment plan')}</span>
             <AlertDialogCancel>X</AlertDialogCancel>
             </div>
           </AlertDialogTitle>
-          <AlertDialogDescription></AlertDialogDescription>
+          
         </AlertDialogHeader>
         <div className="overflow-y-auto h-[600px]">
           <div className="relative w-full pe-4">
@@ -78,20 +73,17 @@ export function SelectFirm({ t, children, onSelect }: Props) {
             />
           </div>
          
-          <div className='grid grid-cols-5 w-full text-xs lg:text-sm border-b mb-2 ps-2 pe-5'>
-            <div className='col-span-4 flex flex-row gap-1'>{t('Firm')}</div>
-            <div className='text-end'>{t('Price')}</div>
+          <div className='grid grid-cols-1 w-full text-xs lg:text-sm border-b mb-2 ps-2 pe-5'>
+            <div className=''>{t('Payment Plan')}</div>
           </div>
           <div className="w-fu11ll overflow-y-auto h-[450px] ps-2 pe-2 lg:pe-4">
-            {list && list.map((e: Firm, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}
+            {list && list.map((e: PaymentPlan, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}
               onClick={(event: any) => onSelect && onSelect(e)}
-              className={`flex-none p-0 border-none grid grid-cols-5 space-y-2 gap-1 w-full hover:bg-amber-500 hover:bg-opacity-15 cursor-pointer ${rowIndex % 2 == 1 ? 'bg-slate-500 bg-opacity-15' : ''} `}>
-              <div className='col-span-4 flex flex-col gap-[2px] items-start text-xs lg:text-base capitalize'>
+              className={`flex-none p-0 border-none grid grid-cols-1 space-y-2 gap-1 w-full hover:bg-amber-500 hover:bg-opacity-15 cursor-pointer ${rowIndex % 2 == 1 ? 'bg-slate-500 bg-opacity-15' : ''} `}>
+              <div className='flex flex-col gap-[2px] items-start text-xs lg:text-base capitalize'>
                 {e.name?.toLowerCase()}
               </div>
-              <div className="flex flex-col text-xs w-20 lg:text-sm lg:w-auto">
-                {e.currency}
-              </div>
+              
             </TsnDialogSelectButton>)}
           </div>
         </div>

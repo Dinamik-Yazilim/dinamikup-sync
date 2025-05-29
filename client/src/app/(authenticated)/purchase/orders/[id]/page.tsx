@@ -10,10 +10,9 @@ import { postItem, putItem } from "@/lib/fetch"
 import { TsnInput } from "@/components/ui216/tsn-input"
 import { TsnPanel } from "@/components/ui216/tsn-panel"
 import { moneyFormat, today } from "@/lib/utils"
-import { TsnSelectRemote } from "@/components/ui216/tsn-select-remote"
 import { TsnGridButtonDelete } from "@/components/ui216/tsn-grid"
-import { OrderDetail, orderDetailQuery, OrderHeader, orderHeaderQuery, paymentPlanQuery, responsibilityQuery } from "@/types/Order"
-import { EditIcon, PlusSquareIcon } from "lucide-react"
+import { OrderDetail, orderDetailQuery, OrderHeader, orderHeaderQuery, saveOrder } from "@/types/Order"
+import { ChefHatIcon, EditIcon, PlusSquareIcon } from "lucide-react"
 
 import { TsnLineGrid } from "@/components/ui216/tsn-line-grid"
 import { OrderLineDialog } from "./order-line-dialog"
@@ -21,12 +20,16 @@ import { SelectFirm } from "@/app/(authenticated)/(components)/select-firm"
 import { ButtonSelect } from "@/components/icon-buttons"
 import { Label } from "@/components/ui/label"
 import { SelectWarehouse } from "@/app/(authenticated)/(components)/select-warehouse"
+import { SelectResponsibility } from "@/app/(authenticated)/(components)/select-responsibility"
+import { SelectPaymentPlan } from "@/app/(authenticated)/(components)/select-paymentPlan"
+import { SelectProject } from "@/app/(authenticated)/(components)/select-project"
 
 interface Props {
   params: { id: string }
 }
 
-export default function UserEditPage({ params }: Props) {
+export default function OrderPage({ params }: Props) {
+  const ioType=1
   const [token, setToken] = useState('')
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
@@ -37,10 +40,10 @@ export default function UserEditPage({ params }: Props) {
   // const [detailLoading, setDetailLoading] = useState(false)
   const load = () => {
     setLoading(true)
-    postItem(`/mikro/get`, token, { query: orderHeaderQuery(params.id) })
+    postItem(`/mikro/get`, token, { query: orderHeaderQuery(params.id,ioType) })
       .then(result => {
         setOrderHeader(result[0] as OrderHeader)
-        postItem(`/mikro/get`, token, { query: orderDetailQuery(params.id) })
+        postItem(`/mikro/get`, token, { query: orderDetailQuery(params.id, ioType) })
           .then(result => {
             setOrderDetails(result as OrderDetail[])
           })
@@ -55,7 +58,11 @@ export default function UserEditPage({ params }: Props) {
 
 
   const save = () => {
-    //qwerty
+    saveOrder(token,orderHeader,orderDetails)
+    .then(()=>{
+      toast({ title: `🙂 ${t('Success')}`, description: t('Document has been saved successfuly')})
+    })
+    .catch(err=>toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
   }
 
   const deleteLine = (rowIndex: number) => {
@@ -67,32 +74,30 @@ export default function UserEditPage({ params }: Props) {
   const OrderCurrency = () => <span className='text-xs text-muted-foreground'>{orderHeader.currency}</span>
 
   const FormHeader = () => {
-    return (<TsnPanel name="porder_Header" defaultOpen={true} className="mt-4" trigger={t('Header')} contentClassName="grid grid-cols-1 lg:grid-cols-2 gap-2 w-full">
-      <div className="flex items-end gap-2">
+    return (<TsnPanel name="porder_Header" defaultOpen={true} className="mt-4" trigger={t('Header')} contentClassName="grid grid-cols-1 lg:grid-cols-6 gap-2 w-full">
+      <div className="col-span-6 flex items-center gap-2">
         <TsnInput title={t('Document Serial')} defaultValue={orderHeader.docNoSerial}
           onBlur={e => setOrderHeader({ ...orderHeader, docNoSerial: e.target.value })} />
         <TsnInput type='number' min={1} title={t('Document Sequence')} defaultValue={orderHeader.docNoSequence}
           onBlur={e => setOrderHeader({ ...orderHeader, docNoSequence: !isNaN(Number(e.target.value)) ? Number(e.target.value) : 1 })} />
         <TsnInput type='date' title={t('Date')} defaultValue={orderHeader.issueDate?.substring(0, 10)}
           onBlur={e => setOrderHeader({ ...orderHeader, issueDate: e.target.value })} />
-      </div>
-      <div className="flex items-end gap-2">
         <TsnInput title={t('Document Number')} defaultValue={orderHeader.documentNumber}
           onBlur={e => setOrderHeader({ ...orderHeader, documentNumber: e.target.value })} />
         <TsnInput type='date' title={t('Document Date')} defaultValue={orderHeader.issueDate?.substring(0, 10)}
           onBlur={e => setOrderHeader({ ...orderHeader, documentDate: e.target.value })} />
       </div>
-      <div className="flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
+      <div className="col-span-4 w-full flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
         <div className="flex flex-col gap-1">
           <Label>{t('Firm')}</Label>
-          <div className="capitalize">{orderHeader.firmCode} - {orderHeader.firmName?.toLowerCase()}</div>
+          <div className="capitalize">{orderHeader.firm?.toLowerCase()}</div>
         </div>
         <SelectFirm t={t} onSelect={e => {
-          setOrderHeader({ ...orderHeader, firmCode: e.firmCode, firmName: e.firmName })
+          setOrderHeader({ ...orderHeader, firmId: e._id, firm: e.name })
         }} ><ButtonSelect /></SelectFirm>
 
       </div>
-      <div className="flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
+      <div className="col-span-2 w-full flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
         <div className="flex flex-col gap-1">
           <Label>{t('Warehouse')}</Label>
           <div className="capitalize">{orderHeader.warehouse}</div>
@@ -103,18 +108,39 @@ export default function UserEditPage({ params }: Props) {
 
       </div>
 
-      <div className="flex items-end gap-2">
-        <TsnSelectRemote title={t('Payment Plan')} value={orderHeader.paymentPlan} onValueChange={e => setOrderHeader({ ...orderHeader, paymentPlan: e })}
-          itemClassName="capitalize"
-          query={paymentPlanQuery()} />
+      <div className="col-span-6 flex justify-between gap-2">
+        <div className="w-full flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
+          <div className="flex flex-col gap-1">
+            <Label>{t('Payment Plan')}</Label>
+            <div className="capitalize">{orderHeader.paymentPlan}</div>
+          </div>
+          <SelectPaymentPlan t={t} onSelect={e => { setOrderHeader({ ...orderHeader, paymentPlanId: e._id, paymentPlan: e.name }) }} ><ButtonSelect /></SelectPaymentPlan>
 
-        <TsnSelectRemote title={t('Responsibility')} value={orderHeader.responsibility} onValueChange={e => setOrderHeader({ ...orderHeader, responsibility: e })}
-          itemClassName="capitalize" empty
-          query={responsibilityQuery()} />
+        </div>
+        <div className="w-full flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
+          <div className="flex flex-col gap-1">
+            <Label>{t('Project')}</Label>
+            <div className="capitalize">{orderHeader.project}</div>
+          </div>
+          <SelectProject t={t} onSelect={e => { setOrderHeader({ ...orderHeader, projectId: e._id, project: e.name }) }} ><ButtonSelect /></SelectProject>
 
-        <TsnSelectRemote title={t('Project')} value={orderHeader.project} onValueChange={e => setOrderHeader({ ...orderHeader, project: e })}
-          itemClassName="capitalize" empty
-          query={responsibilityQuery()} />
+        </div>
+        <div className="w-full flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
+          <div className="flex flex-col gap-1">
+            <Label>{t('Responsibility')}</Label>
+            <div className="capitalize">{orderHeader.responsibility}</div>
+          </div>
+          <SelectResponsibility t={t} onSelect={e => { setOrderHeader({ ...orderHeader, responsibilityId: e._id, responsibility: e.name }) }} ><ButtonSelect /></SelectResponsibility>
+
+        </div>
+        <div className="w-full flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
+          <div className="flex flex-col gap-1">
+            <Label>{t('Salesperson')}</Label>
+            <div className="capitalize">{orderHeader.salesperson}</div>
+          </div>
+          <SelectResponsibility t={t} onSelect={e => { setOrderHeader({ ...orderHeader, salespersonId: e._id, salesperson: e.name }) }} ><ButtonSelect /></SelectResponsibility>
+
+        </div>
       </div>
     </TsnPanel>)
   }
@@ -127,8 +153,7 @@ export default function UserEditPage({ params }: Props) {
           <div className="flex  w-full gap-2">
             <div className="text-xs text-nowrap mt-2 text-muted-foreground">#</div>
             <div className="grid grid-cols-8 gap-1 w-full items-center">
-              <div>{t('Code')}</div>
-              <div>{t('Name')}</div>
+              <div className="col-span-2">{t('Item')}</div>
               <div className="text-end">{t('Quantity')}</div>
               <div className="text-end">{t('Price')}</div>
               <div className="text-end">{t('Amount')}</div>
@@ -147,11 +172,10 @@ export default function UserEditPage({ params }: Props) {
           <div key={'line' + rowIndex} className="flex  w-full gap-2 items-center">
             <div className="text-xs text-nowrap mt-2 text-muted-foreground">#{rowIndex + 1}</div>
             <div className="grid grid-cols-8 gap-1 w-full items-center">
-              <div className="flex flex-col">
-                <div>{e.itemCode}</div>
+              <div className="col-span-2 flex flex-col">
+                <div className="capitalize">{e.item?.toLowerCase()}</div>
                 <div className="text-xs text-muted-foreground">{e.barcode}</div>
               </div>
-              <div className="capitalize">{e.itemName?.toLowerCase()}</div>
               <div className='flex flex-col items-end'>
                 <div className="flex items-center gap-[3px]">{e.quantity}  <span className='text-xs text-muted-foreground capitalize'>{e.unit?.toLowerCase()}</span></div>
                 <div className='text-muted-foreground text-xs'>{e.delivered}/{e.remainder}</div>

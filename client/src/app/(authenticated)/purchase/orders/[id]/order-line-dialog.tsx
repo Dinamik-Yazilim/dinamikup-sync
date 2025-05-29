@@ -44,8 +44,8 @@ export function OrderLineDialog({ t, orderDetails, setOrderDetails, rowIndex, ch
   const [amount, setAmount] = useState(rowIndex >= 0 ? orderDetails[rowIndex]?.amount || 0 : 0)
   const [vatAmount, setVatAmount] = useState(rowIndex >= 0 ? orderDetails[rowIndex].vatAmount || 0 : 0)
   const [vatRate, setVatRate] = useState(rowIndex >= 0 ? orderDetails[rowIndex].vatRate || 0 : 0)
-  const [itemCode, setItemCode] = useState(rowIndex >= 0 ? orderDetails[rowIndex].itemCode || '' : '')
-  const [itemName, setItemName] = useState(rowIndex >= 0 ? orderDetails[rowIndex].itemName || '' : '')
+  const [itemId, setItemId] = useState(rowIndex >= 0 ? orderDetails[rowIndex].itemId || '' : '')
+  const [item, setItem] = useState(rowIndex >= 0 ? orderDetails[rowIndex].item || '' : '')
   const [unit, setUnit] = useState(rowIndex >= 0 ? orderDetails[rowIndex].unit || '' : '')
   const calcAmount = (q: number, p: number) => {
     const amount = Math.round(100 * (q * p)) / 100
@@ -57,17 +57,12 @@ export function OrderLineDialog({ t, orderDetails, setOrderDetails, rowIndex, ch
 
   const save = (e: any) => {
     try {
-      if (!itemCode) {
+      if (!itemId) {
         e.preventDefaut()
-        toast({ title: t('Error'), description: t('Item code required'), variant: 'destructive' })
+        toast({ title: t('Error'), description: t('Item required'), variant: 'destructive' })
         return
       }
-      if (!itemName) {
-        e.preventDefaut()
-        toast({ title: t('Error'), description: t('Item name required'), variant: 'destructive' })
-        
-        return
-      }
+     
       if (quantity <= 0) {
         toast({ title: t('Error'), description: t('Quantity must be greater than zero'), variant: 'destructive' })
         e.preventDefaut()
@@ -76,8 +71,8 @@ export function OrderLineDialog({ t, orderDetails, setOrderDetails, rowIndex, ch
       if (rowIndex < 0) {
         let l=orderDetails.map(e=>e)
         l.push({
-          itemCode:itemCode,
-          itemName:itemName,
+          itemId:itemId,
+          item:item,
           amount:amount,
           price:price,
           quantity:quantity,
@@ -90,14 +85,14 @@ export function OrderLineDialog({ t, orderDetails, setOrderDetails, rowIndex, ch
         setQuantity(0)
         setVatAmount(0)
         setVatRate(0)
-        setItemCode('')
-        setItemName('')
+        setItemId('')
+        setItem('')
         setUnit('')
       } else {
         setOrderDetails(orderDetails.map((e, index) => {
           if (rowIndex == index) {
-            e.itemCode = itemCode
-            e.itemName = itemName
+            e.itemId = itemId
+            e.item = item
             e.amount = amount
             e.price = price
             e.quantity = quantity
@@ -116,7 +111,6 @@ export function OrderLineDialog({ t, orderDetails, setOrderDetails, rowIndex, ch
     <Sheet>
       <SheetTrigger asChild>
         {children}
-
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
@@ -124,15 +118,15 @@ export function OrderLineDialog({ t, orderDetails, setOrderDetails, rowIndex, ch
             {rowIndex >= 0 && <>Satir Duzelt</>}
             {rowIndex < 0 && <>Yeni Satir</>}
           </SheetTitle>
-          {/* <SheetDescription>Açıklama alanı</SheetDescription> */}
+          <SheetDescription></SheetDescription>
         </SheetHeader>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col mx-2">
             <div className="flex justify-between items-center">
-              <div>{itemCode}</div>
+              <div className="capitalize">{item?.toLowerCase()} </div>
               <SelectItem t={t} onSelect={item => {
-                setItemCode(item?.itemCode || '')
-                setItemName(item?.itemName || '')
+                setItemId(item?._id || '')
+                setItem(item?.name || '')
                 setUnit(item?.unit || '')
                 setVatRate(item?.vatRate || 0)
                 if(ioType==0){
@@ -140,17 +134,9 @@ export function OrderLineDialog({ t, orderDetails, setOrderDetails, rowIndex, ch
                 }else{
                   setPrice(item?.purchaseConditionPrice || item?.lastPurchase || 0)
                 }
-                // setLine({...line,itemCode:item.itemCode,itemName:item.itemName})
-                // setOrderDetails(orderDetails.map((e, index) => {
-                //   if (rowIndex == index) {
-                //     e.itemCode = item.itemCode
-                //     e.itemName = item.itemName
-                //   }
-                //   return e
-                // }))
               }}><ButtonSelect /></SelectItem>
             </div>
-            <div className="capitalize">{itemName?.toLowerCase()} </div>
+            
           </div>
 
           <TsnInput type={'number'} title={t('Quantity')} defaultValue={quantity} onBlur={e => {

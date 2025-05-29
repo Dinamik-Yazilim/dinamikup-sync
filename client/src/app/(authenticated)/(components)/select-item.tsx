@@ -52,11 +52,11 @@ export function SelectItem({ t, children, onSelect }: ItemSelectProps) {
       .finally(() => setLoading(false))
   }
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
-  useEffect(() => { token && load('', filter) }, [token])
+  // useEffect(() => { token && load('', filter) }, [token])
   useEffect(() => { token && load(search, filter) }, [filter])
 
   return (
-    <AlertDialog >
+    <AlertDialog onOpenChange={e=>e && load(search)} >
       <AlertDialogTrigger>{children}</AlertDialogTrigger>
       <AlertDialogContent className=" px-3 py-1 lg:max-w-[900px]">
         <AlertDialogHeader className="p-0 m-0">
@@ -66,6 +66,7 @@ export function SelectItem({ t, children, onSelect }: ItemSelectProps) {
             <AlertDialogCancel>X</AlertDialogCancel>
             </div>
           </AlertDialogTitle>
+          <AlertDialogDescription></AlertDialogDescription>
         </AlertDialogHeader>
         <div className="overflow-y-auto h-[600px]">
           <div className="relative w-full pe-4">

@@ -21,14 +21,12 @@ export function ButtonOK({ className, onClick }: ButtonProps) {
 
 export function ButtonSelect({ className, onClick }: ButtonProps) {
   return (
-    <Button
-      className={`bg-amber-600 text-white hover:bg-amber-800 hover:text-white px-2 ${className}`}
-      variant={'outline'}
-      size={'sm'}
+    <div
+      className={`bg-amber-600 text-white hover:bg-amber-800 hover:text-white px-[7px] py-[5px] rounded-md ${className}`}
       onClick={() => onClick && onClick()}
     >
       <ListCheckIcon size={'22px'} />
-    </Button>
+    </div>
   )
 }
 

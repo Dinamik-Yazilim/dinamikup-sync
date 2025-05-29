@@ -1,5 +1,9 @@
+import { postItem } from "@/lib/fetch"
+
 export interface OrderHeader {
+  sip_Guid?: string
   _id?: string
+  ioType?: number
   orderType?: string
   issueDate?: string
   docNoSerial?: string
@@ -7,14 +11,16 @@ export interface OrderHeader {
   orderNumber?: string
   documentNumber?: string
   documentDate?: string
-  firmCode?: string
-  firmName?: string
+  firmId?: string
+  firm?: string
   warehouseId?: string
   warehouse?: string
   paymentPlanId?: string
   paymentPlan?: string
   projectId?: string
   project?: string
+  salespersonId?: string
+  salesperson?: string
   responsibilityId?: string
   responsibility?: string
   quantity?: number
@@ -27,12 +33,12 @@ export interface OrderHeader {
   discountAmount5?: number
   discountAmount6?: number
 
-  discountRate1?:number
-  discountRate2?:number
-  discountRate3?:number
-  discountRate4?:number
-  discountRate5?:number
-  discountRate6?:number
+  discountRate1?: number
+  discountRate2?: number
+  discountRate3?: number
+  discountRate4?: number
+  discountRate5?: number
+  discountRate6?: number
 
   grossTotal?: number
   vatAmount?: number
@@ -43,37 +49,43 @@ export interface OrderHeader {
 
 export interface OrderDetail {
   _id?: string
-  orderId?:string
-  lineNo?:number
-  itemCode?:string
-  itemName?:string
-  barcode?:string
-  quantity?:number
-  delivered?:number
-  remainder?:number
-  unit?:string
-  price?:number
-  amount?:number
-  discountAmount1?:number
-  discountAmount2?:number
-  discountAmount3?:number
-  discountAmount4?:number
-  discountAmount5?:number
-  discountAmount6?:number
+  orderId?: string
+  lineNo?: number
+  itemId?: string
+  item?: string
+  barcode?: string
+  description?: string
+  quantity?: number
+  delivered?: number
+  deliveryDate?: string
+  remainder?: number
+  unit?: string
+  price?: number
+  amount?: number
+  discountAmount1?: number
+  discountAmount2?: number
+  discountAmount3?: number
+  discountAmount4?: number
+  discountAmount5?: number
+  discountAmount6?: number
 
-  discountRate1?:number
-  discountRate2?:number
-  discountRate3?:number
-  discountRate4?:number
-  discountRate5?:number
-  discountRate6?:number
-  vatRate?:number
-  vatAmount?:number
-  lineGrossTotal?:number
-  lineNetTotal?:number
+  discountRate1?: number
+  discountRate2?: number
+  discountRate3?: number
+  discountRate4?: number
+  discountRate5?: number
+  discountRate6?: number
+  expenseAmount1?: number
+  expenseAmount2?: number
+  expenseAmount3?: number
+  expenseAmount4?: number
+  vatRate?: number
+  vatAmount?: number
+  lineGrossTotal?: number
+  lineNetTotal?: number
 }
 
-export function orderListQuery(top:number=100){
+export function orderListQuery(top: number = 100) {
   return `SELECT TOP ${top} orderNumber as _id, *
 , ROUND(100*CASE WHEN amount>0 THEN discountAmount1/amount ELSE 0 END,2) as discountRate1 
 , ROUND(100*CASE WHEN (amount-discountAmount1)>0 THEN discountAmount2/(amount-discountAmount1) ELSE 0 END,2) as discountRate2 
@@ -88,7 +100,7 @@ FROM (
 SELECT SIP.sip_tarih as issueDate, SIP.sip_evrakno_seri + CAST(SIP.sip_evrakno_sira as varchar(10)) as orderNumber, 
 SIP.sip_belgeno as documentNumber,
 dbo.fn_SiparisCins(SIP.sip_cins) as orderType,
-SIP.sip_musteri_kod as firmCode, CARI.cari_unvan1 as firmName,
+SIP.sip_musteri_kod as firmId, SIP.sip_musteri_kod + ' - ' + CARI.cari_unvan1 as firm,
 CAST(SIP.sip_depono as VARCHAR(10)) as warehouseId, CAST(SIP.sip_depono as VARCHAR(10)) + ' - ' + dbo.fn_DepoIsmi(SIP.sip_depono) as warehouse,
 SUM(SIP.sip_miktar) as quantity, SUM(SIP.sip_teslim_miktar) as delivered,
 ROUND(SUM(SIP.sip_tutar),2) as amount,
@@ -98,6 +110,7 @@ ROUND(dbo.fn_SiparisNetTutar(SUM(SIP.sip_tutar),SUM(SIP.sip_iskonto_1),SUM(SIP.s
 ,SUM(SIP.sip_masraf_1),SUM(SIP.sip_masraf_2),SUM(SIP.sip_masraf_3),SUM(SIP.sip_masraf_4),0,SUM(SIP.sip_masvergi),
 SUM(SIP.sip_Otv_Vergi),SUM(SIP.sip_otvtutari),0,0, 1,0,0),2) as grossTotal,
 ROUND(SUM(SIP.sip_vergi),2) as vat , dbo.fn_DovizSembolu(SIP.sip_doviz_cinsi) as currency,
+SIP.sip_satici_kod as salespersonId, SIP.sip_satici_kod as salesperson,
 COUNT(*) as lineCount
 FROM SIPARISLER SIP INNER JOIN
 CARI_HESAPLAR CARI on SIP.sip_musteri_kod = CARI.cari_kod
@@ -111,17 +124,17 @@ and (
 )
 GROUP BY SIP.sip_tarih, SIP.sip_evrakno_seri , SIP.sip_evrakno_sira,
 SIP.sip_cins, CARI.cari_unvan1,SIP.sip_musteri_kod , SIP.sip_depono,
-SIP.sip_belgeno, SIP.sip_doviz_cinsi
+SIP.sip_belgeno, SIP.sip_doviz_cinsi, SIP.sip_satici_kod
 ) X
-WHERE (firmCode like '%{search}%' or firmName like '%{search}%' or orderNumber like '%{search}%' or '{search}'='')
+WHERE (firm like '%{search}%' or orderNumber like '%{search}%' or '{search}'='')
 and (issueDate>='{startDate}' and issueDate<='{endDate}')
-and (warehouseCode='{warehouseCode}' OR '{warehouseCode}'='')
+-- and (warehouseId='{warehouseId}' OR '{warehouse}'='')
 
 ORDER BY issueDate DESC
 `
 }
 
-export function orderHeaderQuery(orderId: string) {
+export function orderHeaderQuery(orderId: string, ioType: number) {
   return `SELECT orderNumber as _id, *, quantity-delivered as remainder 
 , ROUND(100*CASE WHEN amount>0 THEN discountAmount1/amount ELSE 0 END,2) as discountRate1 
 , ROUND(100*CASE WHEN (amount-discountAmount1)>0 THEN discountAmount2/(amount-discountAmount1) ELSE 0 END,2) as discountRate2 
@@ -134,12 +147,16 @@ export function orderHeaderQuery(orderId: string) {
 ,ROUND(grossTotal+vatAmount,2) as netTotal
   FROM (
     SELECT 
+    SIP.sip_tip as ioType,
+	(SELECT TOP 1 sip_Guid  FROM SIPARISLER WHERE sip_tip=SIP.sip_tip and sip_cins=SIP.sip_cins and 
+	sip_evrakno_seri=SIP.sip_evrakno_seri and sip_evrakno_sira=SIP.sip_evrakno_sira AND sip_satirno=0) as sip_Guid,
     dbo.fn_SiparisCins(SIP.sip_cins) as orderType,
     SIP.sip_tarih as issueDate,
+    
     SIP.sip_evrakno_seri as docNoSerial,SIP.sip_evrakno_sira as docNoSequence,
     (SIP.sip_evrakno_seri + CAST(SIP.sip_evrakno_sira as varchar(10))) as orderNumber,
     SIP.sip_belgeno as documentNumber, SIP.sip_belge_tarih as documentDate,
-    CARI.cari_kod as firmCode, CARI.cari_unvan1 as firmName,
+    CARI.cari_kod as firmId, CARI.cari_kod + ' - ' + CARI.cari_unvan1 as firm,
     CAST(SIP.sip_depono as VARCHAR(10)) as warehouseId, CAST(SIP.sip_depono as VARCHAR(10)) + ' - ' + dbo.fn_DepoIsmi(SIP.sip_depono) as warehouse,
     SIP.sip_adresno,
     SUM(SIP.sip_miktar) as quantity, SUM(SIP.sip_teslim_miktar) as delivered,
@@ -150,7 +167,7 @@ export function orderHeaderQuery(orderId: string) {
     ,SUM(SIP.sip_masraf_1),SUM(SIP.sip_masraf_2),SUM(SIP.sip_masraf_3),SUM(SIP.sip_masraf_4),0,SUM(SIP.sip_masvergi),
     SUM(SIP.sip_Otv_Vergi),SUM(SIP.sip_otvtutari),0,0, 1,0,0),2) as grossTotal,
     ROUND(SUM(SIP.sip_vergi),2) as vatAmount , dbo.fn_DovizSembolu(SIP.sip_doviz_cinsi) as currency,
-    COUNT(*) as lineCount , CAST(SIP.sip_opno as VARCHAR(10)) as paymentPlan, ISNULL(ODP.odp_kodu + '-' + ODP.odp_adi,'CASH') as paymentPlanName
+    COUNT(*) as lineCount , CAST(SIP.sip_opno as VARCHAR(10)) as paymentPlanId, ISNULL(ODP.odp_kodu + '-' + ODP.odp_adi,'Peşin') as paymentPlan
     ,SIP.sip_stok_sormerk as responsibility , SIP.sip_projekodu as project
     FROM SIPARISLER SIP INNER JOIN
     CARI_HESAPLAR CARI ON SIP.sip_musteri_kod=CARI.cari_kod LEFT OUTER JOIN
@@ -158,12 +175,12 @@ export function orderHeaderQuery(orderId: string) {
     WHERE SIP.sip_tip=1
     GROUP BY SIP.sip_tarih,SIP.sip_belgeno,SIP.sip_evrakno_seri,SIP.sip_evrakno_sira,SIP.sip_belge_tarih,
     SIP.sip_depono,CARI.cari_kod, CARI.cari_unvan1, SIP.sip_adresno, SIP.sip_doviz_cinsi, SIP.sip_cins,
-    SIP.sip_opno,ODP.odp_kodu, ODP.odp_adi,SIP.sip_stok_sormerk, SIP.sip_projekodu
+    SIP.sip_opno,ODP.odp_kodu, ODP.odp_adi,SIP.sip_stok_sormerk, SIP.sip_projekodu, SIP.sip_tip
     ) X
     WHERE orderNumber='${orderId}';`
 }
 
-export function orderDetailQuery(orderId: string) {
+export function orderDetailQuery(orderId: string, ioType: number) {
   return `SELECT *, quantity-delivered as remainder 
 , ROUND(100*CASE WHEN amount>0 THEN discountAmount1/amount ELSE 0 END,2) as discountRate1 
 , ROUND(100*CASE WHEN (amount-discountAmount1)>0 THEN discountAmount2/(amount-discountAmount1) ELSE 0 END,2) as discountRate2 
@@ -176,9 +193,11 @@ export function orderDetailQuery(orderId: string) {
 ,ROUND(lineGrossTotal+vatAmount,2) as lineNetTotal
 FROM (
 SELECT SIP.sip_Guid as _id,
+SIP.sip_tip as ioType,
 (SIP.sip_evrakno_seri + CAST(SIP.sip_evrakno_sira as VARCHAR(10))) as orderId,
-SIP.sip_satirno as [lineNo], SIP.sip_stok_kod as itemCode, S.sto_isim as itemName
+SIP.sip_satirno as [lineNo], SIP.sip_stok_kod as itemId, SIP.sip_stok_kod + ' - ' + S.sto_isim as item
 , ISNULL((SELECT TOP 1 bar_kodu FROM BARKOD_TANIMLARI WHERE bar_stokkodu= S.sto_kod),'') as barcode
+, RTRIM(SIP.sip_aciklama + ' ' + SIP.sip_aciklama2) as description
 ,SIP.sip_miktar as quantity, SIP.sip_teslim_miktar as delivered, S.sto_birim1_ad as unit
 ,SIP.sip_b_fiyat as price, SIP.sip_tutar as amount ,
 SIP.sip_iskonto_1 as discountAmount1,SIP.sip_iskonto_2 as discountAmount2,SIP.sip_iskonto_3 as discountAmount3,SIP.sip_iskonto_4 as discountAmount4,SIP.sip_iskonto_5 as discountAmount5,SIP.sip_iskonto_6 as discountAmount6,
@@ -197,19 +216,154 @@ order by [lineNo]
   `
 }
 
-export function paymentPlanQuery(){
-  return `SELECT _id, [name] FROM (
-            SELECT '0' as _id, 'Peşin' as [name]
-            union all
-            SELECT CAST(odp_no as VARCHAR(10)) as _id, LOWER(LTRIM(RTRIM(odp_kodu + ' ' + odp_adi))) as [name]  FROM ODEME_PLANLARI 
-            ) X
+function preSaveOrder(token: string, orderHeader: OrderHeader, orderDetails: OrderDetail[]) {
+  return new Promise<void>((resolve, reject) => {
+    if (orderDetails.length == 0) return reject('Order lines cannot be empty')
+    if (!orderHeader.firmId) return reject('Firm required')
+    if (!orderHeader.warehouseId) return reject('Warehouse required')
+
+    resolve()
+  })
+}
+export function saveOrder(token: string, orderHeader: OrderHeader, orderDetails: OrderDetail[]) {
+  return new Promise<void>((resolve, reject) => {
+    try {
+      let msg = ''
+      let query = ''
+      preSaveOrder(token, orderHeader, orderDetails)
+        .then(() => {
+          query = `
+            --DECLARE @EvrakSira INT=${orderHeader.docNoSequence};
+            DECLARE @EvrakSira INT=0;
+            DECLARE @EvrakSeri VARCHAR(50)='${orderHeader.docNoSerial?.replaceAll("'", "''")}';
+            DECLARE @SIP_TIP INT = ${orderHeader.ioType};
+            DECLARE @SIP_CINS INT = 0;
+            DECLARE @MikroUserNo INT = 99;
+            
             `
+          //if (!orderHeader.sip_Guid) {
+
+          query += `
+              IF @EvrakSira>0 BEGIN
+                IF (SELECT COUNT(*) FROM SIPARISLER WHERE sip_tip=@SIP_TIP AND sip_cins=@SIP_CINS AND sip_evrakno_seri=@EvrakSeri AND sip_evrakno_sira=@EvrakSira) >0 BEGIN
+                  RAISERROR('Ayni Seri ve Sira numarasindan baska evrak mevcut', 16, 1);		
+                END
+              END ELSE BEGIN
+                SELECT @EvrakSira=ISNULL(MAX(sip_evrakno_sira),0)+1 FROM SIPARISLER WHERE sip_tip=@SIP_TIP AND sip_cins=@SIP_CINS AND sip_evrakno_seri=@EvrakSeri;
+              END
+            `
+          orderDetails.forEach((e, rowIndex) => {
+            query += insertQuery(orderHeader, e, rowIndex)
+          })
+          //
+          // } else {
+          // }
+          postItem(`/mikro/save`, token, { query: query })
+            .then(result => {
+              console.log('saveOrder result:', result)
+              resolve(result)
+            })
+            .catch(reject)
+        })
+        .catch(reject)
+
+    } catch (err) {
+      reject(err)
+    }
+  })
 }
 
-export function responsibilityQuery(){
-  return `SELECT som_kod as _id, LOWER(som_isim) as [name] FROM SORUMLULUK_MERKEZLERI ORDER BY som_isim`
-}
-
-export function projectQuery(){
-  return `SELECT pro_kodu as _id, LOWER(pro_adi) as [name] FROM PROJELER ORDER BY pro_adi`
+function insertQuery(orderHeader: OrderHeader, orderDetail: OrderDetail, rowIndex: Number) {
+  return `INSERT INTO SIPARISLER (sip_Guid, sip_DBCno, sip_SpecRECno, sip_iptal, sip_fileid, sip_hidden, sip_kilitli, sip_degisti, sip_checksum, sip_create_user, sip_create_date, sip_lastup_user, sip_lastup_date, sip_special1, sip_special2, sip_special3, sip_firmano, sip_subeno, sip_tarih, sip_teslim_tarih, sip_tip, sip_cins, sip_evrakno_seri, sip_evrakno_sira, sip_satirno, sip_belgeno, sip_belge_tarih, sip_satici_kod, sip_musteri_kod, sip_stok_kod, sip_b_fiyat, sip_miktar, sip_birim_pntr, sip_teslim_miktar, sip_tutar, sip_iskonto_1, sip_iskonto_2, sip_iskonto_3, sip_iskonto_4, sip_iskonto_5, sip_iskonto_6, sip_masraf_1, sip_masraf_2, sip_masraf_3, sip_masraf_4, sip_vergi_pntr, sip_vergi, sip_masvergi_pntr, sip_masvergi, sip_opno, sip_aciklama, sip_aciklama2, sip_depono, sip_OnaylayanKulNo, sip_vergisiz_fl, sip_kapat_fl, sip_promosyon_fl, sip_cari_sormerk, sip_stok_sormerk, sip_cari_grupno, sip_doviz_cinsi, sip_doviz_kuru, sip_alt_doviz_kuru, sip_adresno, sip_teslimturu, sip_cagrilabilir_fl, sip_prosip_uid, sip_iskonto1, sip_iskonto2, sip_iskonto3, sip_iskonto4, sip_iskonto5, sip_iskonto6, sip_masraf1, sip_masraf2, sip_masraf3, sip_masraf4, sip_isk1, sip_isk2, sip_isk3, sip_isk4, sip_isk5, sip_isk6, sip_mas1, sip_mas2, sip_mas3, sip_mas4, sip_Exp_Imp_Kodu, sip_kar_orani, sip_durumu, sip_stal_uid, sip_planlananmiktar, sip_teklif_uid, sip_parti_kodu, sip_lot_no, sip_projekodu, sip_fiyat_liste_no, sip_Otv_Pntr, sip_Otv_Vergi, sip_otvtutari, sip_OtvVergisiz_Fl, sip_paket_kod, sip_Rez_uid, sip_harekettipi, sip_yetkili_uid, sip_kapatmanedenkod, sip_gecerlilik_tarihi, sip_onodeme_evrak_tip, sip_onodeme_evrak_seri, sip_onodeme_evrak_sira, sip_rezervasyon_miktari, sip_rezerveden_teslim_edilen, sip_HareketGrupKodu1, sip_HareketGrupKodu2, sip_HareketGrupKodu3, sip_Olcu1, sip_Olcu2, sip_Olcu3, sip_Olcu4, sip_Olcu5, sip_FormulMiktarNo, sip_FormulMiktar, sip_satis_fiyat_doviz_cinsi, sip_satis_fiyat_doviz_kuru, sip_eticaret_kanal_kodu, sip_Tevkifat_turu, sip_otv_tevkifat_turu, sip_otv_tevkifat_tutari, sip_tevkifat_sifirlandi_fl) 
+                VALUES(NEWID(), 0, 0, 0, 21, 0, 0, 0, 0, @MikroUserNo, GETDATE(),  @MikroUserNo, GETDATE(), '', '', 'DNMK', 0, 0, 
+                  '${orderHeader.issueDate}', '${orderDetail.deliveryDate || orderHeader.issueDate || new Date().toISOString().substring(0,10)}',
+                   @SIP_TIP, @SIP_CINS, @EvrakSeri, @EvrakSira, ${rowIndex}, 
+                  '${orderHeader.documentNumber!.replaceAll("'", "''")}', '${orderHeader.documentDate}', '${orderHeader.salespersonId || ''}',
+                  '${orderHeader.firmId}', '${orderDetail.itemId}', ${orderDetail.price || 0}, ${orderDetail.quantity || 0}, 1, 0, ${orderDetail.amount},
+                  ${orderDetail.discountAmount1 || 0}, ${orderDetail.discountAmount2 || 0}, ${orderDetail.discountAmount3 || 0},
+                  ${orderDetail.discountAmount4 || 0}, ${orderDetail.discountAmount5 || 0}, ${orderDetail.discountAmount6 || 0},
+                  ${orderDetail.expenseAmount1 || 0}, ${orderDetail.expenseAmount2 || 0}, ${orderDetail.expenseAmount3 || 0}, ${orderDetail.expenseAmount4 || 0}
+                  ,1 -- sip_vergi_pntr TODO: vergi pointer gelecek
+                  , ${orderDetail.vatAmount || 0}
+                  ,0 -- sip_masvergi_pntr
+                  ,0 -- sip_masvergi
+                  , ${orderHeader.paymentPlanId || ''}, '${orderDetail.description!.replaceAll("'", "''").substring(0, 50)}', 
+                  '${orderDetail.description!.replaceAll("'", "''").substring(50, 100)}', ${orderHeader.warehouseId || 0}
+                  ,0 -- sip_OnaylayanKulNo
+                  ,0 -- sip_vergisiz_fl
+                  ,0 -- sip_kapat_fl
+                  ,0 -- sip_promosyon_fl
+                  , '${orderHeader.responsibilityId || ''}', '${orderHeader.responsibilityId || ''}'
+                  ,0 --sip_cari_grupno
+                  ,0 -- sip_doviz_cinsi
+                  ,1 -- sip_doviz_kuru
+                  ,0 -- sip_alt_doviz_kuru
+                  ,1 -- sip_adresno
+                  ,'' -- sip_teslimturu
+                  ,0 -- sip_cagrilabilir_fl
+                  ,'00000000-0000-0000-0000-000000000000' --sip_prosip_uid
+                  ,0 --sip_iskonto1
+                  ,1 --sip_iskonto2
+                  ,1 --sip_iskonto3
+                  ,1 --sip_iskonto4
+                  ,1 --sip_iskonto5
+                  ,1 --sip_iskonto6
+                  ,1 --sip_masraf1
+                  ,1 --sip_masraf2
+                  ,1 --sip_masraf3
+                  ,1 --sip_masraf4
+                  ,1 --sip_isk1
+                  ,0 --sip_isk2
+                  ,0 --sip_isk3
+                  ,0 --sip_isk4
+                  ,0 --sip_isk5
+                  ,0 --sip_isk6
+                  ,0 --sip_mas1
+                  ,0 --sip_mas2
+                  ,0 --sip_mas3
+                  ,0 --sip_mas4
+                  ,'' --sip_Exp_Imp_Kodu
+                  ,0 --sip_kar_orani
+                  ,0 --sip_durumu
+                  ,'00000000-0000-0000-0000-000000000000' --sip_stal_uid
+                  ,0 --sip_planlananmiktar
+                  ,'00000000-0000-0000-0000-000000000000' --sip_teklif_uid
+                  ,'' --sip_parti_kodu
+                  ,0  --sip_lot_no
+                  , '${orderHeader.projectId || ''}'
+                  ,0 --sip_fiyat_liste_no
+                  ,0 --sip_Otv_Pntr
+                  ,0 --sip_Otv_Vergi
+                  ,0 --sip_otvtutari
+                  ,0 --sip_OtvVergisiz_Fl
+                  ,'' --sip_paket_kod
+                  ,'00000000-0000-0000-0000-000000000000' --sip_Rez_uid
+                  ,0 --sip_harekettipi
+                  ,'00000000-0000-0000-0000-000000000000' --sip_yetkili_uid
+                  ,'' --sip_kapatmanedenkod
+                  ,'1900-01-01' --sip_gecerlilik_tarihi
+                  ,0 --sip_onodeme_evrak_tip
+                  ,'' --sip_onodeme_evrak_seri
+                  ,0 --sip_onodeme_evrak_sira
+                  ,0 --sip_rezervasyon_miktari
+                  ,0 --sip_rezerveden_teslim_edilen
+                  ,'' --sip_HareketGrupKodu1
+                  ,'' --sip_HareketGrupKodu2
+                  ,'' --sip_HareketGrupKodu3
+                  ,0 --sip_Olcu1
+                  ,0 --sip_Olcu2
+                  ,0 --sip_Olcu3
+                  ,0 --sip_Olcu4
+                  ,0 --sip_Olcu5
+                  ,0 --sip_FormulMiktarNo
+                  ,0 --sip_FormulMiktar
+                  ,0 --sip_satis_fiyat_doviz_cinsi
+                  ,0 --sip_satis_fiyat_doviz_kuru
+                  ,'' --sip_eticaret_kanal_kodu
+                  ,0 --sip_Tevkifat_turu
+                  ,0 --sip_otv_tevkifat_turu
+                  ,0 --sip_otv_tevkifat_tutari
+                  ,0 --sip_tevkifat_sifirlandi_fl
+                  );
+              `
 }

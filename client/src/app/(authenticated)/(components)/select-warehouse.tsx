@@ -44,10 +44,9 @@ export function SelectWarehouse({ t, children, onSelect }: Props) {
       .finally(() => setLoading(false))
   }
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
-  useEffect(() => { token && load('') }, [token])
 
   return (
-    <AlertDialog >
+    <AlertDialog onOpenChange={e=>e && load(search)} >
       <AlertDialogTrigger>{children}</AlertDialogTrigger>
       <AlertDialogContent className=" px-3 py-1 lg:max-w-[900px]">
         <AlertDialogHeader className="p-0 m-0 ">
@@ -57,7 +56,7 @@ export function SelectWarehouse({ t, children, onSelect }: Props) {
             <AlertDialogCancel>X</AlertDialogCancel>
             </div>
           </AlertDialogTitle>
-          
+          <AlertDialogDescription></AlertDialogDescription>
         </AlertDialogHeader>
         <div className="overflow-y-auto h-[600px]">
           <div className="relative w-full pe-4">

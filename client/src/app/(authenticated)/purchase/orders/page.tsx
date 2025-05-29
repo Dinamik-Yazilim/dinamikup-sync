@@ -33,14 +33,14 @@ export default function InventoryPage() {
       apiPath='/mikro/get'
       query={orderListQuery()}
       options={{ showAddNew: true, showEdit: true, showDelete: true, showSearch: true, type: 'Update' }}
-      defaultFilter={{ startDate: startOfLastMonth(), endDate: today(), warehouseCode: '', isClosed: '' }}
+      defaultFilter={{ startDate: startOfLastMonth(), endDate: today(), warehouseId: '', isClosed: '' }}
       title={t('Purchase Orders')}
       icon=<TruckIcon />
       onFilterPanel={(filter, setFilter) => {
         return (<div className='flex flex-col gap-1'>
           <TsnInput type='date' title={t('Start Date')} defaultValue={filter.startDate} onBlur={e => setFilter({ ...filter, startDate: e.target.value })} />
           <TsnInput type='date' title={t('End Date')} defaultValue={filter.endDate} onBlur={e => setFilter({ ...filter, endDate: e.target.value })} />
-          <TsnSelectRemote all title={t('Warehouse')} itemClassName='capitalize' value={filter.warehouseCode} onValueChange={e => setFilter({ ...filter, warehouseCode: e })} query={`SELECT dep_no as _id, LOWER(dep_adi) as [name], * FROM DEPOLAR WHERE dep_envanter_harici_fl=0 ORDER BY dep_adi`} />
+          {/* <TsnSelectRemote all title={t('Warehouse')} itemClassName='capitalize' value={filter.warehouseId} onValueChange={e => setFilter({ ...filter, warehouseCode: e })} query={`SELECT dep_no as _id, LOWER(dep_adi) as [name], * FROM DEPOLAR WHERE dep_envanter_harici_fl=0 ORDER BY dep_adi`} /> */}
           <TsnSelect title={t('Closed?')} all list={[{ _id: '0', name: t('Open')}, { _id: '1', name: t('Closed') }]} value={filter.isClosed} onValueChange={e => setFilter({ ...filter, isClosed: e })} />
         </div>)
       }}
@@ -64,15 +64,13 @@ export default function InventoryPage() {
           </div>
         </div>
         <div className='col-span-3 flex flex-col gap-1 items-start'>
-          <div className='capitalize'>{e.firmName?.toLowerCase()}</div>
-          <div className='flex w-full justify-between pe-4 text-xs text-muted-foreground'>
-            <div className=''>{e.firmCode}</div>
-            <div className=''>{t('Line Count')}: <span className='text-foreground'>{e.lineCount}</span></div>
-          </div>
+          <div className='capitalize'>{e.firm?.toLowerCase()}</div>
+          <div className=''>{t('Line Count')}: <span className='text-foreground'>{e.lineCount}</span></div>
+          
         </div>
 
         <div>
-          <div className='capitalize'>{e.warehouseName?.toLowerCase()}</div>
+          <div className='capitalize'>{e.warehouse?.toLowerCase()}</div>
         </div>
         <div className='flex flex-col items-end'>
           <div>{e.quantity! - e.delivered!}</div>

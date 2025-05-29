@@ -58,15 +58,25 @@
   "Document Number": "Document Number",
   "Document Date": "Document Date",
   "Header": "Header",
-  "Payment Plan": "Payment Type",
+  "Payment Plan": "Payment Plan",
   "CASH": "Cash",
   "Responsibility": "Responsibility",
+  "Project": "Project",
   "Lines": "Lines",
   "Totals": "Totals",
   "Price": "Price",
   "Line Total": "Line Total",
   "Select warehouse": "Select warehouse",
   "Select firm": "Select firm",
-  "Select item": "Select item"
-  
+  "Select item": "Select item",
+  "Select responsibility": "Select responsibility",
+  "Select payment plan": "Select payment plan",
+  "Select project": "Select project",
+  "Order lines cannot be empty":"Order lines cannot be empty",
+  "Firm required":"Firm required",
+  "Warehouse required":"Warehouse required",
+  "Success":"Success",
+  "Document has been saved successfuly":"Document has been saved successfuly",
+  "Item":"Item",
+  "Items":"Items"
 }
