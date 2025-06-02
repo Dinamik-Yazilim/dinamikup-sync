@@ -40,7 +40,7 @@ export default function OrderPage({ params }: Props) {
     issueDate: today(),
     ioType: 1,
     documentDate: today(),
-    docNoSequence:0
+    docNoSequence: 0
   })
   const [orderDetails, setOrderDetails] = useState<OrderDetail[]>([])
 
@@ -72,9 +72,15 @@ export default function OrderPage({ params }: Props) {
   }
 
   const deleteLine = (rowIndex: number) => {
-    let l = orderDetails
-    l.splice(rowIndex, 1)
-    setOrderDetails(l.map(e => e))
+    // let l = orderDetails
+    // l.splice(rowIndex, 1)
+    // setOrderDetails(l.map(e => e))
+    const l = orderDetails.map((e, index) => {
+      if (index == rowIndex) e.deleted = true
+      return e
+    })
+    setOrderDetails(l)
+    calcTotals(l)
   }
 
   const OrderCurrency = () => <span className='text-xs text-muted-foreground'>{orderHeader.currency}</span>
@@ -93,9 +99,9 @@ export default function OrderPage({ params }: Props) {
         <TsnInput type='date' title={t('Document Date')} defaultValue={orderHeader.issueDate?.substring(0, 10)}
           onBlur={e => setOrderHeader({ ...orderHeader, documentDate: e.target.value })} />
       </div>
-      <div className="col-span-1 lg:col-span-4 w-full p-2 pe-4 flex items-center  border rounded-md border-dashed">
+      <div className="col-span-4 lg:col-span-4 w-full p-2 pe-4 flex items-start justify-between  border rounded-md border-dashed">
         <div className="flex flex-col gap-1">
-          <Label>{t('Firm')}</Label>
+          <Label className="text-muted-foreground">{t('Firm')}</Label>
           <div className="capitalize">{orderHeader.firm?.toLowerCase()}</div>
         </div>
         <SelectFirm t={t} onSelect={e => {
@@ -103,9 +109,9 @@ export default function OrderPage({ params }: Props) {
         }} ><ButtonSelect /></SelectFirm>
 
       </div>
-      <div className="col-span-1 lg:col-span-2 w-full flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
+      <div className="col-span-2 lg:col-span-2 w-full flex justify-between p-2 pe-4 items-start  border rounded-md border-dashed">
         <div className="flex flex-col gap-1">
-          <Label>{t('Warehouse')}</Label>
+          <Label className="text-muted-foreground">{t('Warehouse')}</Label>
           <div className="capitalize">{orderHeader.warehouse}</div>
         </div>
         <SelectWarehouse t={t} onSelect={e => {
@@ -115,33 +121,33 @@ export default function OrderPage({ params }: Props) {
       </div>
 
       <div className="col-span-1 lg:col-span-6 grid grid-cols-1 lg:grid-cols-4 justify-between gap-2">
-        <div className="w-full flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
+        <div className="w-full flex justify-between p-2 pe-4 items-start  border rounded-md border-dashed">
           <div className="flex flex-col gap-1">
-            <Label>{t('Payment Plan')}</Label>
+            <Label className="text-muted-foreground">{t('Payment Plan')}</Label>
             <div className="capitalize">{orderHeader.paymentPlan}</div>
           </div>
           <SelectPaymentPlan t={t} onSelect={e => { setOrderHeader({ ...orderHeader, paymentPlanId: e._id, paymentPlan: e.name }) }} ><ButtonSelect /></SelectPaymentPlan>
 
         </div>
-        <div className="w-full flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
+        <div className="w-full flex justify-between p-2 pe-4 items-start  border rounded-md border-dashed">
           <div className="flex flex-col gap-1">
-            <Label>{t('Project')}</Label>
+            <Label className="text-muted-foreground">{t('Project')}</Label>
             <div className="capitalize">{orderHeader.project}</div>
           </div>
           <SelectProject t={t} onSelect={e => { setOrderHeader({ ...orderHeader, projectId: e._id, project: e.name }) }} ><ButtonSelect /></SelectProject>
 
         </div>
-        <div className="w-full flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
+        <div className="w-full flex justify-between p-2 pe-4 items-start  border rounded-md border-dashed">
           <div className="flex flex-col gap-1">
-            <Label>{t('Responsibility')}</Label>
+            <Label className="text-muted-foreground">{t('Responsibility')}</Label>
             <div className="capitalize">{orderHeader.responsibility}</div>
           </div>
           <SelectResponsibility t={t} onSelect={e => { setOrderHeader({ ...orderHeader, responsibilityId: e._id, responsibility: e.name }) }} ><ButtonSelect /></SelectResponsibility>
 
         </div>
-        <div className="w-full flex justify-between p-2 pe-4 items-center  border rounded-md border-dashed">
+        <div className="w-full flex justify-between p-2 pe-4 items-start  border rounded-md border-dashed">
           <div className="flex flex-col gap-1">
-            <Label>{t('Salesperson')}</Label>
+            <Label className="text-muted-foreground">{t('Salesperson')}</Label>
             <div className="capitalize">{orderHeader.salesperson}</div>
           </div>
           <SelectSalesperson t={t} onSelect={e => { setOrderHeader({ ...orderHeader, salespersonId: e._id, salesperson: e.name }) }} ><ButtonSelect /></SelectSalesperson>
@@ -168,54 +174,62 @@ export default function OrderPage({ params }: Props) {
               <div className="text-end">{t('Net Total')}</div>
             </div>
             <div className='w-20 p-1 flex justify-end lg:justify-end'>
-              <OrderLineDialog ioType={1} t={t} orderDetails={orderDetails} setOrderDetails={setOrderDetails} rowIndex={-1} >
+              <OrderLineDialog ioType={1} t={t} orderDetails={orderDetails} setOrderDetails={e => {
+                setOrderDetails(e)
+
+              }} rowIndex={-1} >
                 <div className="cursor-pointer bg-green-600 px-[5px] py-[4px] text-white rounded-md" ><PlusSquareIcon width={'24px'} /></div>
               </OrderLineDialog>
             </div>
           </div>
         }
-        onRowPaint={(e: OrderDetail, rowIndex) =>
-          <div key={'line' + rowIndex} className="flex  w-full gap-2 items-center">
-            <div className="text-xs text-nowrap mt-2 text-muted-foreground">#{rowIndex + 1}</div>
-            <div className="grid grid-cols-8 gap-1 w-full items-center">
-              <div className="col-span-2 flex flex-col">
-                <div className="capitalize">{e.item?.toLowerCase()}</div>
-                <div className="text-xs text-muted-foreground">{e.barcode}</div>
-              </div>
-              <div className='flex flex-col items-end'>
-                <div className="flex items-center gap-[3px]">{e.quantity}  <span className='text-xs text-muted-foreground capitalize'>{e.unit?.toLowerCase()}</span></div>
-                <div className='text-muted-foreground text-xs'>{e.delivered}/{e.remainder}</div>
-              </div>
-              <div className='flex items-center justify-end gap-[3px]'>
-                {moneyFormat(e.price)}<span className='text-xs text-muted-foreground ms-1'>{orderHeader.currency}</span>
-              </div>
-              <div className='flex flex-col gap-1 items-end'>
-                <div className='flex items-center gap-[3px]'>{moneyFormat(e.amount)} <span className='text-xs text-muted-foreground'>{orderHeader.currency}</span></div>
+        onRowPaint={(e: OrderDetail, rowIndex) => <>
+          {!e.deleted &&
+            <div key={'line' + rowIndex} className="flex  w-full gap-2 items-center">
+              <div className="text-xs text-nowrap mt-2 text-muted-foreground">#{rowIndex + 1}</div>
+              <div className="grid grid-cols-8 gap-1 w-full items-center">
+                <div className="col-span-2 flex flex-col">
+                  <div className="capitalize">{e.item?.toLowerCase()}</div>
+                  <div className="text-xs text-muted-foreground">{e.barcode}</div>
+                </div>
+                <div className='flex flex-col items-end'>
+                  <div className="flex items-center gap-[3px]">{e.quantity}  <span className='text-xs text-muted-foreground capitalize'>{e.unit?.toLowerCase()}</span></div>
+                  <div className='text-muted-foreground text-xs'>{e.delivered}/{e.remainder}</div>
+                </div>
+                <div className='flex items-center justify-end gap-[3px]'>
+                  {moneyFormat(e.price)}<span className='text-xs text-muted-foreground ms-1'>{orderHeader.currency}</span>
+                </div>
+                <div className='flex flex-col gap-1 items-end'>
+                  <div className='flex items-center gap-[3px]'>{moneyFormat(e.amount)} <span className='text-xs text-muted-foreground'>{orderHeader.currency}</span></div>
+
+                </div>
+                <div className='grid grid-cols-3 text-end justify-end px-2 text-xs text-muted-foreground'>
+                  {e.discountRate1! > 0 && <div>%{e.discountRate1} </div>}
+                  {e.discountRate2! > 0 && <div>%{e.discountRate2} </div>}
+                  {e.discountRate3! > 0 && <div>%{e.discountRate3} </div>}
+                  {e.discountRate4! > 0 && <div>%{e.discountRate4} </div>}
+                  {e.discountRate5! > 0 && <div>%{e.discountRate5} </div>}
+                  {e.discountRate6! > 0 && <div>%{e.discountRate6} </div>}
+                </div>
+                <div className='flex items-center justify-end gap-[3px]'>
+                  {moneyFormat(e.vatAmount)}<span className='text-xs text-muted-foreground ms-1'>{orderHeader.currency}</span>
+                </div>
+                <div className='flex items-center justify-end gap-[3px]'>{moneyFormat(e.lineNetTotal)}<span className='text-xs text-muted-foreground ms-1'>{orderHeader.currency}</span></div>
 
               </div>
-              <div className='grid grid-cols-3 text-end justify-end px-2 text-xs text-muted-foreground'>
-                {e.discountRate1! > 0 && <div>%{e.discountRate1} </div>}
-                {e.discountRate2! > 0 && <div>%{e.discountRate2} </div>}
-                {e.discountRate3! > 0 && <div>%{e.discountRate3} </div>}
-                {e.discountRate4! > 0 && <div>%{e.discountRate4} </div>}
-                {e.discountRate5! > 0 && <div>%{e.discountRate5} </div>}
-                {e.discountRate6! > 0 && <div>%{e.discountRate6} </div>}
-              </div>
-              <div className='flex items-center justify-end gap-[3px]'>
-                {moneyFormat(e.vatAmount)}<span className='text-xs text-muted-foreground ms-1'>{orderHeader.currency}</span>
-              </div>
-              <div className='flex items-center justify-end gap-[3px]'>{moneyFormat(e.lineNetTotal)}<span className='text-xs text-muted-foreground ms-1'>{orderHeader.currency}</span></div>
+              <div className='w-20 flex flex-row items-end justify-end mx-2 gap-2'>
 
+                <OrderLineDialog ioType={1} t={t} orderDetails={orderDetails} setOrderDetails={e => {
+                  setOrderDetails(e)
+                  calcTotals(e)
+                }} rowIndex={rowIndex} >
+                  <div className="cursor-pointer bg-indigo-600 text-white px-[5px] py-[4px] rounded-md" ><EditIcon width={'20px'} /></div>
+                </OrderLineDialog>
+                <TsnGridButtonDelete t={t} title={'delete line?'} onOk={() => deleteLine(rowIndex)} />
+              </div>
             </div>
-            <div className='w-20 flex flex-row items-end justify-end mx-2 gap-2'>
-
-              <OrderLineDialog ioType={1} t={t} orderDetails={orderDetails} setOrderDetails={setOrderDetails} rowIndex={rowIndex} >
-                <div className="cursor-pointer bg-indigo-600 text-white px-[5px] py-[4px] rounded-md" ><EditIcon width={'20px'} /></div>
-              </OrderLineDialog>
-              <TsnGridButtonDelete t={t} title={'delete line?'} onOk={() => deleteLine(rowIndex)} />
-            </div>
-          </div>
-        }
+          }
+        </>}
 
       />
 
@@ -249,10 +263,44 @@ export default function OrderPage({ params }: Props) {
     </TsnPanel>)
   }
 
+  const calcTotals = (orderDetails: OrderDetail[]) => {
+    orderHeader.amount = 0
+    orderHeader.vatAmount = 0
+    orderHeader.discountAmount1 = 0
+    orderHeader.discountAmount2 = 0
+    orderHeader.discountAmount3 = 0
+    orderHeader.discountAmount4 = 0
+    orderHeader.discountAmount5 = 0
+    orderHeader.discountAmount6 = 0
+    orderHeader.expenseAmount1 = 0
+    orderHeader.expenseAmount2 = 0
+    orderHeader.expenseAmount3 = 0
+    orderHeader.expenseAmount4 = 0
+    orderDetails.forEach(e => {
+      if (!e.deleted) {
+        orderHeader.amount! += e.amount || 0
+        orderHeader.vatAmount! += e.vatAmount || 0
+        orderHeader.discountAmount1! += e.discountAmount1 || 0
+        orderHeader.discountAmount2! += e.discountAmount2 || 0
+        orderHeader.discountAmount3! += e.discountAmount3 || 0
+        orderHeader.discountAmount4! += e.discountAmount4 || 0
+        orderHeader.discountAmount5! += e.discountAmount5 || 0
+        orderHeader.discountAmount6! += e.discountAmount6 || 0
+        orderHeader.expenseAmount1! += e.expenseAmount1 || 0
+        orderHeader.expenseAmount2! += e.expenseAmount2 || 0
+        orderHeader.expenseAmount3! += e.expenseAmount3 || 0
+        orderHeader.expenseAmount4! += e.expenseAmount4 || 0
+      }
+    })
+    orderHeader.grossTotal = orderHeader.amount - (orderHeader.discountAmount1 + orderHeader.discountAmount2 + orderHeader.discountAmount3 + orderHeader.discountAmount4 + orderHeader.discountAmount5 + orderHeader.discountAmount6)
+      + (orderHeader.expenseAmount1 + orderHeader.expenseAmount2 + orderHeader.expenseAmount3 + orderHeader.expenseAmount4)
+    orderHeader.netTotal = orderHeader.grossTotal + orderHeader.vatAmount
+
+  }
 
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
   useEffect(() => { token && params.id != 'addnew' && load() }, [token])
-
+  useEffect(() => orderHeader && calcTotals(orderDetails), [orderDetails])
   return (<StandartForm
     title={params.id == 'addnew' ? t('New Order') : t('Edit Order')}
     onSaveClick={save}

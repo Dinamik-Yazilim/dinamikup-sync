@@ -18,29 +18,27 @@ import { ListGrid } from '@/components/ui216/list-grid'
 import { TsnGrid } from '@/components/ui216/tsn-grid'
 import { moneyFormat, startOfLastMonth, today } from '@/lib/utils'
 import { TsnSelectRemote } from '@/components/ui216/tsn-select-remote'
-import { OrderHeader, orderListQuery } from '@/types/Order'
+import { OrderHeader, orderListQuery, orderListQueryProps } from '@/types/Order'
 
 
-export default function InventoryPage() {
+export default function PurchaseOrdersPage() {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { t } = useLanguage()
-
+  const [filter,setFilter]=useState<orderListQueryProps>({ioType:1,startDate:startOfLastMonth(),endDate:today()})
 
   return (
     <TsnGrid
-      apiPath='/mikro/get'
-      query={orderListQuery()}
+      query={orderListQuery(filter)}
       options={{ showAddNew: true, showEdit: true, showDelete: true, showSearch: true, type: 'Update' }}
-      defaultFilter={{ startDate: startOfLastMonth(), endDate: today(), warehouseId: '', isClosed: '' }}
       title={t('Purchase Orders')}
       icon=<TruckIcon />
-      onFilterPanel={(filter, setFilter) => {
+      onFilterPanel={() => {
         return (<div className='flex flex-col gap-1'>
           <TsnInput type='date' title={t('Start Date')} defaultValue={filter.startDate} onBlur={e => setFilter({ ...filter, startDate: e.target.value })} />
           <TsnInput type='date' title={t('End Date')} defaultValue={filter.endDate} onBlur={e => setFilter({ ...filter, endDate: e.target.value })} />
-          {/* <TsnSelectRemote all title={t('Warehouse')} itemClassName='capitalize' value={filter.warehouseId} onValueChange={e => setFilter({ ...filter, warehouseCode: e })} query={`SELECT dep_no as _id, LOWER(dep_adi) as [name], * FROM DEPOLAR WHERE dep_envanter_harici_fl=0 ORDER BY dep_adi`} /> */}
+          <TsnSelectRemote all title={t('Warehouse')} itemClassName='capitalize' value={filter.warehouseId} onValueChange={e => setFilter({ ...filter, warehouseId: e })} query={`SELECT dep_no as _id, CAST(dep_no as VARCHAR(10)) + ' - ' + dep_adi as [name], * FROM DEPOLAR WHERE dep_envanter_harici_fl=0 ORDER BY dep_no`} />
           <TsnSelect title={t('Closed?')} all list={[{ _id: '0', name: t('Open')}, { _id: '1', name: t('Closed') }]} value={filter.isClosed} onValueChange={e => setFilter({ ...filter, isClosed: e })} />
         </div>)
       }}

@@ -47,25 +47,26 @@ export function Sidebar({className}:Props) {
       icon: <TruckIcon className="h-5 w-5" />,
       submenu: [
         { title: t('Inventory'), href: "/purchase/inventory" },
+        { title: t('Vendors'), href: "/module-closed/vendors" },
         { title: t('Purchase Orders'), href: "/purchase/orders" },
+        { title: t('Satın Alma Şartları'), href:  "/module-closed/purchase-conditions" },
       ],
     },
     {
       title: t('Sales'),
       icon: <ShoppingCartIcon className="h-5 w-5" />,
       submenu: [
-        { title: "Reports", href: "/analytics/reports" },
-        { title: "Sales", href: "/analytics/sales" },
+        { title: "Reports", href: "/module-closed/reports" },
+        { title: "Sales", href: "/module-closed/sales" },
       ],
     },
     {
       title: t('Reports'),
       icon: <ChartAreaIcon className="h-5 w-5" />,
       submenu: [
-        { title: "All Products", href: "/products" },
-        { title: "Add Product", href: "/products/add" },
-        { title: "Categories", href: "/products/categories" },
-        { title: "Inventory", href: "/products/inventory" },
+        { title: t('Sales Profit'), href: "/reports/sales-profit" },
+        { title: "Satın Alma Raporu", href: "/module-closed/purchase" },
+        { title: "Satış Devir Hızı", href: "/module-closed/sales-cycle" },
       ],
     },
     {

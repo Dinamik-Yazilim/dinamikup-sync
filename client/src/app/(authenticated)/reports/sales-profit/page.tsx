@@ -12,37 +12,37 @@ import { TsnInput } from '@/components/ui216/tsn-input'
 import { Label } from '@/components/ui/label'
 import { TsnPanel } from '@/components/ui216/tsn-panel'
 import { TsnInputAddress } from '@/components/ui216/tsn-input-address'
-import { PackageCheckIcon, Users2Icon } from 'lucide-react'
+import { ChartAreaIcon, PackageCheckIcon, Users2Icon } from 'lucide-react'
 import { getRoleList, Member } from '@/types/Member'
 import { ListGrid } from '@/components/ui216/list-grid'
 import { TsnGrid } from '@/components/ui216/tsn-grid'
-import { moneyFormat } from '@/lib/utils'
+import { moneyFormat, today } from '@/lib/utils'
 import { TsnSelectRemote } from '@/components/ui216/tsn-select-remote'
-import { Inventory, inventoryQuery } from '@/types/Inventory'
 
-interface FilterType {
-  mainGroup?:string
-  subGroup?:string
-  category?:string
-  brand?:string
-  rayon?:string
-}
-export default function InventoryPage() {
+export default function SalesProfitPage() {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
-  const [filter, setFilter] = useState({search:'', mainGroup:'',subGroup:'',category:'',brand:'',rayon:''})
+  const [filter, setFilter] = useState<salesProfitQueryProps>({
+    startDate:today(),
+    endDate:today(),
+    search:'', mainGroup:'',subGroup:'',category:'',brand:'',rayon:''
+  })
   const router = useRouter()
   const { t } = useLanguage()
  
   return (
     <TsnGrid
-      query={inventoryQuery(filter)}
-      title={t('Inventory')}
-      icon=<PackageCheckIcon />
+      query={salesProfitQuery(filter)}
+      title={t('Sales Profit')}
+      icon=<ChartAreaIcon />
       onSearchChanged={e=>setFilter({...filter,search:e})}
       onFilterPanel={() => {
         const [mainLoading,setMainLoading]=useState(false)
         return (<div className='flex flex-col gap-1'>
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-2'>
+            <TsnInput type='date' title={t('Start Date')} defaultValue={filter.startDate} onChange={e=>setFilter({...filter, startDate:e.target.value})} />
+            <TsnInput type='date' title={t('End Date')} defaultValue={filter.endDate} onChange={e=>setFilter({...filter, endDate:e.target.value})} />
+          </div>
           <TsnSelectRemote all title={t('Main Group')} value={filter.mainGroup} 
             onValueChange={e => {
               setMainLoading(true)
@@ -77,7 +77,7 @@ export default function InventoryPage() {
           <div className='text-end'>{t('Quantity')}</div>
         </div>
       </>}
-      onRowPaint={(e: Inventory, rowIndex) => <div className='grid grid-cols-8 w-full'>
+      onRowPaint={(e: SalesProfit, rowIndex) => <div className='grid grid-cols-8 w-full'>
         <div className='col-span-2 flex flex-col gap-1 items-start'>
           <div>{e.itemCode}</div>
           <div className='text-[10px] p-[1px] px-[3px] bg-green-800 text-white rounded capitalize '>{e.brand?.toLowerCase()}</div>
@@ -97,4 +97,100 @@ export default function InventoryPage() {
       </div>}
     />
   )
+}
+
+export interface SalesProfit {
+  _id?:string
+  itemCode?:string 
+  itemName?:string
+  unit?:string
+  mainGroup?:string
+  subGroup?:string
+  category?:string
+  rayon?:string
+  brand?:string
+  lastPurchase?:number
+  purchaseConditionPrice?:number
+  purchaseConditionGrossPrice?:number
+  salesPrice?:number
+  quantity?:number
+  
+}
+
+interface salesProfitQueryProps {
+  top?:number
+  search?:string
+  startDate?:string
+  endDate?:string
+  warehouseId?:string
+  mainGroup?:string
+  subGroup?:string
+  category?:string
+  brand?:string
+  rayon?:string
+}
+
+function salesProfitQuery({top=100,search='',
+  startDate=new Date().toISOString().substring(0,10),
+  endDate=new Date().toISOString().substring(0,10),
+  mainGroup='',subGroup='',category='',brand='',rayon='', warehouseId='0'
+  }:salesProfitQueryProps){
+  return `
+  DECLARE @Tarih1 DATETIME='${startDate}';
+DECLARE @Tarih2 DATETIME='${endDate}';
+DECLARE @DepoNo INT = ${warehouseId};
+  SELECT top ${top}  S.sto_Guid as _id, S.sto_kod as itemCode, S.sto_isim as itemName, S.sto_birim1_ad as unit,
+ISNULL(SAN.san_isim,'') as mainGroup, ISNULL(STA.sta_isim,'') as [subGroup],
+ISNULL(KTG.ktg_isim,'') as category ,
+ISNULL(RYN.ryn_ismi,'') as rayon ,
+ISNULL(MRK.mrk_ismi,'') as brand 
+,ISNULL(STH.SatisMiktar,0) as quantity
+,ISNULL(STH.Tutar,0) as amount
+,ISNULL(STH.Iskonto,0) as discount
+,ISNULL(STH.AraToplam,0) as grossTotal
+,ISNULL(STH.Vergi,0) as vatAmount
+,ISNULL(STH.AraToplam,0)+ISNULL(STH.Vergi,0) as netTotal
+,ROUND(CASE WHEN STH.SatisMiktar>0 THEN ISNULL(STH.AraToplam,0)/STH.SatisMiktar ELSE 0 END,2) as AvgPrice
+,ROUND(CASE WHEN STH.SatisMiktar>0 THEN (ISNULL(STH.AraToplam,0)+ISNULL(STH.Vergi,0))/STH.SatisMiktar ELSE 0 END,2) as AvgNetPrice
+
+FROM STOKLAR S WITH (NOLOCK) LEFT OUTER JOIN
+STOK_ANA_GRUPLARI SAN ON S.sto_anagrup_kod = SAN.san_kod LEFT OUTER JOIN
+STOK_ALT_GRUPLARI STA ON S.sto_altgrup_kod=STA.sta_kod LEFT OUTER JOIN
+STOK_KATEGORILERI KTG ON S.sto_kategori_kodu= KTG.ktg_kod LEFT OUTER JOIN
+STOK_REYONLARI RYN ON S.sto_reyon_kodu=RYN.ryn_kod LEFT OUTER JOIN
+STOK_MARKALARI MRK ON S.sto_marka_kodu=MRK.mrk_kod
+
+INNER JOIN
+(SELECT sth_stok_kod,
+ROUND(sum(CASE WHEN (sth_tip=1 OR (sth_tip=0 AND sth_normal_iade=1))  THEN
+dbo.fn_StokHareketNetDeger(sth_tutar,0,0,0,0,0,0, sth_masraf1,sth_masraf2,sth_masraf3,sth_masraf4,sth_otvtutari,sth_oivtutari,sth_tip,0,sth_har_doviz_kuru,sth_alt_doviz_kuru,sth_stok_doviz_kuru) *
+Case When sth_normal_iade=1 then -1.0 else 1.0 end
+ELSE 0 END ),2) AS Tutar,
+ROUND(sum(sth_iskonto1 + sth_iskonto2 + sth_iskonto3 + sth_iskonto4 + sth_iskonto5 + sth_iskonto6),2) as Iskonto,
+ROUND(sum(CASE WHEN (sth_tip=1 OR (sth_tip=0 AND sth_normal_iade=1)) THEN
+dbo.fn_StokHareketNetDeger(sth_tutar,sth_iskonto1,sth_iskonto2,sth_iskonto3,sth_iskonto4,sth_iskonto5,sth_iskonto6, sth_masraf1,sth_masraf2,sth_masraf3,sth_masraf4,sth_otvtutari,sth_oivtutari,sth_tip,0,sth_har_doviz_kuru,sth_alt_doviz_kuru,sth_stok_doviz_kuru) *
+Case When sth_normal_iade=1 then -1.0 else 1.0 end
+ELSE 0 END ),2) AS AraToplam,
+ROUND(sum(CASE WHEN (sth_tip=1 OR (sth_tip=0 AND sth_normal_iade=1))   THEN
+sth_vergi * Case When sth_normal_iade=1 then -1.0 else 1.0 end
+ELSE 0 END ),2) AS Vergi,
+ROUND(sum(CASE WHEN (sth_tip=1 OR (sth_tip=0 AND sth_normal_iade=1))  THEN
+sth_miktar * Case When sth_normal_iade=1 then -1.0 else 1.0 end
+ELSE 0 END ),2) AS SatisMiktar
+FROM STOK_HAREKETLERI WITH (NOLOCK)
+WHERE (sth_cikis_depo_no= @DepoNo) AND sth_tarih>=@Tarih1 AND sth_tarih<=@Tarih2
+AND NOT sth_fat_uid IS NULL AND sth_fat_uid<>'00000000-0000-0000-0000-000000000000'
+AND ((sth_tip=1 AND sth_normal_iade=0) OR (sth_tip=0 AND sth_normal_iade=1))
+GROUP BY sth_stok_kod) STH ON S.sto_kod = STH.sth_stok_kod
+
+
+ WHERE (S.sto_kod like '%${search}%' or S.sto_isim like '%${search}%') AND
+ (S.sto_anagrup_kod='${mainGroup}' OR '${mainGroup}'='') AND
+ (S.sto_altgrup_kod='${subGroup}' OR '${subGroup}'='') AND
+ (S.sto_kategori_kodu='${category}' OR '${category}'='') AND
+ (S.sto_marka_kodu='${brand}' OR '${brand}'='') AND
+ (S.sto_reyon_kodu='${rayon}' OR '${rayon}'='')
+
+
+`
 }

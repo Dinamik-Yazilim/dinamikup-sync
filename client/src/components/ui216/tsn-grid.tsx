@@ -44,6 +44,7 @@ interface Props {
 
   onEdit?: (e: any, rowIndex: number) => void
   onLoadingChange?:(e:boolean)=>void
+  onSearchChanged?:(e:string)=>void
 }
 export function TsnGrid({
   // headers = [],
@@ -67,6 +68,7 @@ export function TsnGrid({
   onAddNew,
   onEdit,
   onLoadingChange,
+  onSearchChanged,
   
 }: Props) {
   const [list, setList] = useState<any[]>([])
@@ -80,18 +82,18 @@ export function TsnGrid({
   const { t } = useLanguage()
   const searchParams = useSearchParams()
 
-  const load = (s?: string, f?: any) => {
+  const load = () => {
     if (!query) return
     setLoading(true)
-    let q = query
-    q = q.replaceAll('{search}', s || '')
-    if (f) {
-      Object.keys(f).forEach(key => {
-        q = q.replaceAll(`{${key}}`, f[key])
-      })
+    // let q = query
+    // q = q.replaceAll('{search}', s || '')
+    // if (f) {
+    //   Object.keys(f).forEach(key => {
+    //     q = q.replaceAll(`{${key}}`, f[key])
+    //   })
 
-    }
-    postItem(apiPath, token, { query: q })
+    // }
+    postItem(apiPath, token, { query: query })
       .then(result => {
         setList(result as any[])
       })
@@ -103,7 +105,7 @@ export function TsnGrid({
     let url = `${apiPath.split('?')[0]}/${id}`
     deleteItem(url, token)
       .then(result => {
-        load(search)
+        load()
       })
       .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
   }
@@ -112,7 +114,8 @@ export function TsnGrid({
   const classBgEven = 'hover:bg-blue-500 hover:bg-opacity-10'
 
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
-  useEffect(() => { token && load('', filter) }, [token])
+  useEffect(() => { token && load() }, [token])
+  useEffect(() => { token && query && load() }, [query])
   useEffect(() => { onLoadingChange && onLoadingChange(loading) }, [loading])
 
 
@@ -133,10 +136,9 @@ export function TsnGrid({
               placeholder={t('search...')}
               defaultValue={search}
               onChange={e => {
-                setSearch(e.target.value)
-                e.target.value == "" && load("", filter)
+                onSearchChanged && onSearchChanged(e.target.value)
               }}
-              onKeyDown={e => e.code == 'Enter' && load(search, filter)}
+              onKeyDown={e => e.code == 'Enter' && load()}
             />
           </div>
         }
@@ -147,7 +149,7 @@ export function TsnGrid({
             </div>}>
             {onFilterPanel(filter, (e) => {
               setFilter(e)
-              token && load(search, e)
+              // token && load()
             })}
           </FilterPanel>
         }

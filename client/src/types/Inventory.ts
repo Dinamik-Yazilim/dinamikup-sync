@@ -16,8 +16,17 @@ export interface Inventory {
   
 }
 
-export function inventoryQuery(){
-  return `SELECT top 100 S.sto_Guid as _id, S.sto_kod as itemCode, S.sto_isim as itemName, S.sto_birim1_ad as unit,
+export interface InventoryProps {
+	top?:number
+	search?:string
+	mainGroup?: string
+	subGroup?: string
+	category?: string
+	brand?: string
+	rayon?: string
+}
+export function inventoryQuery({top=100,search='',mainGroup='',subGroup='',category='', brand='', rayon=''}:InventoryProps){
+  return `SELECT top ${top} S.sto_Guid as _id, S.sto_kod as itemCode, S.sto_isim as itemName, S.sto_birim1_ad as unit,
 ISNULL(SAN.san_isim,'') as mainGroup, ISNULL(STA.sta_isim,'') as [subGroup],
 ISNULL(KTG.ktg_isim,'') as category ,
 ISNULL(RYN.ryn_ismi,'') as rayon ,
@@ -55,11 +64,11 @@ STH ON S.sto_kod=STH.sth_stok_kod LEFT OUTER JOIN
 	WHERE sas_bitis_tarih>=GETDATE() AND sas_depo_no=0
 	) SAS ON S.sto_kod= SAS.sas_stok_kod
 
- WHERE (S.sto_kod like '%{search}%' or S.sto_isim like '%{search}%') AND
- (S.sto_anagrup_kod='{mainGroup}' OR '{mainGroup}'='') AND
- (S.sto_altgrup_kod='{subGroup}' OR '{subGroup}'='') AND
- (S.sto_kategori_kodu='{category}' OR '{category}'='') AND
- (S.sto_marka_kodu='{brand}' OR '{brand}'='') AND
- (S.sto_reyon_kodu='{rayon}' OR '{rayon}'='')
+ WHERE (S.sto_kod like '%${search}%' or S.sto_isim like '%${search}%') AND
+ (S.sto_anagrup_kod='${mainGroup}' OR '${mainGroup}'='') AND
+ (S.sto_altgrup_kod='${subGroup}' OR '${subGroup}'='') AND
+ (S.sto_kategori_kodu='${category}' OR '${category}'='') AND
+ (S.sto_marka_kodu='${brand}' OR '${brand}'='') AND
+ (S.sto_reyon_kodu='${rayon}' OR '${rayon}'='')
  `
 }
