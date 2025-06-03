@@ -88,19 +88,19 @@ export interface OrderDetail {
   vatAmount?: number
   lineGrossTotal?: number
   lineNetTotal?: number
-  deleted?:boolean
+  deleted?: boolean
 }
 
-export interface orderListQueryProps{
-  ioType:number
-  top?:number
-  search?:string
-  isClosed?:string
-  warehouseId?:string
-  startDate?:string
-  endDate?:string
+export interface orderListQueryProps {
+  ioType: number
+  top?: number
+  search?: string
+  isClosed?: string
+  warehouseId?: string
+  startDate?: string
+  endDate?: string
 }
-export function orderListQuery({ioType=1, top = 100,search='',isClosed='0',warehouseId='', startDate=today(),endDate=today()}:orderListQueryProps) {
+export function orderListQuery({ ioType = 1, top = 100, search = '', isClosed = '0', warehouseId = '', startDate = today(), endDate = today() }: orderListQueryProps) {
   return `SELECT TOP ${top} orderNumber as _id, *
 , ROUND(100*CASE WHEN amount>0 THEN discountAmount1/amount ELSE 0 END,2) as discountRate1 
 , ROUND(100*CASE WHEN (amount-discountAmount1)>0 THEN discountAmount2/(amount-discountAmount1) ELSE 0 END,2) as discountRate2 
@@ -243,7 +243,6 @@ function preSaveOrder(token: string, orderHeader: OrderHeader, orderDetails: Ord
     if (!orderHeader.firmId) return reject('Firm required')
     if (!orderHeader.warehouseId) return reject('Warehouse required')
 
-    console.log('buraya geldi 1')
     resolve()
   })
 }
@@ -254,10 +253,13 @@ export function saveOrder(token: string, orderHeader: OrderHeader, orderDetails:
       let query = ''
       preSaveOrder(token, orderHeader, orderDetails)
         .then(() => {
-          console.log('buraya geldi 2')
+          if (orderDetails.length == 0) return reject('Order lines cannot be empty')
+          if (!orderHeader.firmId) return reject('Firm required')
+          if (!orderHeader.warehouseId) return reject('Warehouse required')
+
           query = `
-            DECLARE @EvrakSira INT=${orderHeader.sip_Guid?orderHeader.docNoSequence:0};
-            DECLARE @EvrakSeri VARCHAR(50)='${orderHeader.docNoSerial?.replaceAll("'", "''")}';
+            DECLARE @EvrakSira INT=${orderHeader.sip_Guid ? orderHeader.docNoSequence : 0};
+            DECLARE @EvrakSeri VARCHAR(50)='${(orderHeader.docNoSerial || '').replaceAll("'", "''")}';
             DECLARE @SIP_TIP INT = ${orderHeader.ioType};
             DECLARE @SIP_CINS INT = 0;
             DECLARE @MikroUserNo INT = 99;
@@ -268,18 +270,19 @@ export function saveOrder(token: string, orderHeader: OrderHeader, orderDetails:
             END
             `
 
-           orderDetails.forEach((e, rowIndex) => {
-            if(e.sip_Guid){
-              if(e.deleted){
-                query+=`DELETE FROM SIPARISLER WHERE sip_Guid='${e.sip_Guid}';\n`
-              }else{
-                query+=updateLineQuery(orderHeader,e);
+          const qList = orderDetails.map((e, rowIndex) => {
+            if (e.sip_Guid) {
+              if (e.deleted) {
+                return `DELETE FROM SIPARISLER WHERE sip_Guid='${e.sip_Guid}';`
+              } else {
+                return updateLineQuery(orderHeader, e);
               }
-              
-            }else{
-              query += insertLineQuery(orderHeader, e)
+
+            } else {
+              return insertLineQuery(orderHeader, e)
             }
-          })
+          }) as string[]
+          query += qList.join('\n');
 
           postItem(`/mikro/save`, token, { query: query })
             .then(result => {
@@ -288,10 +291,7 @@ export function saveOrder(token: string, orderHeader: OrderHeader, orderDetails:
             })
             .catch(reject)
         })
-        .catch(err=>{
-          console.log('buraya geldi 3')
-          reject(err)
-        })
+        .catch(reject)
 
     } catch (err) {
       console.log('try error:', err)
@@ -305,9 +305,9 @@ function insertLineQuery(orderHeader: OrderHeader, orderDetail: OrderDetail) {
         SET @SatirNo=@SatirNo+1;
         INSERT INTO SIPARISLER (sip_Guid, sip_DBCno, sip_SpecRECno, sip_iptal, sip_fileid, sip_hidden, sip_kilitli, sip_degisti, sip_checksum, sip_create_user, sip_create_date, sip_lastup_user, sip_lastup_date, sip_special1, sip_special2, sip_special3, sip_firmano, sip_subeno, sip_tarih, sip_teslim_tarih, sip_tip, sip_cins, sip_evrakno_seri, sip_evrakno_sira, sip_satirno, sip_belgeno, sip_belge_tarih, sip_satici_kod, sip_musteri_kod, sip_stok_kod, sip_b_fiyat, sip_miktar, sip_birim_pntr, sip_teslim_miktar, sip_tutar, sip_iskonto_1, sip_iskonto_2, sip_iskonto_3, sip_iskonto_4, sip_iskonto_5, sip_iskonto_6, sip_masraf_1, sip_masraf_2, sip_masraf_3, sip_masraf_4, sip_vergi_pntr, sip_vergi, sip_masvergi_pntr, sip_masvergi, sip_opno, sip_aciklama, sip_aciklama2, sip_depono, sip_OnaylayanKulNo, sip_vergisiz_fl, sip_kapat_fl, sip_promosyon_fl, sip_cari_sormerk, sip_stok_sormerk, sip_cari_grupno, sip_doviz_cinsi, sip_doviz_kuru, sip_alt_doviz_kuru, sip_adresno, sip_teslimturu, sip_cagrilabilir_fl, sip_prosip_uid, sip_iskonto1, sip_iskonto2, sip_iskonto3, sip_iskonto4, sip_iskonto5, sip_iskonto6, sip_masraf1, sip_masraf2, sip_masraf3, sip_masraf4, sip_isk1, sip_isk2, sip_isk3, sip_isk4, sip_isk5, sip_isk6, sip_mas1, sip_mas2, sip_mas3, sip_mas4, sip_Exp_Imp_Kodu, sip_kar_orani, sip_durumu, sip_stal_uid, sip_planlananmiktar, sip_teklif_uid, sip_parti_kodu, sip_lot_no, sip_projekodu, sip_fiyat_liste_no, sip_Otv_Pntr, sip_Otv_Vergi, sip_otvtutari, sip_OtvVergisiz_Fl, sip_paket_kod, sip_Rez_uid, sip_harekettipi, sip_yetkili_uid, sip_kapatmanedenkod, sip_gecerlilik_tarihi, sip_onodeme_evrak_tip, sip_onodeme_evrak_seri, sip_onodeme_evrak_sira, sip_rezervasyon_miktari, sip_rezerveden_teslim_edilen, sip_HareketGrupKodu1, sip_HareketGrupKodu2, sip_HareketGrupKodu3, sip_Olcu1, sip_Olcu2, sip_Olcu3, sip_Olcu4, sip_Olcu5, sip_FormulMiktarNo, sip_FormulMiktar, sip_satis_fiyat_doviz_cinsi, sip_satis_fiyat_doviz_kuru, sip_eticaret_kanal_kodu, sip_Tevkifat_turu, sip_otv_tevkifat_turu, sip_otv_tevkifat_tutari, sip_tevkifat_sifirlandi_fl) 
                 VALUES(NEWID(), 0, 0, 0, 21, 0, 0, 0, 0, @MikroUserNo, GETDATE(),  @MikroUserNo, GETDATE(), '', '', 'DNMK', 0, 0, 
-                  '${orderHeader.issueDate}', '${orderDetail.deliveryDate || orderHeader.issueDate || new Date().toISOString().substring(0,10)}',
+                  '${orderHeader.issueDate}', '${orderDetail.deliveryDate || orderHeader.issueDate || new Date().toISOString().substring(0, 10)}',
                    @SIP_TIP, @SIP_CINS, @EvrakSeri, @EvrakSira, @SatirNo, 
-                  '${orderHeader.documentNumber!.replaceAll("'", "''")}', '${orderHeader.documentDate}', '${orderHeader.salespersonId || ''}',
+                  '${(orderHeader.documentNumber || '').replaceAll("'", "''")}', '${orderHeader.documentDate}', '${orderHeader.salespersonId || ''}',
                   '${orderHeader.firmId}', '${orderDetail.itemId}', ${orderDetail.price || 0}, ${orderDetail.quantity || 0}, 1, 0, ${orderDetail.amount},
                   ${orderDetail.discountAmount1 || 0}, ${orderDetail.discountAmount2 || 0}, ${orderDetail.discountAmount3 || 0},
                   ${orderDetail.discountAmount4 || 0}, ${orderDetail.discountAmount5 || 0}, ${orderDetail.discountAmount6 || 0},
@@ -316,8 +316,8 @@ function insertLineQuery(orderHeader: OrderHeader, orderDetail: OrderDetail) {
                   , ${orderDetail.vatAmount || 0}
                   ,0 -- sip_masvergi_pntr
                   ,0 -- sip_masvergi
-                  , ${orderHeader.paymentPlanId || ''}, '${orderDetail.description!.replaceAll("'", "''").substring(0, 50)}', 
-                  '${orderDetail.description!.replaceAll("'", "''").substring(50, 100)}', ${orderHeader.warehouseId || 0}
+                  , ${orderHeader.paymentPlanId || ''}, '${(orderDetail.description || '').replaceAll("'", "''").substring(0, 50)}', 
+                  '${(orderDetail.description || '').replaceAll("'", "''").substring(50, 100)}', ${orderHeader.warehouseId || 0}
                   ,0 -- sip_OnaylayanKulNo
                   ,0 -- sip_vergisiz_fl
                   ,0 -- sip_kapat_fl
@@ -402,7 +402,7 @@ function updateLineQuery(orderHeader: OrderHeader, orderDetail: OrderDetail) {
       SET @SatirNo=@SatirNo+1;
       UPDATE SIPARISLER SET
         sip_lastup_user=@MikroUserNo, sip_lastup_date=GETDATE(),
-        sip_tarih='${orderHeader.issueDate}', sip_teslim_tarih='${orderDetail.deliveryDate || orderHeader.issueDate || new Date().toISOString().substring(0,10)}',
+        sip_tarih='${orderHeader.issueDate}', sip_teslim_tarih='${orderDetail.deliveryDate || orderHeader.issueDate || new Date().toISOString().substring(0, 10)}',
         -- sip_evrakno_seri='',sip_evrakno_sira=0 , 
         sip_satirno=@SatirNo, sip_belgeno='${orderHeader.documentNumber}',sip_belge_tarih='${orderHeader.documentDate}',
         sip_satici_kod='${orderHeader.salespersonId || ''}', sip_musteri_kod='${orderHeader.firmId || ''}',
@@ -416,8 +416,8 @@ function updateLineQuery(orderHeader: OrderHeader, orderDetail: OrderDetail) {
         sip_vergi=${orderDetail.vatAmount},
         sip_masvergi_pntr=0, sip_masvergi=0, -- 
         sip_opno=${orderHeader.paymentPlanId},
-        sip_aciklama='${orderDetail.description!.replaceAll("'", "''").substring(0, 50)}', 
-        sip_aciklama2='${orderDetail.description!.replaceAll("'", "''").substring(50, 100)}',
+        sip_aciklama='${(orderDetail.description || '').replaceAll("'", "''").substring(0, 50)}', 
+        sip_aciklama2='${(orderDetail.description || '').replaceAll("'", "''").substring(50, 100)}',
         sip_depono=${orderHeader.warehouseId || 0},
         sip_cari_sormerk='${orderHeader.responsibilityId || ''}',
         sip_stok_sormerk='${orderHeader.responsibilityId || ''}',

@@ -66,7 +66,8 @@ export default function OrderPage({ params }: Props) {
   const save = () => {
     saveOrder(token, orderHeader, orderDetails)
       .then(() => {
-        toast({ title: `🙂 ${t('Success')}`, description: t('Document has been saved successfuly') })
+        toast({ title: `🙂 ${t('Success')}`, description: t('Document has been saved successfuly') ,duration:800 })
+        setTimeout(()=>router.back(),1000)
       })
       .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
   }
