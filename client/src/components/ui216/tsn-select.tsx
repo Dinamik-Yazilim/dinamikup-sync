@@ -22,7 +22,7 @@ empty?:boolean
 }
 export function TsnSelect({ all, empty, list, title, onValueChange, autoFocus, itemClassName, ...props }: TsnSelectProps) {
   if(empty){
-    list=[{_id:' ', name:'---'}].concat(list)
+    list=[{_id:' ', name:'---'}].concat(list as any[])
   }
   useEffect(() => {
     if (props.defaultValue && list) {
@@ -38,7 +38,7 @@ export function TsnSelect({ all, empty, list, title, onValueChange, autoFocus, i
   return (<div className={`flex flex-col gap-1 my-1 w-full min-w-24 ${props.className}`} >
     <Label className='ms-2'>{title}</Label>
     <Select
-
+  
       // onValueChange={onValueChange}
       onValueChange={val => {
         if (onValueChange) {
@@ -49,13 +49,14 @@ export function TsnSelect({ all, empty, list, title, onValueChange, autoFocus, i
       {...props}
     >
       <SelectTrigger className={`w-full ${itemClassName}`} autoFocus={autoFocus} suppressHydrationWarning>
+        
         {!all && <SelectValue placeholder="---" />}
         {all && <SelectValue placeholder="*" />}
       </SelectTrigger>
       <SelectContent className=''>
         {all &&
           <SelectGroup>
-            <SelectItem value=" ">*</SelectItem>
+            <SelectItem className={`${itemClassName}`} value=" ">*</SelectItem>
           </SelectGroup>
         }
         <SelectGroup>

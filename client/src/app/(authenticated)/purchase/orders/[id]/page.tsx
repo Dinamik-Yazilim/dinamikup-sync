@@ -90,9 +90,12 @@ export default function OrderPage({ params }: Props) {
     return (<TsnPanel name="porder_Header" defaultOpen={true} className="mt-4" trigger={t('Header')} contentClassName="grid grid-cols-1 lg:grid-cols-6 gap-2 w-full">
       <div className="col-span-1 lg:col-span-6 grid grid-cols-1 lg:grid-cols-5 w-full items-center gap-2">
         <TsnInput title={t('Document Serial')} defaultValue={orderHeader.docNoSerial}
-          onBlur={e => setOrderHeader({ ...orderHeader, docNoSerial: e.target.value })} />
+          onBlur={e => setOrderHeader({ ...orderHeader, docNoSerial: e.target.value })}
+          disabled={params.id!='addnew'}
+        />
         <TsnInput type='number' min={0} title={t('Document Sequence')} defaultValue={orderHeader.docNoSequence}
-          onBlur={e => setOrderHeader({ ...orderHeader, docNoSequence: !isNaN(Number(e.target.value)) ? Number(e.target.value) : 1 })} />
+          disabled
+          />
         <TsnInput type='date' title={t('Date')} defaultValue={orderHeader.issueDate?.substring(0, 10)}
           onBlur={e => setOrderHeader({ ...orderHeader, issueDate: e.target.value })} />
         <TsnInput title={t('Document Number')} defaultValue={orderHeader.documentNumber}

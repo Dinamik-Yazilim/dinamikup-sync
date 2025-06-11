@@ -138,7 +138,7 @@ export function TsnGrid({
               onChange={e => {
                 onSearchChanged && onSearchChanged(e.target.value)
               }}
-              onKeyDown={e => e.code == 'Enter' && load()}
+              onKeyDown={e => (e.code == 'Enter' || e.key =='Enter' ) && load()}
             />
           </div>
         }

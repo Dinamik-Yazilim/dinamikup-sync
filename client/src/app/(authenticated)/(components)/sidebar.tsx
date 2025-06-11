@@ -49,7 +49,7 @@ export function Sidebar({className}:Props) {
         { title: t('Inventory'), href: "/purchase/inventory" },
         { title: t('Vendors'), href: "/module-closed/vendors" },
         { title: t('Purchase Orders'), href: "/purchase/orders" },
-        { title: t('Satın Alma Şartları'), href:  "/module-closed/purchase-conditions" },
+        { title: t('Purchase Conditions'), href:  "/purchase/conditions" },
       ],
     },
     {

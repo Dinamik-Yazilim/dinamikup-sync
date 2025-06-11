@@ -53,7 +53,7 @@ export function SelectPaymentPlan({ t, children, onSelect }: Props) {
               <AlertDialogCancel>X</AlertDialogCancel>
             </div>
           </AlertDialogTitle>
-
+        <AlertDialogDescription></AlertDialogDescription>
         </AlertDialogHeader>
         <div className="overflow-y-auto h-[600px]">
           <div className="relative w-full pe-4">

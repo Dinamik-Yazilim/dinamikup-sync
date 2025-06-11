@@ -138,7 +138,7 @@ and (
   ('${isClosed}'='')
 )
 GROUP BY SIP.sip_tarih, SIP.sip_evrakno_seri , SIP.sip_evrakno_sira,
-SIP.sip_cins, CARI.cari_unvan1,SIP.sip_musteri_kod , SIP.sip_depono,
+SIP.sip_cins, CARI.cari_unvan1,SIP.sip_musteri_kod , SIP.sip_depono, 
 SIP.sip_belgeno, SIP.sip_doviz_cinsi, SIP.sip_satici_kod
 ) X
 WHERE (firm like '%${search}%' or orderNumber like '%${search}%')
@@ -198,7 +198,7 @@ export function orderHeaderQuery(orderId: string, ioType: number) {
     SIP.sip_opno,ODP.odp_kodu, ODP.odp_adi,SIP.sip_stok_sormerk, SIP.sip_projekodu, SIP.sip_tip,SIP.sip_stok_sormerk,
 	SOM.som_kod,SOM.som_isim,PRO.pro_kodu, PRO.pro_adi,SIP.sip_teslimturu,TSLT.tslt_kod, TSLT.tslt_ismi
     ) X
-    WHERE orderNumber='${orderId}';`
+    WHERE orderNumber='${orderId}' and ioType=${ioType};`
 }
 
 export function orderDetailQuery(orderId: string, ioType: number) {
@@ -232,14 +232,14 @@ STOKLAR S ON SIP.sip_stok_kod = S.sto_kod
 
 WHERE 1=1
 ) X
-WHERE orderId='${orderId}'
+WHERE orderId='${orderId}' and ioType=${ioType}
 order by [lineNo]
   `
 }
 
 function preSaveOrder(token: string, orderHeader: OrderHeader, orderDetails: OrderDetail[]) {
   return new Promise<void>((resolve, reject) => {
-    if (orderDetails.length == 0) return reject('Order lines cannot be empty')
+    if (orderDetails.length == 0) return reject('Lines cannot be empty')
     if (!orderHeader.firmId) return reject('Firm required')
     if (!orderHeader.warehouseId) return reject('Warehouse required')
 
@@ -253,10 +253,7 @@ export function saveOrder(token: string, orderHeader: OrderHeader, orderDetails:
       let query = ''
       preSaveOrder(token, orderHeader, orderDetails)
         .then(() => {
-          if (orderDetails.length == 0) return reject('Order lines cannot be empty')
-          if (!orderHeader.firmId) return reject('Firm required')
-          if (!orderHeader.warehouseId) return reject('Warehouse required')
-
+         
           query = `
             DECLARE @EvrakSira INT=${orderHeader.sip_Guid ? orderHeader.docNoSequence : 0};
             DECLARE @EvrakSeri VARCHAR(50)='${(orderHeader.docNoSerial || '').replaceAll("'", "''")}';
@@ -304,97 +301,32 @@ function insertLineQuery(orderHeader: OrderHeader, orderDetail: OrderDetail) {
   return `
         SET @SatirNo=@SatirNo+1;
         INSERT INTO SIPARISLER (sip_Guid, sip_DBCno, sip_SpecRECno, sip_iptal, sip_fileid, sip_hidden, sip_kilitli, sip_degisti, sip_checksum, sip_create_user, sip_create_date, sip_lastup_user, sip_lastup_date, sip_special1, sip_special2, sip_special3, sip_firmano, sip_subeno, sip_tarih, sip_teslim_tarih, sip_tip, sip_cins, sip_evrakno_seri, sip_evrakno_sira, sip_satirno, sip_belgeno, sip_belge_tarih, sip_satici_kod, sip_musteri_kod, sip_stok_kod, sip_b_fiyat, sip_miktar, sip_birim_pntr, sip_teslim_miktar, sip_tutar, sip_iskonto_1, sip_iskonto_2, sip_iskonto_3, sip_iskonto_4, sip_iskonto_5, sip_iskonto_6, sip_masraf_1, sip_masraf_2, sip_masraf_3, sip_masraf_4, sip_vergi_pntr, sip_vergi, sip_masvergi_pntr, sip_masvergi, sip_opno, sip_aciklama, sip_aciklama2, sip_depono, sip_OnaylayanKulNo, sip_vergisiz_fl, sip_kapat_fl, sip_promosyon_fl, sip_cari_sormerk, sip_stok_sormerk, sip_cari_grupno, sip_doviz_cinsi, sip_doviz_kuru, sip_alt_doviz_kuru, sip_adresno, sip_teslimturu, sip_cagrilabilir_fl, sip_prosip_uid, sip_iskonto1, sip_iskonto2, sip_iskonto3, sip_iskonto4, sip_iskonto5, sip_iskonto6, sip_masraf1, sip_masraf2, sip_masraf3, sip_masraf4, sip_isk1, sip_isk2, sip_isk3, sip_isk4, sip_isk5, sip_isk6, sip_mas1, sip_mas2, sip_mas3, sip_mas4, sip_Exp_Imp_Kodu, sip_kar_orani, sip_durumu, sip_stal_uid, sip_planlananmiktar, sip_teklif_uid, sip_parti_kodu, sip_lot_no, sip_projekodu, sip_fiyat_liste_no, sip_Otv_Pntr, sip_Otv_Vergi, sip_otvtutari, sip_OtvVergisiz_Fl, sip_paket_kod, sip_Rez_uid, sip_harekettipi, sip_yetkili_uid, sip_kapatmanedenkod, sip_gecerlilik_tarihi, sip_onodeme_evrak_tip, sip_onodeme_evrak_seri, sip_onodeme_evrak_sira, sip_rezervasyon_miktari, sip_rezerveden_teslim_edilen, sip_HareketGrupKodu1, sip_HareketGrupKodu2, sip_HareketGrupKodu3, sip_Olcu1, sip_Olcu2, sip_Olcu3, sip_Olcu4, sip_Olcu5, sip_FormulMiktarNo, sip_FormulMiktar, sip_satis_fiyat_doviz_cinsi, sip_satis_fiyat_doviz_kuru, sip_eticaret_kanal_kodu, sip_Tevkifat_turu, sip_otv_tevkifat_turu, sip_otv_tevkifat_tutari, sip_tevkifat_sifirlandi_fl) 
-                VALUES(NEWID(), 0, 0, 0, 21, 0, 0, 0, 0, @MikroUserNo, GETDATE(),  @MikroUserNo, GETDATE(), '', '', 'DNMK', 0, 0, 
-                  '${orderHeader.issueDate}', '${orderDetail.deliveryDate || orderHeader.issueDate || new Date().toISOString().substring(0, 10)}',
-                   @SIP_TIP, @SIP_CINS, @EvrakSeri, @EvrakSira, @SatirNo, 
-                  '${(orderHeader.documentNumber || '').replaceAll("'", "''")}', '${orderHeader.documentDate}', '${orderHeader.salespersonId || ''}',
-                  '${orderHeader.firmId}', '${orderDetail.itemId}', ${orderDetail.price || 0}, ${orderDetail.quantity || 0}, 1, 0, ${orderDetail.amount},
-                  ${orderDetail.discountAmount1 || 0}, ${orderDetail.discountAmount2 || 0}, ${orderDetail.discountAmount3 || 0},
-                  ${orderDetail.discountAmount4 || 0}, ${orderDetail.discountAmount5 || 0}, ${orderDetail.discountAmount6 || 0},
-                  ${orderDetail.expenseAmount1 || 0}, ${orderDetail.expenseAmount2 || 0}, ${orderDetail.expenseAmount3 || 0}, ${orderDetail.expenseAmount4 || 0}
-                  ,1 -- sip_vergi_pntr TODO: vergi pointer gelecek
-                  , ${orderDetail.vatAmount || 0}
-                  ,0 -- sip_masvergi_pntr
-                  ,0 -- sip_masvergi
-                  , ${orderHeader.paymentPlanId || ''}, '${(orderDetail.description || '').replaceAll("'", "''").substring(0, 50)}', 
-                  '${(orderDetail.description || '').replaceAll("'", "''").substring(50, 100)}', ${orderHeader.warehouseId || 0}
-                  ,0 -- sip_OnaylayanKulNo
-                  ,0 -- sip_vergisiz_fl
-                  ,0 -- sip_kapat_fl
-                  ,0 -- sip_promosyon_fl
-                  , '${orderHeader.responsibilityId || ''}', '${orderHeader.responsibilityId || ''}'
-                  ,0 --sip_cari_grupno
-                  ,0 -- sip_doviz_cinsi
-                  ,1 -- sip_doviz_kuru
-                  ,0 -- sip_alt_doviz_kuru
-                  ,1 -- sip_adresno
-                  ,'' -- sip_teslimturu
-                  ,0 -- sip_cagrilabilir_fl
-                  ,'00000000-0000-0000-0000-000000000000' --sip_prosip_uid
-                  ,0 --sip_iskonto1
-                  ,1 --sip_iskonto2
-                  ,1 --sip_iskonto3
-                  ,1 --sip_iskonto4
-                  ,1 --sip_iskonto5
-                  ,1 --sip_iskonto6
-                  ,1 --sip_masraf1
-                  ,1 --sip_masraf2
-                  ,1 --sip_masraf3
-                  ,1 --sip_masraf4
-                  ,1 --sip_isk1
-                  ,0 --sip_isk2
-                  ,0 --sip_isk3
-                  ,0 --sip_isk4
-                  ,0 --sip_isk5
-                  ,0 --sip_isk6
-                  ,0 --sip_mas1
-                  ,0 --sip_mas2
-                  ,0 --sip_mas3
-                  ,0 --sip_mas4
-                  ,'' --sip_Exp_Imp_Kodu
-                  ,0 --sip_kar_orani
-                  ,0 --sip_durumu
-                  ,'00000000-0000-0000-0000-000000000000' --sip_stal_uid
-                  ,0 --sip_planlananmiktar
-                  ,'00000000-0000-0000-0000-000000000000' --sip_teklif_uid
-                  ,'' --sip_parti_kodu
-                  ,0  --sip_lot_no
-                  , '${orderHeader.projectId || ''}'
-                  ,0 --sip_fiyat_liste_no
-                  ,0 --sip_Otv_Pntr
-                  ,0 --sip_Otv_Vergi
-                  ,0 --sip_otvtutari
-                  ,0 --sip_OtvVergisiz_Fl
-                  ,'' --sip_paket_kod
-                  ,'00000000-0000-0000-0000-000000000000' --sip_Rez_uid
-                  ,0 --sip_harekettipi
-                  ,'00000000-0000-0000-0000-000000000000' --sip_yetkili_uid
-                  ,'' --sip_kapatmanedenkod
-                  ,'1900-01-01' --sip_gecerlilik_tarihi
-                  ,0 --sip_onodeme_evrak_tip
-                  ,'' --sip_onodeme_evrak_seri
-                  ,0 --sip_onodeme_evrak_sira
-                  ,0 --sip_rezervasyon_miktari
-                  ,0 --sip_rezerveden_teslim_edilen
-                  ,'' --sip_HareketGrupKodu1
-                  ,'' --sip_HareketGrupKodu2
-                  ,'' --sip_HareketGrupKodu3
-                  ,0 --sip_Olcu1
-                  ,0 --sip_Olcu2
-                  ,0 --sip_Olcu3
-                  ,0 --sip_Olcu4
-                  ,0 --sip_Olcu5
-                  ,0 --sip_FormulMiktarNo
-                  ,0 --sip_FormulMiktar
-                  ,0 --sip_satis_fiyat_doviz_cinsi
-                  ,0 --sip_satis_fiyat_doviz_kuru
-                  ,'' --sip_eticaret_kanal_kodu
-                  ,0 --sip_Tevkifat_turu
-                  ,0 --sip_otv_tevkifat_turu
-                  ,0 --sip_otv_tevkifat_tutari
-                  ,0 --sip_tevkifat_sifirlandi_fl
-                  );
-              `
+        VALUES(NEWID(), 0, 0, 0, 21, 0, 0, 0, 0, @MikroUserNo, GETDATE(),  @MikroUserNo, GETDATE(), '', '', 'DNMK', 0, 0
+        ,'${orderHeader.issueDate}', '${orderDetail.deliveryDate || orderHeader.issueDate || new Date().toISOString().substring(0, 10)}'
+        ,@SIP_TIP, @SIP_CINS, @EvrakSeri, @EvrakSira, @SatirNo
+        ,'${(orderHeader.documentNumber || '').replaceAll("'", "''")}', '${orderHeader.documentDate}', '${orderHeader.salespersonId || ''}'
+        ,'${orderHeader.firmId}', '${orderDetail.itemId}', ${orderDetail.price || 0}, ${orderDetail.quantity || 0}, 1, 0, ${orderDetail.amount}
+        ,${orderDetail.discountAmount1 || 0}, ${orderDetail.discountAmount2 || 0}, ${orderDetail.discountAmount3 || 0}
+        ,${orderDetail.discountAmount4 || 0}, ${orderDetail.discountAmount5 || 0}, ${orderDetail.discountAmount6 || 0}
+        ,${orderDetail.expenseAmount1 || 0}, ${orderDetail.expenseAmount2 || 0}, ${orderDetail.expenseAmount3 || 0}, ${orderDetail.expenseAmount4 || 0}
+        ,1 /*sip_vergi_pntr TODO: vergi pointer gelecek*/   , ${orderDetail.vatAmount || 0}
+        ,0 /*sip_masvergi_pntr*/, 0 /*sip_masvergi*/
+        , ${orderHeader.paymentPlanId || ''}, '${(orderDetail.description || '').replaceAll("'", "''").substring(0, 50)}'
+        ,'${(orderDetail.description || '').replaceAll("'", "''").substring(50, 100)}', ${orderHeader.warehouseId || 0}
+        ,0 /*sip_OnaylayanKulNo*/, 0 /*sip_vergisiz_fl*/, 0 /*sip_kapat_fl*/, 0 /*sip_promosyon_fl*/
+        ,'${orderHeader.responsibilityId || ''}', '${orderHeader.responsibilityId || ''}', 0 /*sip_cari_grupno*/, 0 /*sip_doviz_cinsi*/, 1 /*sip_doviz_kuru*/
+        ,0 /*sip_alt_doviz_kuru*/, 1 /*sip_adresno*/, '' /*sip_teslimturu*/, 0 /*sip_cagrilabilir_fl*/
+        ,'00000000-0000-0000-0000-000000000000' /*sip_prosip_uid*/, 0 /*sip_iskonto1*/, 1 /*sip_iskonto2*/, 1 /*sip_iskonto3*/, 1 /*sip_iskonto4*/, 1 /*sip_iskonto5*/, 1 /*sip_iskonto6*/
+        ,1 /*sip_masraf1*/,1 /*sip_masraf2*/,1 /*sip_masraf3*/,1 /*sip_masraf4*/,1 /*sip_isk1*/,0 /*sip_isk2*/,0 /*sip_isk3*/, 0 /*sip_isk4*/, 0 /*sip_isk5*/, 0 /*sip_isk6*/
+        ,0 /*sip_mas1*/, 0 /*sip_mas2*/,0 /*sip_mas3*/, 0 /*sip_mas4*/, '' /*sip_Exp_Imp_Kodu*/, 0 /*sip_kar_orani*/, 0 /*sip_durumu*/,'00000000-0000-0000-0000-000000000000' /*sip_stal_uid*/
+        ,0 /*sip_planlananmiktar*/, '00000000-0000-0000-0000-000000000000' /*sip_teklif_uid*/, '' /*sip_parti_kodu*/, 0  /*sip_lot_no*/, '${orderHeader.projectId || ''}'
+        ,0 /*sip_fiyat_liste_no*/, 0 /*sip_Otv_Pntr*/, 0 /*sip_Otv_Vergi*/, 0 /*sip_otvtutari*/, 0 /*sip_OtvVergisiz_Fl*/,'' /*sip_paket_kod*/
+        ,'00000000-0000-0000-0000-000000000000' /*sip_Rez_uid*/, 0 /*sip_harekettipi*/ ,'00000000-0000-0000-0000-000000000000' /*sip_yetkili_uid*/,'' /*sip_kapatmanedenkod*/
+        ,'1900-01-01' /*sip_gecerlilik_tarihi*/ ,0 /*sip_onodeme_evrak_tip*/ ,'' /*sip_onodeme_evrak_seri*/ ,0 /*sip_onodeme_evrak_sira*/ ,0 /*sip_rezervasyon_miktari*/
+        ,0 /*sip_rezerveden_teslim_edilen*/ ,'' /*sip_HareketGrupKodu1*/ ,'' /*sip_HareketGrupKodu2*/ ,'' /*sip_HareketGrupKodu3*/ ,0 /*sip_Olcu1*/ ,0 /*sip_Olcu2*/,0 /*sip_Olcu3*/ ,0 /*sip_Olcu4*/
+        ,0 /*sip_Olcu5*/,0 /*sip_FormulMiktarNo*/,0 /*sip_FormulMiktar*/,0 /*sip_satis_fiyat_doviz_cinsi*/ ,0 /*sip_satis_fiyat_doviz_kuru*/,'' /*sip_eticaret_kanal_kodu*/ 
+        ,0 /*sip_Tevkifat_turu*/, 0 /*sip_otv_tevkifat_turu*/ ,0 /*sip_otv_tevkifat_tutari*/, 0 /*sip_tevkifat_sifirlandi_fl*/  );
+        `
 }
 
 function updateLineQuery(orderHeader: OrderHeader, orderDetail: OrderDetail) {
@@ -402,6 +334,7 @@ function updateLineQuery(orderHeader: OrderHeader, orderDetail: OrderDetail) {
       SET @SatirNo=@SatirNo+1;
       UPDATE SIPARISLER SET
         sip_lastup_user=@MikroUserNo, sip_lastup_date=GETDATE(),
+        sip_special3='DNMK',
         sip_tarih='${orderHeader.issueDate}', sip_teslim_tarih='${orderDetail.deliveryDate || orderHeader.issueDate || new Date().toISOString().substring(0, 10)}',
         -- sip_evrakno_seri='',sip_evrakno_sira=0 , 
         sip_satirno=@SatirNo, sip_belgeno='${orderHeader.documentNumber}',sip_belge_tarih='${orderHeader.documentDate}',

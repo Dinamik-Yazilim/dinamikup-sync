@@ -60,6 +60,13 @@ export function today() {
   t.setMinutes(t.getTimezoneOffset()*-1)
   return t.toISOString().substring(0, 10)
 }
+export function oneYearLater() {
+  var t=new Date()
+  t.setMinutes(t.getTimezoneOffset()*-1)
+  t.setFullYear(t.getFullYear()+1)
+  return t.toISOString().substring(0, 10)
+}
+
 
 export function startOfMonth() {
   var t=new Date(new Date().getFullYear(),new Date().getMonth(),1)
