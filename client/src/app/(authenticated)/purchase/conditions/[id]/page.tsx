@@ -27,14 +27,18 @@ import { PurchaseConditionHeader } from "@/types/PurchaseConditions"
 import { SelectItem } from "@/app/(authenticated)/(components)/select-item"
 import { TsnSelect } from "@/components/ui216/tsn-select"
 import { Input } from "@/components/ui/input"
+import { LineItem } from "./line-item"
+import { TsnSwitch } from "@/components/ui216/tsn-switch"
 
 interface Props {
   params: { id: string }
 }
 
+
 export default function PurchaseConditionPage({ params }: Props) {
   const ioType = 1
   const [token, setToken] = useState('')
+
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -47,12 +51,12 @@ export default function PurchaseConditionPage({ params }: Props) {
     docNoSequence: 0
   })
   const [pcDetails, setPCDetails] = useState<PurchaseConditionDetail[]>([])
+    const [showLineDetails,setShowLineDetails]=useState(false)
 
   const load = () => {
     setLoading(true)
     postItem(`/mikro/get`, token, { query: purchaseConditionHeaderQuery(params.id) })
       .then(result => {
-        console.log('buraya geldi1')
         setPCHeader(result[0] as PurchaseConditionHeader)
         postItem(`/mikro/get`, token, { query: purchaseConditionDetailQuery(params.id) })
           .then(result => {
@@ -77,26 +81,18 @@ export default function PurchaseConditionPage({ params }: Props) {
       .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
   }
 
-  const deleteLine = (rowIndex: number) => {
-    // let l = purhaseConditionDetails
-    // l.splice(rowIndex, 1)
-    // setPurhaseConditionDetails(l.map(e => e))
-    const l = pcDetails.map((e, index) => {
-      if (index == rowIndex) e.deleted = true
-      return e
-    })
-    setPCDetails(l)
-  }
+
 
   const calculateLine = (line: PurchaseConditionDetail, index: number) => {
 
   }
 
-  const OrderCurrency = () => <span className='text-xs text-muted-foreground'>{pcHeader.currency}</span>
+  // const OrderCurrency = () => <span className='text-xs text-muted-foreground'>{pcHeader.currency}</span>
+
 
   const FormHeader = () => {
     return (<TsnPanel name="pcondition_Header" defaultOpen={true} className="mt-4" trigger={t('Header')} contentClassName="grid grid-cols-1 lg:grid-cols-6 gap-2 w-full">
-      <div className="col-span-1 lg:col-span-6 grid grid-cols-1 lg:grid-cols-5 w-full items-center gap-2">
+      <div className="col-spa11n-1 lg:col-span-6 grid grid-cols-2 lg:grid-cols-5 w-full items-center gap-2">
         <TsnInput title={t('Document Serial')} defaultValue={pcHeader.docNoSerial}
           onBlur={e => setPCHeader({ ...pcHeader, docNoSerial: e.target.value })}
           disabled={params.id != 'addnew'}
@@ -169,148 +165,51 @@ export default function PurchaseConditionPage({ params }: Props) {
     </TsnPanel>)
   }
 
+ 
   const FormDetail = () => {
-    return (<TsnPanel name="pcondition_Detail" defaultOpen={true} className="mt-4" trigger={t('Lines')} contentClassName="relative grid grid-cols-1gap-2 w-full">
+
+    return (<TsnPanel 
+      collapsible={false} 
+      name="pcondition_Detail" defaultOpen={true} className="mt-4" 
+      trigger={<div className="flex justify-between items-center w-full me-4">
+        <div>{t('Lines')}</div>
+        <div>
+          <TsnSwitch title={'Detaylı'}
+            defaultChecked={showLineDetails}
+            onCheckedChange={e=>{
+              if(localStorage){
+                localStorage.setItem('showDetail_purchaseCondition_line',e.toString())
+              }
+              setShowLineDetails(e)
+            }}
+          />
+        </div>
+      </div>} 
+      contentClassName="relative grid grid-cols-1gap-2 w-full"
+      >
       <TsnLineGrid
         list={pcDetails}
         onHeaderPaint={() =>
           <div className="flex  w-full gap-2">
             <div className="text-xs text-nowrap mt-2 text-muted-foreground">#</div>
-            <div className="grid grid-cols-12 gap-1 w-full items-center">
-              <div className="col-span-3">{t('Item')}</div>
-              <div className="">{t('Condition')}</div>
-              <div className="text-end">{t('Quantity')}</div>
-              <div className="text-end">{t('Gross Price')}</div>
-              <div className="text-end">{t('%Dis.1')}</div>
-              <div className="text-end">{t('%Dis.2')}</div>
-              <div className="text-end">{t('%Dis.3')}</div>
-              <div className="text-end">{t('Profit')}</div>
-              <div className="text-end">{t('Net Price')}</div>
-              <div className="">{t('Description')}</div>
-
+            <div className="grid grid-cols-3 w-full items-center">
+              <div className="">{t('Item')}</div>
+              <div className="col-span-2 grid grid-cols-6 gap-2 w-full items-center">
+                <div className="text-end">{t('Gross Price')}</div>
+                <div className="text-end">{t('%Dis.1')}</div>
+                <div className="text-end">{t('%Dis.2')}</div>
+                <div className="text-end">{t('%Dis.3')}</div>
+                <div className="text-end">{t('Profit')}</div>
+                <div className="text-end">{t('Net Price')}</div>
+              </div>
             </div>
             <div className='w-20 p-1 flex justify-end lg:justify-end'>
-
             </div>
           </div>
         }
         onRowPaint={(line: PurchaseConditionDetail, rowIndex) => <>
           {!line.deleted &&
-            <div key={'line' + rowIndex} className="flex  w-full gap-2 items-center">
-              <div className="text-xs text-nowrap mt-0 text-muted-foreground">#{rowIndex + 1}</div>
-              <div className="grid grid-cols-12 gap-2 w-full items-center">
-                <div className="col-span-3 flex flex-row justify-between gap-2">
-                  <div className="capitalize">{line.item?.toLowerCase()}</div>
-                  <SelectItem t={t} onSelect={e => {
-                    setPCDetails(pcDetails.map((d, index) => {
-                      if (index == rowIndex) {
-                        d.item = e.name
-                        d.itemId = e._id
-                        return d
-                      } else {
-                        return d
-                      }
-                    }))
-
-                  }} ><ButtonSelect /></SelectItem>
-                </div>
-                <div>
-                  <TsnSelect title={''} itemClassName="px-1 py-1"
-                    list={[{ _id: '0', name: 'Şartsız' }, { _id: '1', name: 'Tek seferdeki miktar' }, { _id: '2', name: 'Toplam alım miktar' }]}
-                    value={(line.quantityCondition || '0').toString()}
-                    onValueChange={e => setPCDetails(pcDetails.map((d, index) => {
-                      if (index == rowIndex) d.quantityCondition = Number(e)
-                      return d
-                    }))}
-                  />
-                </div>
-                <div className='flex flex-col'>
-                  
-                  <Input type="number" className="text-end" defaultValue={line.quantity}
-                    onBlur={e => {
-                      const val = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
-                      setPCDetails(pcDetails.map((d, index) => {
-                        if (index == rowIndex) d.quantity = val
-                        return d
-                      }))
-                    }}
-                  />
-                </div>
-                <div className='flex flex-col gap-1 items-end'>
-                  <Input type="number" className="text-end px-1 py-2" defaultValue={line.grossPrice}
-                    onBlur={e => {
-                      const val = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
-                      setPCDetails(pcDetails.map((d, index) => {
-                        if (index == rowIndex) d.grossPrice = val
-                        return d
-                      }))
-                    }}
-                  />
-                </div>
-                <div className='flex items-center justify-end gap-[3px]'>
-                  <Input type="number" className="text-end px-1 py-2" defaultValue={line.discountRate1}
-                    onBlur={e => {
-                      const val = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
-                      setPCDetails(pcDetails.map((d, index) => {
-                        if (index == rowIndex) d.discountRate1 = val
-                        return d
-                      }))
-                    }}
-                  />
-                </div>
-                <div className='flex items-center justify-end gap-[3px]'>
-                  <Input type="number" className="text-end px-1 py-2" defaultValue={line.discountRate2}
-                    onBlur={e => {
-                      const val = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
-                      setPCDetails(pcDetails.map((d, index) => {
-                        if (index == rowIndex) d.discountRate2 = val
-                        return d
-                      }))
-                    }}
-                  />
-                </div>
-                <div className='flex items-center justify-end gap-[3px]'>
-                  <Input type="number" className="text-end px-1 py-2" defaultValue={line.discountRate3}
-                    onBlur={e => {
-                      const val = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
-                      setPCDetails(pcDetails.map((d, index) => {
-                        if (index == rowIndex) d.discountRate3 = val
-                        return d
-                      }))
-                    }}
-                  />
-                </div>
-                <div className='flex items-center justify-end gap-[3px]'>
-                  <Input type="number" className="text-end px-1 py-2" defaultValue={line.profitRate}
-                    onBlur={e => {
-                      const val = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
-                      setPCDetails(pcDetails.map((d, index) => {
-                        if (index == rowIndex) d.profitRate = val
-                        return d
-                      }))
-                    }}
-                  />
-                </div>
-                <div className='flex items-center justify-end gap-[3px]'>
-                  {moneyFormat(line.salesPrice, 4)}
-                </div>
-                <div className='flex items-center justify-start gap-[3px] '>
-                  <Input className="px-1 py-2" placeholder={t('Description')} defaultValue={line.description}
-                    onBlur={e => {
-                      setPCDetails(pcDetails.map((d, index) => {
-                        if (index == rowIndex) d.description = e.target.value
-                        return d
-                      }))
-                    }}
-                  />
-                </div>
-              </div>
-              <div className='w-20 flex flex-row items-end justify-end mx-2 gap-2'>
-
-
-                <TsnGridButtonDelete t={t} title={'delete line?'} onOk={() => deleteLine(rowIndex)} />
-              </div>
-            </div>
+            <LineItem line={line} rowIndex={rowIndex} t={t} pcDetails={pcDetails} setPCDetails={setPCDetails} showDetail={showLineDetails} />
           }
         </>}
 
@@ -319,15 +218,28 @@ export default function PurchaseConditionPage({ params }: Props) {
     </TsnPanel>)
   }
 
+
+
   const FormFooter = () => {
-    return (<TsnPanel name="pcondition_Footer" defaultOpen={true} className="mt-4" trigger={t('Totals')} contentClassName="grid grid-cols-1 lg:grid-cols-4 gap-2 w-full">
+    return (<TsnPanel collapsible={false} name="pcondition_Footer" defaultOpen={true} className="mt-4" trigger={t('Totals')} contentClassName="grid grid-cols-1 lg:grid-cols-4 gap-2 w-full">
       Kalem Sayisi: {pcDetails.length}
     </TsnPanel>)
   }
 
 
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
-  useEffect(() => { token && params.id != 'addnew' && load() }, [token])
+  useEffect(() => { 
+   
+    if(typeof window!='undefined'){
+      if((localStorage.getItem('showDetail_purchaseCondition_line') || '')=='true'){
+        setShowLineDetails(true)
+      }else{
+        setShowLineDetails(false)
+      }
+    }
+    token && params.id != 'addnew' && load()
+
+  }, [token])
 
   return (<StandartForm
     title={params.id == 'addnew' ? t('New Purchase Condition') : t('Edit Purchase Condition')}
@@ -338,7 +250,7 @@ export default function PurchaseConditionPage({ params }: Props) {
   >
     <div className="relative w-full h-full">
       {FormHeader()}
-      {FormDetail()}
+      <FormDetail />
       {FormFooter()}
     </div>
 

@@ -211,7 +211,8 @@ SAS.sas_kar_oran as profitRate,
 sas_satis_fiyat as salesPrice,
 SAS.sas_net_alis_kdvli as netPurchasePrice,
 SAS.sas_net_satis_kdvli as netSalesPrice,
-dbo.fn_VergiYuzde(S.sto_toptan_vergi) as vatRate
+dbo.fn_VergiYuzde(S.sto_toptan_vergi) as vatRate,
+SAS.sas_aciklama as description
 FROM SATINALMA_SARTLARI SAS INNER JOIN
 STOKLAR S ON SAS.sas_stok_kod=S.sto_kod
 ) X

@@ -1,7 +1,7 @@
 "use client"
 
 import { ReactNode, useEffect, useState } from 'react'
-import { ChevronsUpDown } from "lucide-react"
+import { BracketsIcon, ChevronsUpDown, MenuIcon, PanelBottomIcon } from "lucide-react"
 
 import { usePathname } from 'next/navigation'
 
@@ -15,21 +15,24 @@ export function generateStorageKey(prefix: string, name?: string, pathName?: str
 interface Props {
   name?: string
   children?: any
-  trigger?: string | ReactNode
+  trigger?: ReactNode | any
   defaultOpen?: boolean
   className?: string
   contentClassName?: string
+  collapsible?: boolean
 }
-export function TsnPanel({ name, children, trigger, defaultOpen = true, className,contentClassName }: Props) {
-  const [open, setOpen] = useState(defaultOpen)
+export function TsnPanel({ name, children, trigger, defaultOpen = true, className, contentClassName, collapsible = true }: Props) {
+  const [open, setOpen] = useState(collapsible?defaultOpen:true)
   const pathName = usePathname()
   const storageKey = generateStorageKey('panel_open', name, pathName)
   useEffect(() => {
-    if (typeof window != 'undefined') {
-      if (localStorage.getItem(storageKey) == 'true') {
-        setOpen(true)
-      } else {
-        setOpen(false)
+    if (collapsible) {
+      if (typeof window != 'undefined') {
+        if (localStorage.getItem(storageKey) == 'true') {
+          setOpen(true)
+        } else {
+          setOpen(false)
+        }
       }
     }
   }, [])
@@ -37,14 +40,18 @@ export function TsnPanel({ name, children, trigger, defaultOpen = true, classNam
     <div className={`flex flex-col my-1 ${className}`}>
       <div
         onClick={() => {
-          if (typeof window != 'undefined') {
-            localStorage.setItem(storageKey, !open ? 'true' : 'false')
+          if (collapsible) {
+            if (typeof window != 'undefined') {
+              localStorage.setItem(storageKey, !open ? 'true' : 'false')
+            }
+            setOpen(!open)
           }
-          setOpen(!open)
         }}
-        className={`cursor-pointer ps-2 bg-slate-500 text-white dark:bg-slate-900 py-[4px]  ${!open ? 'rounded-lg' : 'rounded-t-lg'} flex gap-2`}
+        className={`cursor-pointer ps-2 bg-slate-500 text-white dark:bg-slate-900 py-[4px]  ${!open ? 'rounded-lg' : 'rounded-t-lg'} flex items-center gap-2`}
       >
-        <ChevronsUpDown />
+        {collapsible && <ChevronsUpDown />}
+        {!collapsible && <PanelBottomIcon size={'16px'} />}
+
         {trigger}
       </div>
       <div className={` py-4 px-4 rounded-b-lg border border-dashed ${contentClassName} ${!open ? 'hidden' : ''}`}>
