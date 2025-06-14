@@ -29,6 +29,7 @@ import { TsnSelect } from "@/components/ui216/tsn-select"
 import { Input } from "@/components/ui/input"
 import { LineItem } from "./line-item"
 import { TsnSwitch } from "@/components/ui216/tsn-switch"
+import { Button } from "@/components/ui/button"
 
 interface Props {
   params: { id: string }
@@ -51,7 +52,7 @@ export default function PurchaseConditionPage({ params }: Props) {
     docNoSequence: 0
   })
   const [pcDetails, setPCDetails] = useState<PurchaseConditionDetail[]>([])
-    const [showLineDetails,setShowLineDetails]=useState(false)
+  const [showLineDetails, setShowLineDetails] = useState(false)
 
   const load = () => {
     setLoading(true)
@@ -165,28 +166,25 @@ export default function PurchaseConditionPage({ params }: Props) {
     </TsnPanel>)
   }
 
- 
+
   const FormDetail = () => {
 
-    return (<TsnPanel 
-      collapsible={false} 
-      name="pcondition_Detail" defaultOpen={true} className="mt-4" 
+    return (<TsnPanel
+      collapsible={false}
+      name="pcondition_Detail" defaultOpen={true} className="mt-4"
       trigger={<div className="flex justify-between items-center w-full me-4">
         <div>{t('Lines')}</div>
         <div>
-          <TsnSwitch title={'Detaylı'}
-            defaultChecked={showLineDetails}
-            onCheckedChange={e=>{
-              if(localStorage){
-                localStorage.setItem('showDetail_purchaseCondition_line',e.toString())
-              }
+          <TsnSwitch title={t('Detailed')} defaultChecked={showLineDetails}
+            onCheckedChange={e => {
+              localStorage && localStorage.setItem('showDetail_purchaseCondition_line', e.toString())
               setShowLineDetails(e)
             }}
           />
         </div>
-      </div>} 
+      </div>}
       contentClassName="relative grid grid-cols-1gap-2 w-full"
-      >
+    >
       <TsnLineGrid
         list={pcDetails}
         onHeaderPaint={() =>
@@ -212,9 +210,25 @@ export default function PurchaseConditionPage({ params }: Props) {
             <LineItem line={line} rowIndex={rowIndex} t={t} pcDetails={pcDetails} setPCDetails={setPCDetails} showDetail={showLineDetails} />
           }
         </>}
-
       />
-
+      <div className="px-2 py-1 rounded border border-dashed bg-blue-600 bg-opacity-10 flex justify-end w-full">
+        <Button className="bg-indigo-600 text-white hover:bg-indigo-400"
+          onClick={() => {
+            let l=pcDetails.map(e=>e)
+            l.push({
+              deleted: false, discountRate1: 2, discountRate2: 0, discountRate3: 0, discountRate4: 0, discountRate5: 0, discountRate6: 0,
+              expenseRate1: 0, expenseRate2: 0, expenseRate3: 0, expenseRate4: 0,
+              grossPrice: 0, netPurchasePrice: 0, netSalesPrice: 0, profitRate: 0, salesPrice: 0
+            })
+            setPCDetails(l)
+          }}
+          variant={'outline'}
+          size='sm'
+        >
+          <PlusSquareIcon size={'22px'} />
+        </Button>
+      
+      </div>
     </TsnPanel>)
   }
 
@@ -228,12 +242,12 @@ export default function PurchaseConditionPage({ params }: Props) {
 
 
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
-  useEffect(() => { 
-   
-    if(typeof window!='undefined'){
-      if((localStorage.getItem('showDetail_purchaseCondition_line') || '')=='true'){
+  useEffect(() => {
+
+    if (typeof window != 'undefined') {
+      if ((localStorage.getItem('showDetail_purchaseCondition_line') || '') == 'true') {
         setShowLineDetails(true)
-      }else{
+      } else {
         setShowLineDetails(false)
       }
     }
@@ -250,6 +264,7 @@ export default function PurchaseConditionPage({ params }: Props) {
   >
     <div className="relative w-full h-full">
       {FormHeader()}
+      {/* {!loading && <FormDetail />} */}
       <FormDetail />
       {FormFooter()}
     </div>

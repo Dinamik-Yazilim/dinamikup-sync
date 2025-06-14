@@ -281,13 +281,13 @@ export function savePurchaseCondition(token: string, pcHeader: PurchaseCondition
 }
 
 function insertLineQuery(pcHeader: PurchaseConditionHeader, pcDetail: PurchaseConditionDetail) {
-  return `
+  let q= `
         SET @SatirNo=@SatirNo+1;
         INSERT INTO SATINALMA_SARTLARI (sas_Guid, sas_DBCno, sas_SpecRECno, sas_iptal, sas_fileid, sas_hidden, sas_kilitli, sas_degisti, sas_checksum, sas_create_user, sas_create_date, sas_lastup_user, sas_lastup_date, sas_special1, sas_special2, sas_special3, sas_stok_kod, sas_cari_kod, sas_evrak_no_seri, sas_evrak_no_sira, sas_evrak_tarih, sas_satir_no, sas_belge_no, sas_belge_tarih, sas_asgari_miktar, sas_teslim_sure, sas_basla_tarih, sas_bitis_tarih, sas_brut_fiyat, sas_isk_acik1, sas_isk_uyg1, sas_isk_durum1, sas_isk_vergi1, sas_isk_kriter1, sas_isk_yuzde1, sas_isk_miktar1, sas_isk_acik2, sas_isk_uyg2, sas_isk_durum2, sas_isk_vergi2, sas_isk_kriter2, sas_isk_yuzde2, sas_isk_miktar2, sas_isk_acik3, sas_isk_uyg3, sas_isk_durum3, sas_isk_vergi3, sas_isk_kriter3, sas_isk_yuzde3, sas_isk_miktar3, sas_isk_acik4, sas_isk_uyg4, sas_isk_durum4, sas_isk_vergi4, sas_isk_kriter4, sas_isk_yuzde4, sas_isk_miktar4, sas_isk_acik5, sas_isk_uyg5, sas_isk_durum5, sas_isk_vergi5, sas_isk_kriter5, sas_isk_yuzde5, sas_isk_miktar5, sas_isk_acik6, sas_isk_uyg6, sas_isk_durum6, sas_isk_vergi6, sas_isk_kriter6, sas_isk_yuzde6, sas_isk_miktar6, sas_mas_acik1, sas_mas_uyg1, sas_mas_durum1, sas_mas_vergi1, sas_mas_kriter1, sas_mas_yuzde1, sas_mas_miktar1, sas_mas_acik2, sas_mas_uyg2, sas_mas_durum2, sas_mas_vergi2, sas_mas_kriter2, sas_mas_yuzde2, sas_mas_miktar2, sas_mas_acik3, sas_mas_uyg3, sas_mas_durum3, sas_mas_vergi3, sas_mas_kriter3, sas_mas_yuzde3, sas_mas_miktar3, sas_mas_acik4, sas_mas_uyg4, sas_mas_durum4, sas_mas_vergi4, sas_mas_kriter4, sas_mas_yuzde4, sas_mas_miktar4, sas_odeme_plan, sas_net_alis_kdvli, sas_kar_oran, sas_net_satis_kdvli, sas_satis_fiyat, sas_doviz_cinsi, sas_evrtipi, sas_aciklama, sas_depo_no, sas_maliyette_kullan_fl, sas_ilave_maliyet_tutari, sas_ilave_maliyet_yuzdesi, Sas_Kesinlesti_fl, Sas_ProSas_uid, sas_miktar_tip, sas_miktar, sas_proje_kodu, sas_srmmrk_kodu) 
                 VALUES(NEWID(), 0, 0, 0, 44, 0, 0, 0, 0, @MikroUserNo, GETDATE(),  @MikroUserNo, GETDATE(), '', '', 'DNMK', 
                  '${pcDetail.itemId || ''}', '${pcHeader.firmId || ''}', @EvrakSeri, @EvrakSira, '${pcHeader.issueDate || ''}',
                   @SatirNo, '${(pcHeader.documentNumber || '').replaceAll("'","''")}', '${pcHeader.documentDate}'
-                  ,0 /*sas_asgari_miktar*/,  ,0 /*sas_teslim_sure*/, '${pcHeader.startDate || pcHeader.issueDate || ''}',
+                  ,0 /*sas_asgari_miktar*/, 0 /*sas_teslim_sure*/, '${pcHeader.startDate || pcHeader.issueDate || ''}',
                   '${pcHeader.endDate || '1899-12-30 00:00:00.000'}',
                    ${pcDetail.grossPrice || 0}
                    ,'İskonto 1', 0 /*sas_isk_uyg1*/, 0 /*sas_isk_durum1*/,0 /*sas_isk_vergi1*/, 0 /*sas_isk_kriter1*/, ${pcDetail.discountRate1 || 0}, ${pcDetail.discountAmount1 || 0}
@@ -303,8 +303,10 @@ function insertLineQuery(pcHeader: PurchaseConditionHeader, pcDetail: PurchaseCo
                    , ${pcHeader.paymentPlanId || 0}, ${pcDetail.netPurchasePrice}, ${pcDetail.profitRate}, ${pcDetail.netSalesPrice}, ${pcDetail.salesPrice}
                    , 0 /*sas_doviz_cinsi*/, 0 /*sas_evrtipi*/, '${(pcDetail.description || '').replaceAll("'","''")}'
                    , ${pcHeader.warehouseId || 0}, 0 /*sas_maliyette_kullan_fl*/, 0 /*sas_ilave_maliyet_tutari*/, 0 /*sas_ilave_maliyet_yuzdesi*/, 0 /*Sas_Kesinlesti_fl*/, '00000000-0000-0000-0000-000000000000'
-                   , ${pcDetail.quantityCondition || 0} /*sas_miktar_tip*/, ${pcDetail.quantity || 0}, '${pcHeader.projectId || ''}', '${pcHeader.responsibilityId} || ''');
+                   , ${pcDetail.quantityCondition || 0} /*sas_miktar_tip*/, ${pcDetail.quantity || 0}, '${pcHeader.projectId || ''}', '${pcHeader.responsibilityId || ''}');
               `
+  console.log(q)
+  return q
 }
 
 function updateLineQuery(pcHeader: PurchaseConditionHeader, pcDetail: PurchaseConditionDetail) {

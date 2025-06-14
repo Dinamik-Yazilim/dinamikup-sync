@@ -38,11 +38,13 @@ export function TsnLineGrid({
       </div>
     }
     <div >
-      {list && list.map((e, index) => (
-        <div key={(e._id || 'grid' + index)} className={`w-full flex flex-row items-center rounded my-1 p-1 text-sm ${index % 2 == 1 ? classBgOdd : classBgEven}`}>
+      {list && list.map((e: any, index: number) => (<>
+
+        {!e.deleted && <div key={(e._id || 'grid' + index)} className={`w-full flex flex-row items-center rounded my-1 p-1 text-sm ${index % 2 == 1 ? classBgOdd : classBgEven}`}>
           {onRowPaint && onRowPaint(e, index)}
         </div>
-      ))}
+        }
+      </>))}
     </div>
 
   </div>)

@@ -44,8 +44,8 @@ export default function MeEditPage() {
       <div className="w-fu11ll m11ax-w-3xl mx-auto py-8 px-0 md:px-6">
         <div className="flex items-center gap-4 mb-6">
           <Avatar className="h-24 w-24">
-            <AvatarImage src={user.image || '/placeholder-user.jpg'} alt="@shadcn" />
-            <AvatarFallback>{user.fullName}</AvatarFallback>
+            {/* <AvatarImage src={user.image || '/placeholder-user.jpg'} alt="@shadcn" /> */}
+            {/* <AvatarFallback>{user.fullName}</AvatarFallback> */}
           </Avatar>
           <div>
             <div className='flex flex-row gap-2'>
