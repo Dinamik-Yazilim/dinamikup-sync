@@ -26,11 +26,39 @@ export function LineItem({ line, rowIndex, pcDetails, setPCDetails, t, showDetai
     setPCDetails(l)
   }
 
-  // const addNewLine = ()=>{
-  //   let l = pcDetails.map(e=>e)
-  //   l.push(line)
-  //   setPCDetails(l)
-  // }
+  const calcLine = (line: PurchaseConditionDetail) => {
+    let kalan = (line.grossPrice || 0)
+    line.discountAmount1 = Math.round(100 * (kalan || 0) * (line.discountRate1 || 0) / 100) / 100
+
+    kalan = kalan - line.discountAmount1
+    line.discountAmount2 = Math.round(100 * (kalan || 0) * (line.discountRate2 || 0) / 100) / 100
+
+    kalan = kalan - line.discountAmount2
+    line.discountAmount3 = Math.round(100 * (kalan || 0) * (line.discountRate3 || 0) / 100) / 100
+
+    kalan = kalan - line.discountAmount3
+    line.discountAmount4 = Math.round(100 * (kalan || 0) * (line.discountRate4 || 0) / 100) / 100
+
+    kalan = kalan - line.discountAmount4
+    line.discountAmount5 = Math.round(100 * (kalan || 0) * (line.discountRate5 || 0) / 100) / 100
+
+    kalan = kalan - line.discountAmount5
+    line.discountAmount6 = Math.round(100 * (kalan || 0) * (line.discountRate6 || 0) / 100) / 100
+
+    kalan = kalan - line.discountAmount6
+    line.expenseAmount1 = Math.round(100 * (kalan || 0) * (line.expenseRate1 || 0) / 100) / 100
+    kalan = kalan + line.expenseAmount1
+    line.expenseAmount2 = Math.round(100 * (kalan || 0) * (line.expenseRate2 || 0) / 100) / 100
+    kalan = kalan + line.expenseAmount2
+    line.expenseAmount3 = Math.round(100 * (kalan || 0) * (line.expenseRate3 || 0) / 100) / 100
+    kalan = kalan + line.expenseAmount3
+    line.expenseAmount4 = Math.round(100 * (kalan || 0) * (line.expenseRate4 || 0) / 100) / 100
+    kalan = kalan + line.expenseAmount4
+    line.salesPrice = kalan
+    let l = pcDetails.map(e => e)
+    l.push(line)
+    setPCDetails(l)
+  }
 
   return (<div key={'line' + rowIndex} className={`flex  w-full gap-4 items-center`}>
     <div className="text-xs text-nowrap mt-0 text-muted-foreground">
