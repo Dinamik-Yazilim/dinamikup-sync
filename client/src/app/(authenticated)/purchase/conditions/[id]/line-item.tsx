@@ -26,38 +26,41 @@ export function LineItem({ line, rowIndex, pcDetails, setPCDetails, t, showDetai
     setPCDetails(l)
   }
 
-  const calcLine = (line: PurchaseConditionDetail) => {
+  const calcLine = (line: PurchaseConditionDetail, rowIndex: number) => {
     let kalan = (line.grossPrice || 0)
-    line.discountAmount1 = Math.round(100 * (kalan || 0) * (line.discountRate1 || 0) / 100) / 100
+    line.discountAmount1 = (kalan || 0) * (line.discountRate1 || 0) / 100
 
     kalan = kalan - line.discountAmount1
-    line.discountAmount2 = Math.round(100 * (kalan || 0) * (line.discountRate2 || 0) / 100) / 100
+    line.discountAmount2 = (kalan || 0) * (line.discountRate2 || 0) / 100
 
     kalan = kalan - line.discountAmount2
-    line.discountAmount3 = Math.round(100 * (kalan || 0) * (line.discountRate3 || 0) / 100) / 100
+    line.discountAmount3 = (kalan || 0) * (line.discountRate3 || 0) / 100
 
     kalan = kalan - line.discountAmount3
-    line.discountAmount4 = Math.round(100 * (kalan || 0) * (line.discountRate4 || 0) / 100) / 100
+    line.discountAmount4 = (kalan || 0) * (line.discountRate4 || 0) / 100
 
     kalan = kalan - line.discountAmount4
-    line.discountAmount5 = Math.round(100 * (kalan || 0) * (line.discountRate5 || 0) / 100) / 100
+    line.discountAmount5 = (kalan || 0) * (line.discountRate5 || 0) / 100
 
     kalan = kalan - line.discountAmount5
-    line.discountAmount6 = Math.round(100 * (kalan || 0) * (line.discountRate6 || 0) / 100) / 100
+    line.discountAmount6 = (kalan || 0) * (line.discountRate6 || 0) / 100
 
     kalan = kalan - line.discountAmount6
-    line.expenseAmount1 = Math.round(100 * (kalan || 0) * (line.expenseRate1 || 0) / 100) / 100
+    line.expenseAmount1 = (kalan || 0) * (line.expenseRate1 || 0) / 100
     kalan = kalan + line.expenseAmount1
-    line.expenseAmount2 = Math.round(100 * (kalan || 0) * (line.expenseRate2 || 0) / 100) / 100
+    line.expenseAmount2 = (kalan || 0) * (line.expenseRate2 || 0) / 100
     kalan = kalan + line.expenseAmount2
-    line.expenseAmount3 = Math.round(100 * (kalan || 0) * (line.expenseRate3 || 0) / 100) / 100
+    line.expenseAmount3 = (kalan || 0) * (line.expenseRate3 || 0) / 100
     kalan = kalan + line.expenseAmount3
-    line.expenseAmount4 = Math.round(100 * (kalan || 0) * (line.expenseRate4 || 0) / 100) / 100
+    line.expenseAmount4 = (kalan || 0) * (line.expenseRate4 || 0) / 100
     kalan = kalan + line.expenseAmount4
     line.salesPrice = kalan
-    let l = pcDetails.map(e => e)
-    l.push(line)
-    setPCDetails(l)
+    line.netPurchasePrice = Math.round(100 * line.salesPrice + (line.salesPrice * (line.vatRate || 0) / 100)) / 100
+    line.netSalesPrice = Math.round(100 * line.netPurchasePrice + line.netPurchasePrice * (line.profitRate || 0) / 100) / 100
+    setPCDetails(pcDetails.map((d, index) => {
+      if (index == rowIndex) d = line
+      return d
+    }))
   }
 
   return (<div key={'line' + rowIndex} className={`flex  w-full gap-4 items-center`}>
@@ -69,13 +72,11 @@ export function LineItem({ line, rowIndex, pcDetails, setPCDetails, t, showDetai
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center w-full">
       <div className="col-span-1 flex flex-row items-center gap-2 text-start">
         <SelectItem t={t} onSelect={e => {
-          setPCDetails(pcDetails.map((d, index) => {
-            if (index == rowIndex) {
-              d.item = e.name
-              d.itemId = e._id
-            }
-            return d
-          }))
+          line.item=e.name
+          line.itemId=e._id
+          line.vatRate=e.vatRate
+          line.grossPrice=e.purchaseConditionGrossPrice || e.purchaseConditionPrice || e.salesPrice
+          calcLine(line,rowIndex)
 
         }} ><ButtonSelect /></SelectItem>
         {line.itemId && <div className="capitalize">{line.item?.toLowerCase()}</div>}
@@ -94,54 +95,66 @@ export function LineItem({ line, rowIndex, pcDetails, setPCDetails, t, showDetai
                   }))
                 }}
                 onFocus={e => e.target.select()}
+                onClick={e => e.currentTarget.focus()}
               />
             </div>
             <div className='flex items-center justify-end gap-[3px]'>
               <Input type="number" className="text-end px-1 py-2" defaultValue={line.discountRate1}
                 onBlur={e => {
-                  const val = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
-                  setPCDetails(pcDetails.map((d, index) => {
-                    if (index == rowIndex) d.discountRate1 = val
-                    return d
-                  }))
+                  line.discountRate1 = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
+                  calcLine(line, rowIndex)
+                  // setPCDetails(pcDetails.map((d, index) => {
+                  //   if (index == rowIndex) d.discountRate1 = val
+                  //   return d
+                  // }))
                 }}
                 onFocus={e => e.target.select()}
+                onClick={e => e.currentTarget.focus()}
               />
             </div>
             <div className='flex items-center justify-end gap-[3px]'>
               <Input type="number" className="text-end px-1 py-2" defaultValue={line.discountRate2}
                 onBlur={e => {
-                  const val = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
-                  setPCDetails(pcDetails.map((d, index) => {
-                    if (index == rowIndex) d.discountRate2 = val
-                    return d
-                  }))
+                  line.discountRate2 = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
+                  calcLine(line, rowIndex)
+                  // const val = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
+                  // setPCDetails(pcDetails.map((d, index) => {
+                  //   if (index == rowIndex) d.discountRate2 = val
+                  //   return d
+                  // }))
                 }}
                 onFocus={e => e.target.select()}
+                onClick={e => e.currentTarget.focus()}
               />
             </div>
             <div className='flex items-center justify-end gap-[3px]'>
               <Input type="number" className="text-end px-1 py-2" defaultValue={line.discountRate3}
                 onBlur={e => {
-                  const val = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
-                  setPCDetails(pcDetails.map((d, index) => {
-                    if (index == rowIndex) d.discountRate3 = val
-                    return d
-                  }))
+                  line.discountRate3 = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
+                  calcLine(line, rowIndex)
+                  // const val = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
+                  // setPCDetails(pcDetails.map((d, index) => {
+                  //   if (index == rowIndex) d.discountRate3 = val
+                  //   return d
+                  // }))
                 }}
                 onFocus={e => e.target.select()}
+                onClick={e => e.currentTarget.focus()}
               />
             </div>
             <div className='flex items-center justify-end gap-[3px]'>
               <Input type="number" className="text-end px-1 py-2" defaultValue={line.profitRate}
                 onBlur={e => {
-                  const val = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
-                  setPCDetails(pcDetails.map((d, index) => {
-                    if (index == rowIndex) d.profitRate = val
-                    return d
-                  }))
+                  line.profitRate = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
+                  calcLine(line, rowIndex)
+                  // const val = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
+                  // setPCDetails(pcDetails.map((d, index) => {
+                  //   if (index == rowIndex) d.profitRate = val
+                  //   return d
+                  // }))
                 }}
                 onFocus={e => e.target.select()}
+                onClick={e => e.currentTarget.focus()}
               />
             </div>
             <div className='flex items-center justify-end gap-[3px]'>
@@ -172,6 +185,7 @@ export function LineItem({ line, rowIndex, pcDetails, setPCDetails, t, showDetai
                     }))
                   }}
                   onFocus={e => e.target.select()}
+                  onClick={e => e.currentTarget.focus()}
                 />
               </div>
 
@@ -184,7 +198,8 @@ export function LineItem({ line, rowIndex, pcDetails, setPCDetails, t, showDetai
                       return d
                     }))
                   }}
-                  onFocus={e => e.target.select()}
+                  // onFocus={e => e.target.select()}
+                  // onClick={e => e.currentTarget.focus()}
                 />
               </div>
             </div>

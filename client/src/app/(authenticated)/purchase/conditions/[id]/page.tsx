@@ -58,7 +58,9 @@ export default function PurchaseConditionPage({ params }: Props) {
     setLoading(true)
     postItem(`/mikro/get`, token, { query: purchaseConditionHeaderQuery(params.id) })
       .then(result => {
-        setPCHeader(result[0] as PurchaseConditionHeader)
+        let h=result[0] as PurchaseConditionHeader
+        if((h.endDate || '')<'1900-01-01') h.endDate=''
+        setPCHeader(h)
         postItem(`/mikro/get`, token, { query: purchaseConditionDetailQuery(params.id) })
           .then(result => {
             setPCDetails(result as PurchaseConditionDetail[])
@@ -84,16 +86,10 @@ export default function PurchaseConditionPage({ params }: Props) {
 
 
 
-  const calculateLine = (line: PurchaseConditionDetail, index: number) => {
-
-  }
-
-  // const OrderCurrency = () => <span className='text-xs text-muted-foreground'>{pcHeader.currency}</span>
-
 
   const FormHeader = () => {
-    return (<TsnPanel name="pcondition_Header" defaultOpen={true} className="mt-4" trigger={t('Header')} contentClassName="grid grid-cols-1 lg:grid-cols-6 gap-2 w-full">
-      <div className="col-spa11n-1 lg:col-span-6 grid grid-cols-2 lg:grid-cols-5 w-full items-center gap-2">
+    return (<TsnPanel name="pcondition_Header" defaultOpen={true} className="mt-4" trigger={t('Header')} contentClassName="flex flex-col gap-2 w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-5 w-full items-center gap-2">
         <TsnInput title={t('Document Serial')} defaultValue={pcHeader.docNoSerial}
           onBlur={e => setPCHeader({ ...pcHeader, docNoSerial: e.target.value })}
           disabled={params.id != 'addnew'}
@@ -108,28 +104,30 @@ export default function PurchaseConditionPage({ params }: Props) {
         <TsnInput type='date' title={t('Document Date')} defaultValue={pcHeader.issueDate?.substring(0, 10)}
           onBlur={e => setPCHeader({ ...pcHeader, documentDate: e.target.value })} />
       </div>
-      <div className="col-span-4 lg:col-span-4 w-full p-2 pe-4 flex items-start justify-between  border rounded-md border-dashed">
-        <div className="flex flex-col gap-1">
-          <Label className="text-muted-foreground">{t('Firm')}</Label>
-          <div className="capitalize">{pcHeader.firm?.toLowerCase()}</div>
+      <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
+        <div className="col-span-1 lg:col-span-4 w-full p-2 pe-4 flex items-start justify-between  border rounded-md border-dashed">
+          <div className="flex flex-col gap-1">
+            <Label className="text-muted-foreground">{t('Firm')}</Label>
+            <div className="capitalize">{pcHeader.firm?.toLowerCase()}</div>
+          </div>
+          <SelectFirm t={t} onSelect={e => {
+            setPCHeader({ ...pcHeader, firmId: e._id, firm: e.name })
+          }} ><ButtonSelect /></SelectFirm>
+
         </div>
-        <SelectFirm t={t} onSelect={e => {
-          setPCHeader({ ...pcHeader, firmId: e._id, firm: e.name })
-        }} ><ButtonSelect /></SelectFirm>
+        <div className="col-span-1 lg:col-span-2 w-full flex justify-between p-2 pe-4 items-start  border rounded-md border-dashed">
+          <div className="flex flex-col gap-1">
+            <Label className="text-muted-foreground">{t('Warehouse')}</Label>
+            <div className="capitalize">{pcHeader.warehouse}</div>
+          </div>
+          <SelectWarehouse t={t} onSelect={e => {
+            setPCHeader({ ...pcHeader, warehouseId: e._id, warehouse: e.name })
+          }} ><ButtonSelect /></SelectWarehouse>
 
-      </div>
-      <div className="col-span-2 lg:col-span-2 w-full flex justify-between p-2 pe-4 items-start  border rounded-md border-dashed">
-        <div className="flex flex-col gap-1">
-          <Label className="text-muted-foreground">{t('Warehouse')}</Label>
-          <div className="capitalize">{pcHeader.warehouse}</div>
         </div>
-        <SelectWarehouse t={t} onSelect={e => {
-          setPCHeader({ ...pcHeader, warehouseId: e._id, warehouse: e.name })
-        }} ><ButtonSelect /></SelectWarehouse>
-
       </div>
 
-      <div className="col-span-1 lg:col-span-6 grid grid-cols-1 lg:grid-cols-4 justify-between gap-2">
+      <div className="grid grid-cols-1 lg:grid-cols-4 justify-between gap-2">
         <div className="w-full flex justify-between p-2 pe-4 items-start  border rounded-md border-dashed">
           <div className="flex flex-col gap-1">
             <Label className="text-muted-foreground">{t('Payment Plan')}</Label>
@@ -162,6 +160,13 @@ export default function PurchaseConditionPage({ params }: Props) {
           <SelectSalesperson t={t} onSelect={e => { setPCHeader({ ...pcHeader, salespersonId: e._id, salesperson: e.name }) }} ><ButtonSelect /></SelectSalesperson>
 
         </div>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-5 w-full items-center gap-2">
+       
+        <TsnInput type='date' title={t('Start Date')} defaultValue={pcHeader.startDate?.substring(0, 10)}
+          onBlur={e => setPCHeader({ ...pcHeader, startDate: e.target.value })} />
+        <TsnInput type='date' title={t('End Date')} defaultValue={pcHeader.endDate?.substring(0, 10)}
+          onBlur={e => setPCHeader({ ...pcHeader, endDate: e.target.value })} />
       </div>
     </TsnPanel>)
   }
@@ -214,9 +219,10 @@ export default function PurchaseConditionPage({ params }: Props) {
       <div className="px-2 py-1 rounded border border-dashed bg-blue-600 bg-opacity-10 flex justify-end w-full">
         <Button className="bg-indigo-600 text-white hover:bg-indigo-400"
           onClick={() => {
-            let l=pcDetails.map(e=>e)
+            let l = pcDetails.map(e => e)
             l.push({
-              deleted: false, discountRate1: 2, discountRate2: 0, discountRate3: 0, discountRate4: 0, discountRate5: 0, discountRate6: 0,
+              item: '', itemId: '', vatRate: 0,
+              deleted: false, discountRate1: 0, discountRate2: 0, discountRate3: 0, discountRate4: 0, discountRate5: 0, discountRate6: 0,
               expenseRate1: 0, expenseRate2: 0, expenseRate3: 0, expenseRate4: 0,
               grossPrice: 0, netPurchasePrice: 0, netSalesPrice: 0, profitRate: 0, salesPrice: 0
             })
@@ -227,7 +233,7 @@ export default function PurchaseConditionPage({ params }: Props) {
         >
           <PlusSquareIcon size={'22px'} />
         </Button>
-      
+
       </div>
     </TsnPanel>)
   }

@@ -54,10 +54,10 @@ export interface PurchaseConditionDetail {
   itemId?: string
   item?: string
   unit?: string
-  quantityCondition?:number
+  quantityCondition?: number
   quantity?: number
   grossPrice?: number
-  
+
   discountAmount1?: number
   discountAmount2?: number
   discountAmount3?: number
@@ -79,11 +79,11 @@ export interface PurchaseConditionDetail {
   expenseRate2?: number
   expenseRate3?: number
   expenseRate4?: number
-  salesPrice?:number
-  vatRate?:number
-  profitRate?:number
-  netPurchasePrice?:number
-  netSalesPrice?:number
+  salesPrice?: number
+  vatRate?: number
+  profitRate?: number
+  netPurchasePrice?: number
+  netSalesPrice?: number
   description?: string
   deleted?: boolean
 }
@@ -248,18 +248,21 @@ export function savePurchaseCondition(token: string, pcHeader: PurchaseCondition
             IF @EvrakSira=0 BEGIN
               SELECT @EvrakSira=ISNULL(MAX(sas_evrak_no_sira),0)+1 FROM SATINALMA_SARTLARI WHERE sas_evrak_no_seri=@EvrakSeri;
             END
+            DELETE FROM SATINALMA_SARTLARI WHERE sas_evrak_no_seri=@EvrakSeri AND sas_evrak_no_sira=@EvrakSira;
             `
 
           const qList = pcDetails.map((e, rowIndex) => {
-            if (e.sas_Guid) {
-              if (e.deleted) {
-                return `DELETE FROM SATINALMA_SARTLARI WHERE sas_Guid='${e.sas_Guid}';`
-              } else {
-                return updateLineQuery(pcHeader, e);
-              }
+            if (e.itemId) {
+              if (e.sas_Guid) {
+                if (e.deleted) {
+                  //return `DELETE FROM SATINALMA_SARTLARI WHERE sas_Guid='${e.sas_Guid}';`
+                } else {
+                  return updateLineQuery(pcHeader, e);
+                }
 
-            } else {
-              return insertLineQuery(pcHeader, e)
+              } else {
+                return insertLineQuery(pcHeader, e)
+              }
             }
           }) as string[]
           query += qList.join('\n');
@@ -281,12 +284,12 @@ export function savePurchaseCondition(token: string, pcHeader: PurchaseCondition
 }
 
 function insertLineQuery(pcHeader: PurchaseConditionHeader, pcDetail: PurchaseConditionDetail) {
-  let q= `
+  let q = `
         SET @SatirNo=@SatirNo+1;
         INSERT INTO SATINALMA_SARTLARI (sas_Guid, sas_DBCno, sas_SpecRECno, sas_iptal, sas_fileid, sas_hidden, sas_kilitli, sas_degisti, sas_checksum, sas_create_user, sas_create_date, sas_lastup_user, sas_lastup_date, sas_special1, sas_special2, sas_special3, sas_stok_kod, sas_cari_kod, sas_evrak_no_seri, sas_evrak_no_sira, sas_evrak_tarih, sas_satir_no, sas_belge_no, sas_belge_tarih, sas_asgari_miktar, sas_teslim_sure, sas_basla_tarih, sas_bitis_tarih, sas_brut_fiyat, sas_isk_acik1, sas_isk_uyg1, sas_isk_durum1, sas_isk_vergi1, sas_isk_kriter1, sas_isk_yuzde1, sas_isk_miktar1, sas_isk_acik2, sas_isk_uyg2, sas_isk_durum2, sas_isk_vergi2, sas_isk_kriter2, sas_isk_yuzde2, sas_isk_miktar2, sas_isk_acik3, sas_isk_uyg3, sas_isk_durum3, sas_isk_vergi3, sas_isk_kriter3, sas_isk_yuzde3, sas_isk_miktar3, sas_isk_acik4, sas_isk_uyg4, sas_isk_durum4, sas_isk_vergi4, sas_isk_kriter4, sas_isk_yuzde4, sas_isk_miktar4, sas_isk_acik5, sas_isk_uyg5, sas_isk_durum5, sas_isk_vergi5, sas_isk_kriter5, sas_isk_yuzde5, sas_isk_miktar5, sas_isk_acik6, sas_isk_uyg6, sas_isk_durum6, sas_isk_vergi6, sas_isk_kriter6, sas_isk_yuzde6, sas_isk_miktar6, sas_mas_acik1, sas_mas_uyg1, sas_mas_durum1, sas_mas_vergi1, sas_mas_kriter1, sas_mas_yuzde1, sas_mas_miktar1, sas_mas_acik2, sas_mas_uyg2, sas_mas_durum2, sas_mas_vergi2, sas_mas_kriter2, sas_mas_yuzde2, sas_mas_miktar2, sas_mas_acik3, sas_mas_uyg3, sas_mas_durum3, sas_mas_vergi3, sas_mas_kriter3, sas_mas_yuzde3, sas_mas_miktar3, sas_mas_acik4, sas_mas_uyg4, sas_mas_durum4, sas_mas_vergi4, sas_mas_kriter4, sas_mas_yuzde4, sas_mas_miktar4, sas_odeme_plan, sas_net_alis_kdvli, sas_kar_oran, sas_net_satis_kdvli, sas_satis_fiyat, sas_doviz_cinsi, sas_evrtipi, sas_aciklama, sas_depo_no, sas_maliyette_kullan_fl, sas_ilave_maliyet_tutari, sas_ilave_maliyet_yuzdesi, Sas_Kesinlesti_fl, Sas_ProSas_uid, sas_miktar_tip, sas_miktar, sas_proje_kodu, sas_srmmrk_kodu) 
                 VALUES(NEWID(), 0, 0, 0, 44, 0, 0, 0, 0, @MikroUserNo, GETDATE(),  @MikroUserNo, GETDATE(), '', '', 'DNMK', 
                  '${pcDetail.itemId || ''}', '${pcHeader.firmId || ''}', @EvrakSeri, @EvrakSira, '${pcHeader.issueDate || ''}',
-                  @SatirNo, '${(pcHeader.documentNumber || '').replaceAll("'","''")}', '${pcHeader.documentDate}'
+                  @SatirNo, '${(pcHeader.documentNumber || '').replaceAll("'", "''")}', '${pcHeader.documentDate}'
                   ,0 /*sas_asgari_miktar*/, 0 /*sas_teslim_sure*/, '${pcHeader.startDate || pcHeader.issueDate || ''}',
                   '${pcHeader.endDate || '1899-12-30 00:00:00.000'}',
                    ${pcDetail.grossPrice || 0}
@@ -301,39 +304,63 @@ function insertLineQuery(pcHeader: PurchaseConditionHeader, pcDetail: PurchaseCo
                    , 'Masraf 3',1 /*sas_mas_uyg3*/, 0 /*sas_mas_durum3*/, 0 /*sas_mas_vergi3*/, 0 /*sas_mas_kriter3*/, ${pcDetail.expenseRate3 || 0}, ${pcDetail.expenseRate3 || 0}
                    , 'Masraf 4',1 /*sas_mas_uyg4*/, 0 /*sas_mas_durum4*/, 0 /*sas_mas_vergi4*/, 0 /*sas_mas_kriter4*/, ${pcDetail.expenseRate4 || 0}, ${pcDetail.expenseRate4 || 0}
                    , ${pcHeader.paymentPlanId || 0}, ${pcDetail.netPurchasePrice}, ${pcDetail.profitRate}, ${pcDetail.netSalesPrice}, ${pcDetail.salesPrice}
-                   , 0 /*sas_doviz_cinsi*/, 0 /*sas_evrtipi*/, '${(pcDetail.description || '').replaceAll("'","''")}'
+                   , 0 /*sas_doviz_cinsi*/, 0 /*sas_evrtipi*/, '${(pcDetail.description || '').replaceAll("'", "''")}'
                    , ${pcHeader.warehouseId || 0}, 0 /*sas_maliyette_kullan_fl*/, 0 /*sas_ilave_maliyet_tutari*/, 0 /*sas_ilave_maliyet_yuzdesi*/, 0 /*Sas_Kesinlesti_fl*/, '00000000-0000-0000-0000-000000000000'
                    , ${pcDetail.quantityCondition || 0} /*sas_miktar_tip*/, ${pcDetail.quantity || 0}, '${pcHeader.projectId || ''}', '${pcHeader.responsibilityId || ''}');
               `
-  console.log(q)
   return q
 }
 
 function updateLineQuery(pcHeader: PurchaseConditionHeader, pcDetail: PurchaseConditionDetail) {
-  return `
-      SET @SatirNo=@SatirNo+1;
-      UPDATE SATINALMA_SARTLARI SET
-        sas_lastup_user=@MikroUserNo, sas_lastup_date=GETDATE(),
-        sas_special3='DNMK', 
-        sas_stok_kod='${pcDetail.itemId}', sas_cari_kod='${pcHeader.firmId || ''}' , sas_evrak_tarih='${pcHeader.issueDate || ''}',
-        sas_satir_no=@SatirNo, sas_belge_no='${(pcHeader.documentNumber || '').replaceAll("'","''")}', sas_belge_tarih='${pcHeader.documentDate || ''}',
-        sas_basla_tarih='${pcHeader.startDate || ''}', sas_bitis_tarih='${pcHeader.endDate || '1899-12-30 00:00:00.000'}',
-        sas_brut_fiyat=${pcDetail.grossPrice || 0}, 
-        sas_isk_yuzde1=${pcDetail.discountRate1 || 0}, sas_isk_miktar1=${pcDetail.discountAmount1 || 0},
-        sas_isk_yuzde2=${pcDetail.discountRate2 || 0}, sas_isk_miktar2=${pcDetail.discountAmount2 || 0},
-        sas_isk_yuzde3=${pcDetail.discountRate3 || 0}, sas_isk_miktar3=${pcDetail.discountAmount3 || 0},
-        sas_isk_yuzde4=${pcDetail.discountRate4 || 0}, sas_isk_miktar4=${pcDetail.discountAmount4 || 0},
-        sas_isk_yuzde5=${pcDetail.discountRate5 || 0}, sas_isk_miktar5=${pcDetail.discountAmount5 || 0},
-        sas_isk_yuzde6=${pcDetail.discountRate6 || 0}, sas_isk_miktar6=${pcDetail.discountAmount6 || 0},
-        sas_mas_yuzde1=${pcDetail.expenseRate1 || 0}, sas_mas_miktar1=${pcDetail.expenseAmount1 || 0},
-        sas_mas_yuzde2=${pcDetail.expenseRate2 || 0}, sas_mas_miktar2=${pcDetail.expenseAmount2 || 0},
-        sas_mas_yuzde3=${pcDetail.expenseRate3 || 0}, sas_mas_miktar3=${pcDetail.expenseAmount3 || 0},
-        sas_mas_yuzde4=${pcDetail.expenseRate4 || 0}, sas_mas_miktar4=${pcDetail.expenseAmount4 || 0},
-        sas_odeme_plan=${pcHeader.paymentPlanId || 0}, sas_net_alis_kdvli=${pcDetail.netPurchasePrice || 0},
-        sas_kar_oran=${pcDetail.profitRate || 0}, sas_net_satis_kdvli=${pcDetail.netSalesPrice || 0},
-        sas_satis_fiyat=${pcDetail.salesPrice || 0}, sas_aciklama='${(pcDetail.description || '').replaceAll("'","''")}',
-        sas_depo_no=${pcHeader.warehouseId || 0}, sas_miktar_tip=${pcDetail.quantityCondition || 0}, sas_miktar=${pcDetail.quantity || 0},
-        sas_proje_kodu='${pcHeader.projectId || ''}', sas_srmmrk_kodu='${pcHeader.responsibilityId || ''}'
-        WHERE sas_Guid='${pcDetail.sas_Guid}';
-         `
+  let q = `
+        SET @SatirNo=@SatirNo+1;
+        INSERT INTO SATINALMA_SARTLARI (sas_Guid, sas_DBCno, sas_SpecRECno, sas_iptal, sas_fileid, sas_hidden, sas_kilitli, sas_degisti, sas_checksum, sas_create_user, sas_create_date, sas_lastup_user, sas_lastup_date, sas_special1, sas_special2, sas_special3, sas_stok_kod, sas_cari_kod, sas_evrak_no_seri, sas_evrak_no_sira, sas_evrak_tarih, sas_satir_no, sas_belge_no, sas_belge_tarih, sas_asgari_miktar, sas_teslim_sure, sas_basla_tarih, sas_bitis_tarih, sas_brut_fiyat, sas_isk_acik1, sas_isk_uyg1, sas_isk_durum1, sas_isk_vergi1, sas_isk_kriter1, sas_isk_yuzde1, sas_isk_miktar1, sas_isk_acik2, sas_isk_uyg2, sas_isk_durum2, sas_isk_vergi2, sas_isk_kriter2, sas_isk_yuzde2, sas_isk_miktar2, sas_isk_acik3, sas_isk_uyg3, sas_isk_durum3, sas_isk_vergi3, sas_isk_kriter3, sas_isk_yuzde3, sas_isk_miktar3, sas_isk_acik4, sas_isk_uyg4, sas_isk_durum4, sas_isk_vergi4, sas_isk_kriter4, sas_isk_yuzde4, sas_isk_miktar4, sas_isk_acik5, sas_isk_uyg5, sas_isk_durum5, sas_isk_vergi5, sas_isk_kriter5, sas_isk_yuzde5, sas_isk_miktar5, sas_isk_acik6, sas_isk_uyg6, sas_isk_durum6, sas_isk_vergi6, sas_isk_kriter6, sas_isk_yuzde6, sas_isk_miktar6, sas_mas_acik1, sas_mas_uyg1, sas_mas_durum1, sas_mas_vergi1, sas_mas_kriter1, sas_mas_yuzde1, sas_mas_miktar1, sas_mas_acik2, sas_mas_uyg2, sas_mas_durum2, sas_mas_vergi2, sas_mas_kriter2, sas_mas_yuzde2, sas_mas_miktar2, sas_mas_acik3, sas_mas_uyg3, sas_mas_durum3, sas_mas_vergi3, sas_mas_kriter3, sas_mas_yuzde3, sas_mas_miktar3, sas_mas_acik4, sas_mas_uyg4, sas_mas_durum4, sas_mas_vergi4, sas_mas_kriter4, sas_mas_yuzde4, sas_mas_miktar4, sas_odeme_plan, sas_net_alis_kdvli, sas_kar_oran, sas_net_satis_kdvli, sas_satis_fiyat, sas_doviz_cinsi, sas_evrtipi, sas_aciklama, sas_depo_no, sas_maliyette_kullan_fl, sas_ilave_maliyet_tutari, sas_ilave_maliyet_yuzdesi, Sas_Kesinlesti_fl, Sas_ProSas_uid, sas_miktar_tip, sas_miktar, sas_proje_kodu, sas_srmmrk_kodu) 
+                VALUES('${pcDetail.sas_Guid || ''}', 0, 0, 0, 44, 0, 0, 0, 0, @MikroUserNo, GETDATE(),  @MikroUserNo, GETDATE(), '', '', 'DNMK', 
+                 '${pcDetail.itemId || ''}', '${pcHeader.firmId || ''}', @EvrakSeri, @EvrakSira, '${pcHeader.issueDate || ''}',
+                  @SatirNo, '${(pcHeader.documentNumber || '').replaceAll("'", "''")}', '${pcHeader.documentDate}'
+                  ,0 /*sas_asgari_miktar*/, 0 /*sas_teslim_sure*/, '${pcHeader.startDate || pcHeader.issueDate || ''}',
+                  '${pcHeader.endDate || '1899-12-30 00:00:00.000'}',
+                   ${pcDetail.grossPrice || 0}
+                   ,'İskonto 1', 0 /*sas_isk_uyg1*/, 0 /*sas_isk_durum1*/,0 /*sas_isk_vergi1*/, 0 /*sas_isk_kriter1*/, ${pcDetail.discountRate1 || 0}, ${pcDetail.discountAmount1 || 0}
+                   ,'İskonto 2',1 /*sas_isk_uyg2*/, 0 /*sas_isk_durum2*/, 0 /*sas_isk_vergi2*/, 0 /*sas_isk_kriter2*/, ${pcDetail.discountRate2 || 0}, ${pcDetail.discountAmount2 || 0}
+                   ,'İskonto 3',1 /*sas_isk_uyg3*/, 0 /*sas_isk_durum3*/, 0 /*sas_isk_vergi3*/, 0 /*sas_isk_kriter3*/, ${pcDetail.discountRate3 || 0}, ${pcDetail.discountAmount3 || 0}
+                   ,'İskonto 4',1 /*sas_isk_uyg4*/, 0 /*sas_isk_durum4*/, 0 /*sas_isk_vergi4*/, 0 /*sas_isk_kriter4*/, ${pcDetail.discountRate4 || 0}, ${pcDetail.discountAmount4 || 0}
+                   ,'İskonto 5',1 /*sas_isk_uyg5*/, 0 /*sas_isk_durum5*/, 0 /*sas_isk_vergi5*/, 0 /*sas_isk_kriter5*/, ${pcDetail.discountRate5 || 0}, ${pcDetail.discountAmount5 || 0}
+                   ,'İskonto 6',1 /*sas_isk_uyg6*/, 0 /*sas_isk_durum6*/, 0 /*sas_isk_vergi6*/, 0 /*sas_isk_kriter6*/, ${pcDetail.discountRate6 || 0}, ${pcDetail.discountAmount6 || 0}
+                   , 'Masraf 1',1 /*sas_mas_uyg1*/, 0 /*sas_mas_durum1*/, 0 /*sas_mas_vergi1*/, 0 /*sas_mas_kriter1*/, ${pcDetail.expenseRate1 || 0}, ${pcDetail.expenseRate1 || 0}
+                   , 'Masraf 2',1 /*sas_mas_uyg2*/, 0 /*sas_mas_durum2*/, 0 /*sas_mas_vergi2*/, 0 /*sas_mas_kriter2*/, ${pcDetail.expenseRate2 || 0}, ${pcDetail.expenseRate2 || 0}
+                   , 'Masraf 3',1 /*sas_mas_uyg3*/, 0 /*sas_mas_durum3*/, 0 /*sas_mas_vergi3*/, 0 /*sas_mas_kriter3*/, ${pcDetail.expenseRate3 || 0}, ${pcDetail.expenseRate3 || 0}
+                   , 'Masraf 4',1 /*sas_mas_uyg4*/, 0 /*sas_mas_durum4*/, 0 /*sas_mas_vergi4*/, 0 /*sas_mas_kriter4*/, ${pcDetail.expenseRate4 || 0}, ${pcDetail.expenseRate4 || 0}
+                   , ${pcHeader.paymentPlanId || 0}, ${pcDetail.netPurchasePrice}, ${pcDetail.profitRate}, ${pcDetail.netSalesPrice}, ${pcDetail.salesPrice}
+                   , 0 /*sas_doviz_cinsi*/, 0 /*sas_evrtipi*/, '${(pcDetail.description || '').replaceAll("'", "''")}'
+                   , ${pcHeader.warehouseId || 0}, 0 /*sas_maliyette_kullan_fl*/, 0 /*sas_ilave_maliyet_tutari*/, 0 /*sas_ilave_maliyet_yuzdesi*/, 0 /*Sas_Kesinlesti_fl*/, '00000000-0000-0000-0000-000000000000'
+                   , ${pcDetail.quantityCondition || 0} /*sas_miktar_tip*/, ${pcDetail.quantity || 0}, '${pcHeader.projectId || ''}', '${pcHeader.responsibilityId || ''}');
+              `
+  return q
+  // return `
+  //     SET @SatirNo=@SatirNo+1;
+  //     UPDATE SATINALMA_SARTLARI SET
+  //       sas_lastup_user=@MikroUserNo, sas_lastup_date=GETDATE(),
+  //       sas_special3='DNMK', 
+  //       sas_stok_kod='${pcDetail.itemId}', sas_cari_kod='${pcHeader.firmId || ''}' , sas_evrak_tarih='${pcHeader.issueDate || ''}',
+  //       sas_satir_no=@SatirNo, sas_belge_no='${(pcHeader.documentNumber || '').replaceAll("'","''")}', sas_belge_tarih='${pcHeader.documentDate || ''}',
+  //       sas_basla_tarih='${pcHeader.startDate || ''}', sas_bitis_tarih='${pcHeader.endDate || '1899-12-30 00:00:00.000'}',
+  //       sas_brut_fiyat=${pcDetail.grossPrice || 0}, 
+  //       sas_isk_yuzde1=${pcDetail.discountRate1 || 0}, sas_isk_miktar1=${pcDetail.discountAmount1 || 0},
+  //       sas_isk_yuzde2=${pcDetail.discountRate2 || 0}, sas_isk_miktar2=${pcDetail.discountAmount2 || 0},
+  //       sas_isk_yuzde3=${pcDetail.discountRate3 || 0}, sas_isk_miktar3=${pcDetail.discountAmount3 || 0},
+  //       sas_isk_yuzde4=${pcDetail.discountRate4 || 0}, sas_isk_miktar4=${pcDetail.discountAmount4 || 0},
+  //       sas_isk_yuzde5=${pcDetail.discountRate5 || 0}, sas_isk_miktar5=${pcDetail.discountAmount5 || 0},
+  //       sas_isk_yuzde6=${pcDetail.discountRate6 || 0}, sas_isk_miktar6=${pcDetail.discountAmount6 || 0},
+  //       sas_mas_yuzde1=${pcDetail.expenseRate1 || 0}, sas_mas_miktar1=${pcDetail.expenseAmount1 || 0},
+  //       sas_mas_yuzde2=${pcDetail.expenseRate2 || 0}, sas_mas_miktar2=${pcDetail.expenseAmount2 || 0},
+  //       sas_mas_yuzde3=${pcDetail.expenseRate3 || 0}, sas_mas_miktar3=${pcDetail.expenseAmount3 || 0},
+  //       sas_mas_yuzde4=${pcDetail.expenseRate4 || 0}, sas_mas_miktar4=${pcDetail.expenseAmount4 || 0},
+  //       sas_odeme_plan=${pcHeader.paymentPlanId || 0}, sas_net_alis_kdvli=${pcDetail.netPurchasePrice || 0},
+  //       sas_kar_oran=${pcDetail.profitRate || 0}, sas_net_satis_kdvli=${pcDetail.netSalesPrice || 0},
+  //       sas_satis_fiyat=${pcDetail.salesPrice || 0}, sas_aciklama='${(pcDetail.description || '').replaceAll("'","''")}',
+  //       sas_depo_no=${pcHeader.warehouseId || 0}, sas_miktar_tip=${pcDetail.quantityCondition || 0}, sas_miktar=${pcDetail.quantity || 0},
+  //       sas_proje_kodu='${pcHeader.projectId || ''}', sas_srmmrk_kodu='${pcHeader.responsibilityId || ''}'
+  //       WHERE sas_Guid='${pcDetail.sas_Guid}';
+  //        `
 }
