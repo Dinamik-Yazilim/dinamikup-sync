@@ -4,33 +4,27 @@ import { useEffect, useState } from 'react'
 import { getItem, getList, putItem } from '@/lib/fetch'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
-import { Settings } from '@/types/Settings'
 import { useToast } from '@/components/ui/use-toast'
-import { TsnSelect } from '@/components/ui216/tsn-select'
 import { useLanguage } from '@/i18n'
-import { StandartForm } from '@/components/ui216/standart-form'
-import { TsnInput } from '@/components/ui216/tsn-input'
-import { Label } from '@/components/ui/label'
-import { TsnPanel } from '@/components/ui216/tsn-panel'
-import { Users2Icon } from 'lucide-react'
-import { getRoleList, Member } from '@/types/Member'
+import { StoreIcon, Users2Icon } from 'lucide-react'
 import { ListGrid } from '@/components/ui216/list-grid'
+import { Store, getPosIntegrationTypeList } from '@/types/Store'
 interface Props {
 }
 export default function SettingsPage({ }: Props) {
-  const [members, setMembers] = useState<Member[]>([])
+  const [stores, setStores] = useState<Store[]>([])
   const [token, setToken] = useState('')
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { t } = useLanguage()
-  const roleList=getRoleList(t)
+  const posIntegrationTypeList=getPosIntegrationTypeList()
 
   const load = () => {
     setLoading(true)
-    getList(`/members`, token)
+    getList(`/stores`, token)
       .then(result => {
-        setMembers(result.docs as Member[])
+        setStores(result.docs as Store[])
       })
       .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
       .finally(() => setLoading(false))
@@ -41,20 +35,24 @@ export default function SettingsPage({ }: Props) {
 
   return (
     <ListGrid
-      apiPath='/members'
+      apiPath='/stores'
 
-      title={t('Users')}
-      icon=<Users2Icon />
-      onHeaderPaint={() => <div className='grid grid-cols-4 w-full'>
-        <div>{t('Username')}</div>
+      title={t('Stores')}
+      icon=<StoreIcon />
+      onHeaderPaint={() => <div className='grid grid-cols-6 w-full'>
         <div>{t('Name')}</div>
-        <div>{t('Rol')}</div>
+        <div>{t('Warehouse')}</div>
+        <div>{t('Responsibility')}</div>
+        <div>{t('Project')}</div>
+        <div>{t('Pos')}</div>
         <div className='text-center'>{t('Passive?')}</div>
       </div>}
-      onRowPaint={(e:Member,colIndex) => <div className='grid grid-cols-4 w-full'>
-        <div>{e.username}</div>
+      onRowPaint={(e:Store,colIndex) => <div className='grid grid-cols-6 w-full'>
         <div>{e.name}</div>
-        <div>{roleList.find(r=>r._id==e.role)?.name}</div>
+        <div>{e.warehouse}</div>
+        <div>{e.responsibility}</div>
+        <div>{e.project}</div>
+        <div>{posIntegrationTypeList.find(r=>r._id==e.posIntegration?.integrationType)?.name}</div>
         <div className='text-center'>{e.passive?'✅':''}</div>
       </div>}
     />

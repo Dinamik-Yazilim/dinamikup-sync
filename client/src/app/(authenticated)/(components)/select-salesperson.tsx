@@ -19,6 +19,8 @@ import React from "react"
 import { TsnDialogSelectButton } from "@/components/ui216/tsn-dialog-selectbutton"
 import { Salesperson, salespersonListQuery } from "@/types/Salesperson"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Label } from "@/components/ui/label"
+import { ButtonSelect } from "@/components/icon-buttons"
 
 interface Props {
   t: (text: string) => string
@@ -96,5 +98,22 @@ export function SelectSalesperson({ t, children, onSelect }: Props) {
 
       </AlertDialogContent>
     </AlertDialog>
+  )
+}
+
+
+interface WithLabelProps extends Props {
+  className?: string
+  caption?: React.ReactNode | any
+}
+export function SelectSalespersonWithLabel({ t, children, onSelect, className, caption }: WithLabelProps) {
+  return (
+    <div className={`w-full flex justify-between p-2 pe-4 items-start  border rounded-md border-dashed ${className}`}>
+      <div className="flex flex-col gap-1">
+        <Label className="text-muted-foreground">{t('Warehouse')}</Label>
+        <div className="capitalize">{caption}</div>
+      </div>
+      <SelectSalesperson t={t} onSelect={onSelect} ><ButtonSelect /></SelectSalesperson>
+    </div>
   )
 }

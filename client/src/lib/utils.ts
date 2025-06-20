@@ -50,54 +50,74 @@ export function currSymbol(currency?: string) {
 }
 
 export function yesterday() {
-  var t=new Date(new Date().setDate(new Date().getDate() - 1))
-  t.setMinutes(t.getTimezoneOffset()*-1)
+  var t = new Date(new Date().setDate(new Date().getDate() - 1))
+  t.setMinutes(t.getTimezoneOffset() * -1)
   return t.toISOString().substring(0, 10)
 }
 
 export function today() {
-  var t=new Date()
-  t.setMinutes(t.getTimezoneOffset()*-1)
+  var t = new Date()
+  t.setMinutes(t.getTimezoneOffset() * -1)
   return t.toISOString().substring(0, 10)
 }
 export function oneYearLater() {
-  var t=new Date()
-  t.setMinutes(t.getTimezoneOffset()*-1)
-  t.setFullYear(t.getFullYear()+1)
+  var t = new Date()
+  t.setMinutes(t.getTimezoneOffset() * -1)
+  t.setFullYear(t.getFullYear() + 1)
   return t.toISOString().substring(0, 10)
 }
 
 
 export function startOfMonth() {
-  var t=new Date(new Date().getFullYear(),new Date().getMonth(),1)
+  var t = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
   t.setMinutes(t.getTimezoneOffset() * -1)
   return t.toISOString().substring(0, 10)
 }
 
 export function startOfWeek() {
-  var t=new Date()
-  var w=new Date(t.setDate(t.getDate()-t.getDay()))
-  w.setMinutes(w.getTimezoneOffset()*-1)
+  var t = new Date()
+  var w = new Date(t.setDate(t.getDate() - t.getDay()))
+  w.setMinutes(w.getTimezoneOffset() * -1)
   return w.toISOString().substring(0, 10)
 }
 
 export function startOfLastMonth() {
-  var t=new Date()
-  var w=new Date(t.getFullYear(),t.getMonth()-1,1)
-  w.setMinutes(w.getTimezoneOffset()*-1)
+  var t = new Date()
+  var w = new Date(t.getFullYear(), t.getMonth() - 1, 1)
+  w.setMinutes(w.getTimezoneOffset() * -1)
   return w.toISOString().substring(0, 10)
 }
 
 export function endOfLastMonth() {
-  var t=new Date()
-  var w=new Date(t.getFullYear(),t.getMonth(),0)
-  w.setMinutes(w.getTimezoneOffset()*-1)
+  var t = new Date()
+  var w = new Date(t.getFullYear(), t.getMonth(), 0)
+  w.setMinutes(w.getTimezoneOffset() * -1)
   return w.toISOString().substring(0, 10)
 }
 
 export function startOfThreeMonthsAgo() {
-  var t=new Date()
-  var w=new Date(t.getFullYear(),t.getMonth()-3,1)
-  w.setMinutes(w.getTimezoneOffset()*-1)
+  var t = new Date()
+  var w = new Date(t.getFullYear(), t.getMonth() - 3, 1)
+  w.setMinutes(w.getTimezoneOffset() * -1)
   return w.toISOString().substring(0, 10)
+}
+
+export function setLocalStorage(mainKey: string, key: string, val: any) {
+  if (typeof window != 'undefined') {
+    try {
+      let obj = JSON.parse(localStorage.getItem(mainKey) || '{}') as any
+      obj[key] = val
+      localStorage.setItem(mainKey, JSON.stringify(obj))
+    } catch { }
+  }
+}
+
+export function getLocalStorage(mainKey: string, key: string) {
+  if (typeof window != 'undefined') {
+    try {
+      let obj = JSON.parse(localStorage.getItem(mainKey) || '{}') as any
+      return obj[key]
+    } catch { }
+    return
+  }
 }

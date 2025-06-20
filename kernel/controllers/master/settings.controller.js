@@ -9,13 +9,8 @@ module.exports = (dbModel, sessionDoc, req) =>
         break
       case 'POST':
       case 'PUT':
-        if (req.params.param1 == 'connectorTest') {
-          connectorTest(dbModel, sessionDoc, req).then(resolve).catch(reject)
-        } else if (req.params.param1 == 'mssqlTest') {
-          mssqlTest(dbModel, sessionDoc, req).then(resolve).catch(reject)
-        } else {
-          save(dbModel, sessionDoc, req).then(resolve).catch(reject)
-        }
+
+        save(dbModel, sessionDoc, req).then(resolve).catch(reject)
         break
 
       default:
@@ -27,12 +22,15 @@ module.exports = (dbModel, sessionDoc, req) =>
 function getOne(dbModel, sessionDoc, req) {
   return new Promise(async (resolve, reject) => {
     try {
-      let orgDoc = await dbModel.organizations.findOne({ _id: sessionDoc.organization })
-      console.log('orgDoc.settings:', orgDoc.settings)
-      resolve({
-        connector: orgDoc.connector,
-        settings: orgDoc.settings
-      })
+      dbModel.settings.findOne({ organization: sessionDoc.organization, db: sessionDoc.db })
+        .then(async doc => {
+          if (!doc) {
+            doc = new db.settings({ organization: sessionDoc.organization, db: sessionDoc.db })
+            doc = await doc.save()
+          }
+          resolve(doc)
+        })
+        .catch(reject)
     } catch (err) {
       reject(err)
     }
@@ -43,15 +41,20 @@ function save(dbModel, sessionDoc, req) {
   return new Promise(async (resolve, reject) => {
     try {
       let data = req.body || {}
-      let orgDoc = await dbModel.organizations.findOne({ _id: sessionDoc.organization })
-      if (data.connector) {
-        orgDoc.connector = Object.assign(orgDoc.connector || {}, data.connector)
-      }
-      if (data.settings) {
-        orgDoc.settings = Object.assign(orgDoc.settings || {}, data.settings)
-      }
-      orgDoc.save()
-        .then(resolve)
+      delete data._id
+      delete data.organization
+      delete data.db
+
+      dbModel.settings.findOne({ organization: sessionDoc.organization, db: sessionDoc.db })
+        .then(async doc => {
+          if (!doc) {
+            doc = new db.settings({ organization: sessionDoc.organization, db: sessionDoc.db })
+          }
+          doc = Object.assign(doc, data)
+          doc.save()
+            .then(resolve)
+            .catch(reject)
+        })
         .catch(reject)
     } catch (err) {
       reject(err)
@@ -59,48 +62,3 @@ function save(dbModel, sessionDoc, req) {
   })
 }
 
-
-function connectorTest(dbModel, sessionDoc, req) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const clientId = req.getValue('clientId')
-      const clientPass = req.getValue('clientPass')
-      if (!clientId) return reject(`clientId required`)
-      if (!clientPass) return reject(`clientPass required`)
-      devLog('connectorTest clientId:', clientId)
-      devLog('connectorTest clientPass:', clientPass)
-      connectorAbi
-        .dateTime(clientId, clientPass)
-        .then(resolve)
-        .catch(reject)
-
-    } catch (err) {
-      reject(err)
-    }
-  })
-}
-
-function mssqlTest(dbModel, sessionDoc, req) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const clientId = req.getValue('clientId')
-      const clientPass = req.getValue('clientPass')
-
-      const mssql = req.body.mssql
-      if (!clientId) return reject(`clientId required`)
-      if (!clientPass) return reject(`clientPass required`)
-      if (!mssql) return reject(`mssql required`)
-      if (!mssql.options) {
-        mssql.options = { encrypt: false, trustServerCertificate: true }
-      }
-      const query = `SELECT name, object_id, create_date FROM sys.objects WHERE type='U' ORDER BY name`
-      connectorAbi
-        .mssql(clientId, clientPass, mssql, query)
-        .then(resolve)
-        .catch(reject)
-
-    } catch (err) {
-      reject(err)
-    }
-  })
-}

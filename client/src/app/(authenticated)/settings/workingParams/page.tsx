@@ -12,9 +12,7 @@ import { StandartForm } from '@/components/ui216/standart-form'
 import { TsnInput } from '@/components/ui216/tsn-input'
 import { Label } from '@/components/ui/label'
 import { TsnPanel } from '@/components/ui216/tsn-panel'
-import { TsnInputAddress } from '@/components/ui216/tsn-input-address'
-import { Settings2Icon, SettingsIcon } from 'lucide-react'
-import { TsnSwitch } from '@/components/ui216/tsn-switch'
+import { PosIntegrationPos312 } from '../stores/[id]/pos-integration-pos312'
 interface Props {
 }
 export default function SettingsPage({ }: Props) {
@@ -29,8 +27,7 @@ export default function SettingsPage({ }: Props) {
     setLoading(true)
     getItem(`/settings`, token)
       .then(result => {
-        console.log('result', result)
-        setSettings(result.settings as Settings)
+        setSettings(result as Settings)
       })
       .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
       .finally(() => setLoading(false))
@@ -38,29 +35,33 @@ export default function SettingsPage({ }: Props) {
 
   const save = () => {
     setLoading(true)
-    putItem(`/settings`, token, {settings:settings})
+    putItem(`/settings`, token, settings)
       .then(result => {
-        router.push('/')
+        getItem(`/settings`, token)
+          .then(result => {
+            toast({ title: `🙂 ${t('Success')}`, description: t('Document has been saved successfuly'), duration: 800 })
+            //setTimeout(() => location.href = '/', 1000)
+          })
+          .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
       })
       .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
       .finally(() => setLoading(false))
 
   }
 
+
+  
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
   useEffect(() => { token && load() }, [token])
 
   return (
     <StandartForm
-      title={t('Working Parameters')}
+      title={t('Settings')}
       onSaveClick={save}
       onCancelClick={() => router.back()}
-      icon=<Settings2Icon />
       loading={loading}
     >
-      <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
-        <TsnSwitch title={t('VAT Included')} defaultChecked={settings?.vatIncluded} onCheckedChange={e=>setSettings({...settings,vatIncluded:e})} />
-      </div>
+      
     </StandartForm>
   )
 }

@@ -23,7 +23,6 @@ function getList(dbModel, sessionDoc, req, orgDoc) {
 
       const maindb = orgDoc.connector.mssql.database
       const query = `SELECT '${maindb}_' + DB_kod as db, DB_kod  as dbName, DB_isim as dbDesc FROM VERI_TABANLARI ORDER BY DB_kod`
-      console.log('orgDoc.connector:', orgDoc.connector)
       mssql(orgDoc.connector.clientId, orgDoc.connector.clientPass, orgDoc.connector.mssql, query)
         .then(result => {
           if (result.recordsets) {

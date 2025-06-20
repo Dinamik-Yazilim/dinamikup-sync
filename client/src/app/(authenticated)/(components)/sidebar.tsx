@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Settings, Users, ShoppingCart, BarChart, FileText, Mail, Bell, HelpCircle, CheckCircle2Icon, ChartAreaIcon, TruckIcon, ShoppingCartIcon } from "lucide-react"
+import { Home, Settings, Users, ShoppingCart, BarChart, FileText, Mail, Bell, HelpCircle, CheckCircle2Icon, ChartAreaIcon, TruckIcon, ShoppingCartIcon, ComputerIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
@@ -61,6 +61,15 @@ export function Sidebar({className}:Props) {
       ],
     },
     {
+      title: t('POS'),
+      icon: <ComputerIcon className="h-5 w-5" />,
+      submenu: [
+        { title: "Kasalar", href: "/module-closed/reports" },
+        { title: "PLU Aktarim", href: "/module-closed/sales" },
+        { title: "Mikro Aktarim", href: "/module-closed/sales" },
+      ],
+    },
+    {
       title: t('Reports'),
       icon: <ChartAreaIcon className="h-5 w-5" />,
       submenu: [
@@ -80,6 +89,7 @@ export function Sidebar({className}:Props) {
       submenu: [
         { title: t('Users'), href: "/settings/users" },
         { title: t('Connector'), href: "/settings/connector" },
+        { title: t('Stores'), href: "/settings/stores" },
         { title: t('Working Parameters'), href: "/settings/workingParams" },
       ],
     },

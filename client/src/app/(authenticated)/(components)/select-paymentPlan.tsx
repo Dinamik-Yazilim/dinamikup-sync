@@ -19,6 +19,8 @@ import React from "react"
 import { TsnDialogSelectButton } from "@/components/ui216/tsn-dialog-selectbutton"
 import { PaymentPlan, paymentPlanListQuery } from "@/types/PaymentPlan"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Label } from "@/components/ui/label"
+import { ButtonSelect } from "@/components/icon-buttons"
 
 interface Props {
   t: (text: string) => string
@@ -95,5 +97,21 @@ export function SelectPaymentPlan({ t, children, onSelect }: Props) {
 
       </AlertDialogContent>
     </AlertDialog>
+  )
+}
+
+interface WithLabelProps extends Props {
+  className?: string
+  caption?: React.ReactNode | any
+}
+export function SelectPaymentPlanWithLabel({ t, children, onSelect, className, caption }: WithLabelProps) {
+  return (
+    <div className={`w-full flex justify-between p-2 pe-4 items-start  border rounded-md border-dashed ${className}`}>
+      <div className="flex flex-col gap-1">
+        <Label className="text-muted-foreground">{t('Project')}</Label>
+        <div className="capitalize">{caption}</div>
+      </div>
+      <SelectPaymentPlan t={t} onSelect={onSelect} ><ButtonSelect /></SelectPaymentPlan>
+    </div>
   )
 }

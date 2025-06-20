@@ -1,3 +1,5 @@
+import { TsnListType } from "@/components/ui216/tsn-select"
+
 export interface Connector {
     clientId?: string
     clientPass?: string
@@ -38,4 +40,11 @@ export interface Connector {
     excel?: {
       filePath?: string
     }
+  }
+
+  export function getMainAppList(){
+    return [
+      {_id:'mikro16', name:'Mikro Version 16'},
+      {_id:'mikro17', name:'Mikro Version 17'},
+    ] as TsnListType[]
   }

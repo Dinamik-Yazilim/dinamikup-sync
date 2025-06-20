@@ -3,7 +3,7 @@ module.exports = function (dbModel) {
   const schema = mongoose.Schema(
     {
       name: { type: String, unique: true },
-      mainApp: { type: String, default: 'mikro_v16', enum: ['mikro16', 'mikro17'] },
+      mainApp: { type: String, default: 'mikro16', enum: ['mikro16', 'mikro17'] },
       connector: {
         clientId: { type: String, default: '', index: true },
         clientPass: { type: String, default: '', index: true },
@@ -44,9 +44,6 @@ module.exports = function (dbModel) {
         // excel: {
         //   filePath: { type: String, default: '' },
         // }
-      },
-      settings: {
-        vatIncluded: { type: Boolean, default: false }
       },
       passive: { type: Boolean, default: false, index: true }
     },

@@ -4,10 +4,11 @@ import { ReactNode, useEffect, useState } from 'react'
 import { BracketsIcon, ChevronsUpDown, MenuIcon, PanelBottomIcon } from "lucide-react"
 
 import { usePathname } from 'next/navigation'
+import { getLocalStorage, setLocalStorage } from '@/lib/utils'
 
 export function generateStorageKey(prefix: string, name?: string, pathName?: string) {
-  let s = prefix
-  if (name) s += '_' + name
+  let s = prefix ? prefix + '_' : ''
+  if (name) s += name
   if (pathName?.substring(1)) s += '_' + pathName?.substring(1).replaceAll('/', '_')
 
   return s
@@ -22,17 +23,15 @@ interface Props {
   collapsible?: boolean
 }
 export function TsnPanel({ name, children, trigger, defaultOpen = true, className, contentClassName, collapsible = true }: Props) {
-  const [open, setOpen] = useState(collapsible?defaultOpen:true)
+  const [open, setOpen] = useState(collapsible ? defaultOpen : true)
   const pathName = usePathname()
-  const storageKey = generateStorageKey('panel_open', name, pathName)
+  const storageKey = generateStorageKey('', name, pathName)
   useEffect(() => {
     if (collapsible) {
-      if (typeof window != 'undefined') {
-        if (localStorage.getItem(storageKey) == 'true') {
-          setOpen(true)
-        } else {
-          setOpen(false)
-        }
+      if (getLocalStorage('panel_status', storageKey) == true) {
+        setOpen(true)
+      } else {
+        setOpen(false)
       }
     }
   }, [])
@@ -41,9 +40,14 @@ export function TsnPanel({ name, children, trigger, defaultOpen = true, classNam
       <div
         onClick={() => {
           if (collapsible) {
-            if (typeof window != 'undefined') {
-              localStorage.setItem(storageKey, !open ? 'true' : 'false')
-            }
+            // if (typeof window != 'undefined') {
+            //   try{
+            //     let panel_status = JSON.parse(localStorage.getItem('panel_status') || '{}') as any
+            //     panel_status[storageKey]=!open
+            //     localStorage.setItem('panel_status', JSON.stringify(panel_status))
+            //   }catch{}
+            // }
+            setLocalStorage('panel_status', storageKey, !open)
             setOpen(!open)
           }
         }}
