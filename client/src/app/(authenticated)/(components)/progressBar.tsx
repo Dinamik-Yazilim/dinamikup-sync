@@ -69,7 +69,7 @@ export function ProgressBar({ className, eventName, title, onProgress, onFinishe
   return (<div className={`w-full  flex flex-col gap-0 bg-sla11te-800 ro11unded-lg bor11der bord11er-dashed p11-2 ${className}`}>
     <div className="w-full text-center ">{title}</div>
     <div className="w-full relative">
-      <Progress className="h-8 bg-amber-700" value={progress.percent || 0} />
+      <Progress className="h-8 bg-amber-700" value={progress.percent || 0}  />
       <div className="absolute top-1 w-full text-center text-muted-foreground">{progress.caption}</div>
     </div>
   </div>)

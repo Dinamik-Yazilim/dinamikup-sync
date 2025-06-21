@@ -1,4 +1,4 @@
-const { socketSend } = require('../../lib/socketHelper')
+const { syncItems_pos312, syncBarcodes_pos312, syncPrices_pos312 } = require('../../posProviders/pos312/pos312Helper')
 module.exports = (dbModel, sessionDoc, req, orgDoc) =>
   new Promise(async (resolve, reject) => {
 
@@ -13,7 +13,11 @@ module.exports = (dbModel, sessionDoc, req, orgDoc) =>
       case 'POST':
         if (!req.params.param1) return reject(`param1 required`)
         if (req.params.param2 == 'syncItems') {
-          syncItems(dbModel, sessionDoc, req).then(resolve).catch(reject)
+          syncItems(dbModel, sessionDoc, req, orgDoc).then(resolve).catch(reject)
+        } else if (req.params.param2 == 'syncBarcodes') {
+          syncBarcodes(dbModel, sessionDoc, req, orgDoc).then(resolve).catch(reject)
+        } else if (req.params.param2 == 'syncPrices') {
+          syncPrices(dbModel, sessionDoc, req, orgDoc).then(resolve).catch(reject)
         } else {
           return reject(`param2 required`)
         }
@@ -28,14 +32,14 @@ module.exports = (dbModel, sessionDoc, req, orgDoc) =>
   })
 
 
-function syncItems(dbModel, sessionDoc, req) {
+function syncItems(dbModel, sessionDoc, req, orgDoc) {
   return new Promise(async (resolve, reject) => {
     try {
       const storeDoc = await db.stores.findOne({ organization: sessionDoc.organization, db: sessionDoc.db, _id: req.params.param1 })
       if (!storeDoc) return reject('store not found')
       switch (storeDoc.posIntegration.integrationType) {
         case 'pos312':
-          syncItems_pos312(dbModel, sessionDoc, req, storeDoc).then(resolve).catch(reject)
+          syncItems_pos312(dbModel, sessionDoc, req, orgDoc, storeDoc).then(resolve).catch(reject)
           break
         default:
           reject('integration type not supported yet')
@@ -48,42 +52,42 @@ function syncItems(dbModel, sessionDoc, req) {
   })
 }
 
-function syncItems_pos312(dbModel, sessionDoc, req, storeDoc) {
+function syncBarcodes(dbModel, sessionDoc, req, orgDoc) {
   return new Promise(async (resolve, reject) => {
-    resolve('stok kartlari isleniyor')
     try {
-
-      let i = 0
-      function calistir() {
-        return new Promise((resolve, reject) => {
-          if (i >= 150) return resolve()
-          socketSend(sessionDoc, {
-            event: 'syncItems_progress',
-            max: 150,
-            position: i + 1,
-            percent: Math.round(10 * 100 * (i + 1) / 150) / 10,
-            caption: `stok isleniyor ${i + 1}`
-          })
-          setTimeout(() => {
-            i++
-            calistir().then(resolve).catch(reject)
-          }, 300)
-        })
+      const storeDoc = await db.stores.findOne({ organization: sessionDoc.organization, db: sessionDoc.db, _id: req.params.param1 })
+      if (!storeDoc) return reject('store not found')
+      switch (storeDoc.posIntegration.integrationType) {
+        case 'pos312':
+          syncBarcodes_pos312(dbModel, sessionDoc, req, orgDoc, storeDoc).then(resolve).catch(reject)
+          break
+        default:
+          reject('integration type not supported yet')
+          break
       }
-
-      calistir()
-        .then(() => {
-          console.log('150 sayim bitti')
-          socketSend(sessionDoc, { event: 'syncItems_progress_end' })
-        })
-        .catch(err => {
-          socketSend(sessionDoc, { event: 'syncItems_progress_end' })
-          console.error(err)
-        })
     } catch (err) {
-      console.error(err)
+      reject(err)
     }
 
   })
+}
 
+function syncPrices(dbModel, sessionDoc, req, orgDoc) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const storeDoc = await db.stores.findOne({ organization: sessionDoc.organization, db: sessionDoc.db, _id: req.params.param1 })
+      if (!storeDoc) return reject('store not found')
+      switch (storeDoc.posIntegration.integrationType) {
+        case 'pos312':
+          syncPrices_pos312(dbModel, sessionDoc, req, orgDoc, storeDoc).then(resolve).catch(reject)
+          break
+        default:
+          reject('integration type not supported yet')
+          break
+      }
+    } catch (err) {
+      reject(err)
+    }
+
+  })
 }

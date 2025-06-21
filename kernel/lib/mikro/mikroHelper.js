@@ -20,11 +20,11 @@ exports.getDbList = function (connector) {
 }
 
 
-exports.getList = function (dbModel, sessionDoc, req, orgDoc, dbSuffix = '') {
+exports.getList = function (sessionDoc, orgDoc, listQuery, dbSuffix = '') {
   return new Promise(async (resolve, reject) => {
     try {
       let query = `use ${sessionDoc.db}${dbSuffix};
-      ${req.getValue('query') || ''}
+      ${listQuery || ''}
       `
       mssql(orgDoc.connector.clientId, orgDoc.connector.clientPass, orgDoc.connector.mssql, query)
         .then(result => {
@@ -41,13 +41,13 @@ exports.getList = function (dbModel, sessionDoc, req, orgDoc, dbSuffix = '') {
   })
 }
 
-exports.executeSql = function (dbModel, sessionDoc, req, orgDoc, dbSuffix = '') {
+exports.executeSql = function (sessionDoc, orgDoc, execQuery, dbSuffix = '') {
   return new Promise(async (resolve, reject) => {
     try {
       let query = `use ${sessionDoc.db}${dbSuffix};
       BEGIN TRY
         BEGIN TRAN T216;
-          ${req.getValue('query') || ''}
+          ${execQuery || ''}
         COMMIT TRAN T216;
       END TRY
       BEGIN CATCH

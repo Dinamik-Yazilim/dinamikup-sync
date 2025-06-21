@@ -27,7 +27,11 @@ module.exports = function (dbModel) {
         },
         genius3: {
 
-        }
+        },
+        lastUpdate_items: { type: String, default: '', index: true },
+        lastUpdate_barcodes: { type: String, default: '', index: true },
+        lastUpdate_firms: { type: String, default: '', index: true },
+        lastUpdate_prices: { type: String, default: '', index: true },
       },
       passive: { type: Boolean, default: false, index: true }
     },
