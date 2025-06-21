@@ -10,8 +10,9 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Cookies from 'js-cookie'
 import { ListGrid } from "@/components/ui216/list-grid"
-import { BanknoteIcon, BarcodeIcon, ComputerIcon, Divide, Package2Icon, StoreIcon } from "lucide-react"
+import { BanknoteIcon, BarcodeIcon, CircleArrowDown, ComputerIcon, Divide, Package2Icon, RefreshCcwDotIcon, StoreIcon } from "lucide-react"
 import { ProgressBar } from "../../(components)/progressBar"
+import { ButtonConfirm } from "@/components/button-confirm"
 
 
 interface Props {
@@ -44,7 +45,25 @@ export default function PosPage({ }: Props) {
 
   const storePage = (store: Store) => {
     return (<div className="border rounded-md border-dashed px-4 py-2 flex flex-col gap-4 w-full min-h-40">
-      <div className="flex gap-4"><StoreIcon /> {store.name}</div>
+      <div className="flex justify-between">
+        <div className="flex gap-4"><StoreIcon /> {store.name}</div>
+        {!busyItems && !busyBarcodes && !busyPrices &&
+          <ButtonConfirm
+            title="Reset?"
+            description={'Son Guncelleme tarihleri resetlenecek. Onayliyor musunuz?'}
+            onOk={() => {
+              postItem(`/storeIntegration/${store._id}/syncReset`, token, store)
+                .then(result => {
+                  alert('Guncelleme tarihleri resetlendi')
+                  location.reload()
+                })
+                .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+            }}
+          >
+            <Button variant={'destructive'}><RefreshCcwDotIcon /> Reset</Button>
+          </ButtonConfirm>
+        }
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 items-end">
         <Button disabled={busyItems} variant={'outline'}
           onClick={() => {
@@ -84,7 +103,7 @@ export default function PosPage({ }: Props) {
         <ProgressBar className="col-span-3" title={'Fiyat Aktarimi'} eventName="syncPrices_progress" onProgress={e => setBusyPrices(true)} onFinished={() => setBusyPrices(false)} />
         <div>{JSON.stringify(sonucPrices)}</div>
       </div>
-    </div>)
+    </div >)
   }
 
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])

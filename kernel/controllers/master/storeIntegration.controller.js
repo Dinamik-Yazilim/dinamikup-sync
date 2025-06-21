@@ -12,7 +12,9 @@ module.exports = (dbModel, sessionDoc, req, orgDoc) =>
       //   break
       case 'POST':
         if (!req.params.param1) return reject(`param1 required`)
-        if (req.params.param2 == 'syncItems') {
+        if (req.params.param2 == 'syncReset') {
+          syncReset(dbModel, sessionDoc, req, orgDoc).then(resolve).catch(reject)
+        } else if (req.params.param2 == 'syncItems') {
           syncItems(dbModel, sessionDoc, req, orgDoc).then(resolve).catch(reject)
         } else if (req.params.param2 == 'syncBarcodes') {
           syncBarcodes(dbModel, sessionDoc, req, orgDoc).then(resolve).catch(reject)
@@ -31,6 +33,24 @@ module.exports = (dbModel, sessionDoc, req, orgDoc) =>
     }
   })
 
+function syncReset(dbModel, sessionDoc, req, orgDoc) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const storeDoc = await db.stores.findOne({ organization: sessionDoc.organization, db: sessionDoc.db, _id: req.params.param1 })
+      if (!storeDoc) return reject('store not found')
+      storeDoc.posIntegration.lastUpdate_barcodes = ''
+      storeDoc.posIntegration.lastUpdate_firms = ''
+      storeDoc.posIntegration.lastUpdate_items = ''
+      storeDoc.posIntegration.lastUpdate_prices = ''
+      storeDoc.save()
+        .then(() => resolve())
+        .catch(reject)
+    } catch (err) {
+      reject(err)
+    }
+
+  })
+}
 
 function syncItems(dbModel, sessionDoc, req, orgDoc) {
   return new Promise(async (resolve, reject) => {

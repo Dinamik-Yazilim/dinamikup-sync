@@ -64,9 +64,8 @@ export function Sidebar({className}:Props) {
       title: t('POS'),
       icon: <ComputerIcon className="h-5 w-5" />,
       submenu: [
-        { title: "İşlemler", href: "/pos/transactions" },
-        { title: "PLU Aktarim", href: "/module-closed/sales" },
-        { title: "Mikro Aktarim", href: "/module-closed/sales" },
+        { title: "POS Güncelle", href: "/pos/transactions" },
+        { title: "Mikro Aktarim", href: "/module-closed/mikro-aktarim" },
       ],
     },
     {

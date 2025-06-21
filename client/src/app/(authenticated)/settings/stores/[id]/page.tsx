@@ -85,7 +85,7 @@ export default function EditPage({ params }: Props) {
   useEffect(() => { token && params.id != 'addnew' && load() }, [token])
 
   return (<StandartForm
-    title={params.id == 'addnew' ? t('New User') : t('Edit User')}
+    title={params.id == 'addnew' ? t('New Store') : t('Edit Store')}
     onSaveClick={save}
     onCancelClick={() => router.back()}
     loading={loading}
