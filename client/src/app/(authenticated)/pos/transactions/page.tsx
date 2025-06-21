@@ -25,7 +25,7 @@ export default function PosPage({ }: Props) {
   const router = useRouter()
   const { t } = useLanguage()
   const posIntegrationTypeList = getPosIntegrationTypeList()
-  
+
   const [sonuc, setSonuc] = useState<any>({})
 
   const load = () => {
@@ -43,15 +43,36 @@ export default function PosPage({ }: Props) {
   const storePage = (store: Store) => {
     return (<div className="border rounded-md border-dashed px-4 py-2 flex flex-col gap-4 w-full min-h-40">
       <div className="flex gap-4"><StoreIcon /> {store.name}</div>
-
-      <Button disabled={busy} className="w-40" variant={'outline'}
-        onClick={() => {
-          postItem(`/storeIntegration/${store._id}/syncItems`, token, store)
-            .then(result => setSonuc(result))
-            .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
-        }}
-      >Stok Aktarim Test</Button>
-      <pre>{JSON.stringify(sonuc,null,2)}</pre>
+      <div className="flex gap-2 items-end">
+        <Button disabled={busy} className="w-40" variant={'outline'}
+          onClick={() => {
+            postItem(`/storeIntegration/${store._id}/syncItems`, token, store)
+              .then(result => setSonuc(result))
+              .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+          }}
+        >Stok&Barkod Aktar</Button>
+        <ProgressBar title={'Stok Aktarimi'} eventName="syncItems_progress" onProgress={e => setBusy(true)} onFinished={() => setBusy(false)} />
+      </div>
+      <div className="flex gap-2 items-end">
+        <Button disabled={busy} className="w-40" variant={'outline'}
+          onClick={() => {
+            postItem(`/storeIntegration/${store._id}/syncItems`, token, store)
+              .then(result => setSonuc(result))
+              .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+          }}
+        >Fiyat Aktar</Button>
+        <ProgressBar title={'Fiyat Aktarimi'} eventName="syncItems_progress" onProgress={e => setBusy(true)} onFinished={() => setBusy(false)} />
+      </div>
+      <div className="flex gap-2 items-end">
+        <Button disabled={busy} className="w-40" variant={'outline'}
+          onClick={() => {
+            postItem(`/storeIntegration/${store._id}/syncItems`, token, store)
+              .then(result => setSonuc(result))
+              .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+          }}
+        >Satislarin Aktar</Button>
+        <ProgressBar title={'Stok Aktarimi'} eventName="syncItems_progress" onProgress={e => setBusy(true)} onFinished={() => setBusy(false)} />
+      </div>
     </div>)
   }
 
@@ -63,7 +84,7 @@ export default function PosPage({ }: Props) {
       loading={loading}
       icon={<ComputerIcon />}
     >
-      <ProgressBar eventName="syncItems_progress" onProgress={e=>setBusy(true)} onFinished={()=>setBusy(false)} />
+
       <div className="flex flex-col gap-8 mt-6">
         {stores && stores.map(store => <div key={store._id}>{storePage(store)}</div>)}
       </div>

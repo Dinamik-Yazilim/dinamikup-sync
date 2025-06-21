@@ -14,11 +14,11 @@ interface ProgressBarProps {
 interface Props {
   className?: string
   eventName?: string
-
+  title?:React.ReactNode | any
   onProgress?: (e: ProgressBarProps) => void
   onFinished?: () => void
 }
-export function ProgressBar({ className, eventName, onProgress, onFinished }: Props) {
+export function ProgressBar({ className, eventName, title, onProgress, onFinished }: Props) {
   const [token, setToken] = useState('')
   const [wsSubscribed, setWsSubscribed] = useState(false)
   const [progress, setProgress] = useState<ProgressBarProps>({})
@@ -66,9 +66,11 @@ export function ProgressBar({ className, eventName, onProgress, onFinished }: Pr
 
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
   useEffect(() => { token && load() }, [token])
-  return (<div className={`w-full  flex flex-col gap-2 bg-sla11te-800 ro11unded-lg bor11der bord11er-dashed p11-2 ${className}`}>
-    <div className="w-full text-center text-muted-foreground">{progress.caption}</div>
-    <Progress className="h-8 bg-amber-700" value={progress.percent || 0} />
-    
+  return (<div className={`w-full  flex flex-col gap-0 bg-sla11te-800 ro11unded-lg bor11der bord11er-dashed p11-2 ${className}`}>
+    <div className="w-full text-center ">{title}</div>
+    <div className="w-full relative">
+      <Progress className="h-8 bg-amber-700" value={progress.percent || 0} />
+      <div className="absolute top-1 w-full text-center text-muted-foreground">{progress.caption}</div>
+    </div>
   </div>)
 }
