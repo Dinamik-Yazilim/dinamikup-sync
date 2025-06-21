@@ -7,8 +7,8 @@ module.exports = function (dbModel) {
       name: { type: String, required: true, index: true },
       warehouseId: { type: String, default: '', index: true },
       warehouse: { type: String, default: '' },
-      reponsibilityId: { type: String, default: '', index: true },
-      reponsibility: { type: String, default: '', index: true },
+      responsibilityId: { type: String, default: '', index: true },
+      responsibility: { type: String, default: '', index: true },
       projectId: { type: String, default: '', index: true },
       project: { type: String, default: '', index: true },
       posIntegration: {

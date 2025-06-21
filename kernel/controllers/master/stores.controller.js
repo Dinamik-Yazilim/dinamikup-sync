@@ -1,4 +1,4 @@
-module.exports = (dbModel, sessionDoc, req) =>
+module.exports = (dbModel, sessionDoc, req, orgDoc) =>
   new Promise(async (resolve, reject) => {
 
     switch (req.method.toUpperCase()) {

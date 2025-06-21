@@ -12,11 +12,8 @@ import { TsnInput } from "@/components/ui216/tsn-input"
 import { TsnSwitch } from "@/components/ui216/tsn-switch"
 import { TsnPanel } from "@/components/ui216/tsn-panel"
 import { TsnSelect } from "@/components/ui216/tsn-select"
-import { SelectResponsibility, SelectResponsibilityWithLabel } from "@/app/(authenticated)/(components)/select-responsibility"
-import { set } from "date-fns"
-import { Label } from "@/components/ui/label"
-import { SelectProject, SelectProjectWithLabel } from "@/app/(authenticated)/(components)/select-project"
-import { ButtonSelect } from "@/components/icon-buttons"
+import { SelectResponsibilityWithLabel } from "@/app/(authenticated)/(components)/select-responsibility"
+import {  SelectProjectWithLabel } from "@/app/(authenticated)/(components)/select-project"
 import { PosIntegrationPos312 } from "./pos-integration-pos312"
 import { SelectWarehouseWithLabel } from "@/app/(authenticated)/(components)/select-warehouse"
 
@@ -38,7 +35,6 @@ export default function EditPage({ params }: Props) {
     setLoading(true)
     getItem(`/stores/${params.id}`, token)
       .then(result => {
-        console.log(result)
         setStore(result as Store)
       })
       .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))

@@ -1,4 +1,4 @@
-module.exports = (dbModel, sessionDoc, req) =>
+module.exports = (dbModel, sessionDoc, req, orgDoc) =>
   new Promise(async (resolve, reject) => {
 
     switch (req.method.toUpperCase()) {
@@ -77,8 +77,8 @@ function post(dbModel, sessionDoc, req) {
       delete data._id
       if (!data.store) return reject('store required')
       if (!data.name) return reject('name required')
-
-      const storeDoc = await db.stores.findOne({ organization: sessionDoc.organization, db: sessionDoc.db, store: data.store })
+      console.log(`data.store`, data.store)
+      const storeDoc = await db.stores.findOne({ organization: sessionDoc.organization, db: sessionDoc.db, _id: data.store })
       if (!storeDoc) return reject(`store not found`)
 
       if (await dbModel.storePosComputers.countDocuments({ organization: sessionDoc.organization, db: sessionDoc.db, store: storeDoc._id, name: data.name }) > 0)
@@ -110,7 +110,7 @@ function put(dbModel, sessionDoc, req) {
       let doc = await dbModel.storePosComputers.findOne({ organization: sessionDoc.organization, db: sessionDoc.db, _id: req.params.param1 })
       if (!doc) return reject(`pos computer not found`)
 
-      const storeDoc = await db.stores.findOne({ organization: sessionDoc.organization, db: sessionDoc.db, store: doc.store })
+      const storeDoc = await db.stores.findOne({ organization: sessionDoc.organization, db: sessionDoc.db, _id: doc.store })
       if (!storeDoc) return reject(`store not found`)
 
       data.organization = sessionDoc.organization

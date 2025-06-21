@@ -18,11 +18,11 @@ import Cookies from 'js-cookie'
 export function SelectLang() {
   const { langList } = useLanguage()
   const [lang, setLang] = useState('')
-  const [defaultLang, setDefaultLang] = useState('en')
+  const [defaultLang, setDefaultLang] = useState('tr')
   useEffect(() => {
     if (typeof window != 'undefined') {
       const navLang = navigator.language.substring(0, 2)
-      const l = langList.indexOf(navLang) > -1 ? navLang : 'en'
+      const l = langList.indexOf(navLang) > -1 ? navLang : 'tr'
       setDefaultLang(lang)
       setLang(Cookies.get('lang') || l)
     }

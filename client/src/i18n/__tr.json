@@ -98,5 +98,13 @@
   "Profit": "Kar",
   "Detailed": "Detaylı",
   "Please choose an item":"Lütfen kalem seçiniz",
-  "Stores":"Mağazalar"
+  "Stores":"Mağazalar",
+  "Store":"Mağaza",
+  "POS Computers":"POS Bilgisayarları",
+  "POS Computer":"POS Bilgisayarı",
+  "New POS Computer":"Yeni POS Bilgisayarı",
+  "Edit POS Computer":"POS Bilgisayarı Düzenle",
+  "Cash Account":"Kasa Hesabı",
+  "Bank Account":"Banka Hesabı",
+  "POS Transactions":"POS İşlemleri"
 }

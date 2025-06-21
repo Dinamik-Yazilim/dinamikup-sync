@@ -98,5 +98,12 @@
   "Profit":"Profit",
   "Detailed": "Detailed",
   "Please choose an item":"Please choose an item",
-  "Stores":"Stores"
+  "Stores":"Stores",
+  "Store":"Store",
+  "POS Computers":"POS Computers",
+  "POS Computer":"POS Computer",
+  "New POS Computer":"New POS Computer",
+  "Edit POS Computer":"Edit POS Computer",
+  "Cash Account":"Cash Account",
+  "Bank Account":"Bank Account"
 }

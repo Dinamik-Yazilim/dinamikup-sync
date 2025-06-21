@@ -64,7 +64,7 @@ export function Sidebar({className}:Props) {
       title: t('POS'),
       icon: <ComputerIcon className="h-5 w-5" />,
       submenu: [
-        { title: "Kasalar", href: "/module-closed/reports" },
+        { title: "İşlemler", href: "/pos/transactions" },
         { title: "PLU Aktarim", href: "/module-closed/sales" },
         { title: "Mikro Aktarim", href: "/module-closed/sales" },
       ],
@@ -90,6 +90,7 @@ export function Sidebar({className}:Props) {
         { title: t('Users'), href: "/settings/users" },
         { title: t('Connector'), href: "/settings/connector" },
         { title: t('Stores'), href: "/settings/stores" },
+        { title: t('POS Computers'), href: "/settings/posComputers" },
         { title: t('Working Parameters'), href: "/settings/workingParams" },
       ],
     },

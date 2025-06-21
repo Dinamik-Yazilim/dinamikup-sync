@@ -1,7 +1,10 @@
-export interface PosStoreComputer {
+import { Store } from "./Store"
+
+export interface StorePosComputer {
   _id?: string
   organization?: string
   database?: string
+  store?:Store
   name?: string
   responsibilityId?: string
   responsibility?: string

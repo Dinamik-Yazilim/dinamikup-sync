@@ -6,25 +6,24 @@ import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
 import { useToast } from '@/components/ui/use-toast'
 import { useLanguage } from '@/i18n'
-import { StoreIcon, Users2Icon } from 'lucide-react'
+import { ComputerIcon, StoreIcon, Users2Icon } from 'lucide-react'
 import { ListGrid } from '@/components/ui216/list-grid'
-import { Store, getPosIntegrationTypeList } from '@/types/Store'
+import { StorePosComputer } from '@/types/StorePosComputer'
 interface Props {
 }
 export default function SettingsPage({ }: Props) {
-  const [stores, setStores] = useState<Store[]>([])
+  const [storePosComputers, setStorePosComputers] = useState<StorePosComputer[]>([])
   const [token, setToken] = useState('')
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { t } = useLanguage()
-  const posIntegrationTypeList=getPosIntegrationTypeList()
 
   const load = () => {
     setLoading(true)
-    getList(`/stores`, token)
+    getList(`/storePosComputers`, token)
       .then(result => {
-        setStores(result.docs as Store[])
+        setStorePosComputers(result.docs as StorePosComputer[])
       })
       .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
       .finally(() => setLoading(false))
@@ -35,24 +34,26 @@ export default function SettingsPage({ }: Props) {
 
   return (
     <ListGrid
-      apiPath='/stores'
+      apiPath='/storePosComputers'
 
-      title={t('Stores')}
-      icon=<StoreIcon />
-      onHeaderPaint={() => <div className='grid grid-cols-6 w-full'>
+      title={t('POS Computers')}
+      icon=<ComputerIcon />
+      onHeaderPaint={() => <div className='grid grid-cols-7 w-full'>
+        <div>{t('Store')}</div>
         <div>{t('Name')}</div>
-        <div>{t('Warehouse')}</div>
+        <div>{t('Cash')}</div>
+        <div>{t('Bank')}</div>
         <div>{t('Responsibility')}</div>
         <div>{t('Project')}</div>
-        <div>{t('Pos')}</div>
         <div className='text-center'>{t('Passive?')}</div>
       </div>}
-      onRowPaint={(e:Store,colIndex) => <div className='grid grid-cols-6 w-full'>
+      onRowPaint={(e:StorePosComputer,colIndex) => <div className='grid grid-cols-7 w-full'>
+        <div>{e.store?.name}</div>
         <div>{e.name}</div>
-        <div>{e.warehouse}</div>
+        <div>{e.cashAccount}</div>
+        <div>{e.bankAccount}</div>
         <div>{e.responsibility}</div>
         <div>{e.project}</div>
-        <div>{posIntegrationTypeList.find(r=>r._id==e.posIntegration?.integrationType)?.name}</div>
         <div className='text-center'>{e.passive?'✅':''}</div>
       </div>}
     />

@@ -15,7 +15,7 @@
 	var app = await require('./app')()
 	var httpServer = await require('./lib/http-server')(process.env.HTTP_PORT, app)
 
-	// await require('./wss-api/wss-api')(httpServer)
+	await require('./wss-api/wss-api')(httpServer)
 
 
 	setTimeout(() => {

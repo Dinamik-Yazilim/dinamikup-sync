@@ -18,8 +18,10 @@ export function PosIntegrationPos312({ t, store, setStore }: Props) {
   const [token, setToken] = useState('')
   const [result, setResult] = useState<any>()
   const { toast } = useToast()
+  const [testing, setTesting] = useState(false)
 
   const pos312Test = () => {
+    setTesting(true)
     fetch(`${store?.posIntegration?.pos312?.webServiceUrl}/auth/loginuser`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -28,9 +30,19 @@ export function PosIntegrationPos312({ t, store, setStore }: Props) {
         password: store?.posIntegration?.pos312?.webServicePassword
       })
     })
-      .then(res => res.json())
-      .then(setResult)
-      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .then(res => {
+        if (res.ok) {
+          res.json()
+            .then(setResult)
+            .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+        } else {
+          setResult({ error: res.statusText })
+        }
+      })
+      .catch(err => setResult(err))
+      .finally(()=>setTesting(false))
+
+
   }
 
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
@@ -51,14 +63,14 @@ export function PosIntegrationPos312({ t, store, setStore }: Props) {
     <TsnInput title={t('StoreId')}
       type='number'
       defaultValue={store?.posIntegration?.pos312?.storeId}
-      onBlur={e =>{
-        const val=!isNaN(Number(e.target.value))?Number(e.target.value):0
+      onBlur={e => {
+        const val = !isNaN(Number(e.target.value)) ? Number(e.target.value) : 0
         setStore({ ...store, posIntegration: { ...store?.posIntegration, pos312: { ...store?.posIntegration?.pos312, storeId: val } } })
       }}
     />
     <div className="flex flex-col gap-4 my-4">
       <div className='flex gap-2'>
-        <Button onClick={pos312Test} disabled={result!=undefined} className='w-44 bg-green-600 text-white' variant={'outline'} >
+        <Button onClick={pos312Test} disabled={result != undefined || testing} className='w-44 bg-green-600 text-white' variant={'outline'} >
           <PlugZapIcon />  {t('Pos312 Test')}
         </Button>
         {result && <Button onClick={() => setResult(undefined)} ><PaintbrushIcon /></Button>}

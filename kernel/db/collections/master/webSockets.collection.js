@@ -8,7 +8,6 @@ module.exports = function (dbModel) {
       member: { type: ObjectId, ref: 'members', index: true },
       role: { type: String },
       connected: { type: Boolean, default: false, index: true },
-      createdDate: { type: Date, default: Date.now },
       lastPong: { type: Date, default: Date.now, index: true },
       lastIP: { type: String, default: '' },
       logs: [],

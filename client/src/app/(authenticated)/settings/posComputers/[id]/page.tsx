@@ -6,19 +6,19 @@ import { useLanguage } from "@/i18n"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Cookies from 'js-cookie'
-import { getItem, postItem, putItem } from "@/lib/fetch"
-import { getPosIntegrationTypeList, Store } from "@/types/Store"
+import { getItem, getList, postItem, putItem } from "@/lib/fetch"
+import { StorePosComputer } from "@/types/StorePosComputer"
 import { TsnInput } from "@/components/ui216/tsn-input"
 import { TsnSwitch } from "@/components/ui216/tsn-switch"
 import { TsnPanel } from "@/components/ui216/tsn-panel"
 import { TsnSelect } from "@/components/ui216/tsn-select"
-import { SelectResponsibility, SelectResponsibilityWithLabel } from "@/app/(authenticated)/(components)/select-responsibility"
-import { set } from "date-fns"
-import { Label } from "@/components/ui/label"
-import { SelectProject, SelectProjectWithLabel } from "@/app/(authenticated)/(components)/select-project"
-import { ButtonSelect } from "@/components/icon-buttons"
-import { PosIntegrationPos312 } from "./pos-integration-pos312"
+import { SelectResponsibilityWithLabel } from "@/app/(authenticated)/(components)/select-responsibility"
+import { SelectProjectWithLabel } from "@/app/(authenticated)/(components)/select-project"
 import { SelectWarehouseWithLabel } from "@/app/(authenticated)/(components)/select-warehouse"
+import { TsnSelectRemote } from "@/components/ui216/tsn-select-remote"
+import { Store } from "@/types/Store"
+import { SelectCashAccountWithLabel } from "@/app/(authenticated)/(components)/select-cashAccount"
+import { SelectBankAccountWithLabel } from "@/app/(authenticated)/(components)/select-bankAccount"
 
 interface Props {
   params: { id: string }
@@ -30,90 +30,75 @@ export default function EditPage({ params }: Props) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { t } = useLanguage()
-  const [store, setStore] = useState<Store>()
+  const [storePosComputer, setStorePosComputer] = useState<StorePosComputer>()
+  const [stores, setStores] = useState<Store[]>()
   const [password, setPassword] = useState('')
   const [rePassword, setRePassword] = useState('')
 
   const load = () => {
     setLoading(true)
-    getItem(`/stores/${params.id}`, token)
+    getItem(`/storePosComputers/${params.id}`, token)
       .then(result => {
-        console.log(result)
-        setStore(result as Store)
+        setStorePosComputer(result as StorePosComputer)
+
       })
       .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
       .finally(() => setLoading(false))
   }
 
+  const loadStores = () => {
+    getList(`/stores?pageSize=1000`, token)
+      .then(result => {
+        result.docs && setStores(result.docs as Store[])
+      })
+      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+  }
+
   const save = () => {
-    if (!store?._id) {
-      postItem(`/stores`, token, store)
+    if (!storePosComputer?._id) {
+      postItem(`/storePosComputers`, token, storePosComputer)
         .then(result => router.back())
         .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
     } else {
-      putItem(`/stores/${store?._id}`, token, store)
+      putItem(`/storePosComputers/${storePosComputer?._id}`, token, storePosComputer)
         .then(result => router.back())
         .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
     }
   }
 
-  const PosIntegrationDinamikUp = ({ }) => {
-    return (<TsnPanel name='PosIntegrationDinamikUp' trigger={'DinamikUp POS'} collapsible={false}>
-      DinamikUp Pos
-    </TsnPanel>)
-  }
 
-  const PosIntegrationIngenico = ({ }) => {
-    return (<TsnPanel name='PosIntegrationIngenico' trigger={'WorldLine Ingenico'} collapsible={false}>
-      <TsnInput title={t('Web Service Url')}
-        defaultValue={store?.posIntegration?.ingenico?.webServiceUrl}
-        onBlur={e => setStore({ ...store, posIntegration: { ...store?.posIntegration, ingenico: { ...store?.posIntegration?.ingenico, webServiceUrl: e.target.value } } })}
-      />
-      <TsnInput title={t('Username')}
-        defaultValue={store?.posIntegration?.ingenico?.webServiceUsername}
-        onBlur={e => setStore({ ...store, posIntegration: { ...store?.posIntegration, ingenico: { ...store?.posIntegration?.ingenico, webServiceUsername: e.target.value } } })}
-      />
-      <TsnInput title={t('Password')}
-        defaultValue={store?.posIntegration?.ingenico?.webServicePassword}
-        onBlur={e => setStore({ ...store, posIntegration: { ...store?.posIntegration, ingenico: { ...store?.posIntegration?.ingenico, webServicePassword: e.target.value } } })}
-      />
-    </TsnPanel>)
-  }
-
-  const PosIntegrationGenius3 = ({ }) => {
-    return (<TsnPanel name='PosIntegrationGenius3' trigger={'IBM Genius 3'} collapsible={false}>
-      IBM Genius 3
-    </TsnPanel>)
-  }
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
-  useEffect(() => { token && params.id != 'addnew' && load() }, [token])
+  useEffect(() => {
+    if (token) {
+      loadStores()
+      params.id != 'addnew' && load()
+    }
+  }, [token])
 
   return (<StandartForm
-    title={params.id == 'addnew' ? t('New User') : t('Edit User')}
+    title={params.id == 'addnew' ? t('New POS Computer') : t('Edit POS Computer')}
     onSaveClick={save}
     onCancelClick={() => router.back()}
     loading={loading}
   >
     <div className="flex flex-col gap-4">
-      <TsnInput title={t('Name')} defaultValue={store?.name} onBlur={e => setStore({ ...store, name: e.target.value })} />
-      <div className="grid grid-cols-1 lg:grid-cols-3">
-        <SelectWarehouseWithLabel caption={store?.warehouse} t={t} onSelect={e => { setStore({ ...store, warehouseId: e._id, warehouse: e.name }) }} />
-        <SelectProjectWithLabel caption={store?.project} t={t} onSelect={e => { setStore({ ...store, projectId: e._id, project: e.name }) }} />
-        <SelectResponsibilityWithLabel caption={store?.responsibility} t={t} onSelect={e => { setStore({ ...store, responsibilityId: e._id, responsibility: e.name }) }} />
-      </div>
-      <div className='flex flex-col ga-4 w-full max-w-3xl'>
-        <TsnSelect
-          list={getPosIntegrationTypeList()}
-          title={t('Pos Integration Type')}
-          defaultValue={store?.posIntegration?.integrationType}
-          onValueChange={e => setStore({ ...store, posIntegration: { ...store?.posIntegration, integrationType: e } })}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <TsnSelect title={t('Store')} defaultValue={storePosComputer?.store?._id}
+          onValueChange={e => setStorePosComputer({ ...storePosComputer, store: { ...storePosComputer?.store, _id: e } })}
+          list={stores}
         />
+        <TsnInput title={t('Name')} defaultValue={storePosComputer?.name} onBlur={e => setStorePosComputer({ ...storePosComputer, name: e.target.value })} />
       </div>
-      {store?.posIntegration?.integrationType == 'dinamikup' && <PosIntegrationDinamikUp />}
-      {store?.posIntegration?.integrationType == 'pos312' && <PosIntegrationPos312 t={t} store={store} setStore={setStore} />}
-      {store?.posIntegration?.integrationType == 'ingenico' && <PosIntegrationIngenico />}
-      {store?.posIntegration?.integrationType == 'genius3' && <PosIntegrationGenius3 />}
-      <TsnSwitch title={t('Passive?')} defaultChecked={store?.passive} onCheckedChange={e => setStore({ ...store, passive: e })} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <SelectProjectWithLabel caption={storePosComputer?.project} t={t} onSelect={e => { setStorePosComputer({ ...storePosComputer, projectId: e._id, project: e.name }) }} />
+        <SelectResponsibilityWithLabel caption={storePosComputer?.responsibility} t={t} onSelect={e => { setStorePosComputer({ ...storePosComputer, responsibilityId: e._id, responsibility: e.name }) }} />
+        <SelectCashAccountWithLabel caption={storePosComputer?.cashAccount} t={t} onSelect={e => { setStorePosComputer({ ...storePosComputer, cashAccountId: e._id, cashAccount: e.name }) }} />
+        <SelectBankAccountWithLabel caption={storePosComputer?.bankAccount} t={t} onSelect={e => { setStorePosComputer({ ...storePosComputer, bankAccountId: e._id, bankAccount: e.name }) }} />
+      </div>
+      <TsnPanel name='scaleOptions' trigger={'Terazi Ayarlari'} >
+        
+      </TsnPanel>
+      <TsnSwitch title={t('Passive?')} defaultChecked={storePosComputer?.passive} onCheckedChange={e => setStorePosComputer({ ...storePosComputer, passive: e })} />
     </div>
 
   </StandartForm>)
