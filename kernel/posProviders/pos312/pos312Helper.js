@@ -144,7 +144,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
                 if (Kdv) {
                   DepartmentId = Kdv.id
                   try {
-                    StockBarcodes = await getList(sessionDoc, orgDoc, `SELECT bar_kodu as Barcode,bar_stokkodu as StockCode,
+                    StockBarcodes = (await getList(sessionDoc, orgDoc, `SELECT bar_kodu as Barcode,bar_stokkodu as StockCode,
                     CASE 
                       WHEN B.bar_birimpntr=1 OR B.bar_birimpntr=0 THEN S.sto_birim1_katsayi 
                       WHEN B.bar_birimpntr=2 THEN S.sto_birim2_katsayi 
@@ -153,7 +153,10 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
                       ELSE 1 END as Multiplier FROM BARKOD_TANIMLARI B INNER JOIN
                     STOKLAR S ON B.bar_stokkodu=S.sto_kod
                     WHERE B.bar_stokkodu='${docs[i].code}';
-                    `) || []
+                    `) || []).map(e => {
+                      if (e.Multiplier <= 0) e.Multiplier = 1
+                      return e
+                    })
                   } catch (err) {
                     errorLog(`[syncItems_pos312] Error:`, err)
                   }
@@ -168,7 +171,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
                         ordr: index,
                         storeId: storeDoc.posIntegration.pos312.storeId,
                         startDate: new Date().toISOString(),
-                        endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 2)).toISOString(),
+                        endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 12)).toISOString(),
                         price: e.price,
                         newPrice: e.newPrice,
                         deleted: false
@@ -466,6 +469,45 @@ exports.syncPrices_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc
           }
         })
         .catch(reject)
+
+    } catch (err) {
+      console.error(err)
+      reject(err)
+    }
+  })
+
+}
+
+exports.syncPriceTrigger_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const token312 = await exports.login(storeDoc.posIntegration.pos312.webServiceUrl,
+        storeDoc.posIntegration.pos312.webServiceUsername,
+        storeDoc.posIntegration.pos312.webServicePassword)
+      fetch(`${storeDoc.posIntegration.pos312.webServiceUrl}/integration/addtransfer`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token312}` },
+        body: JSON.stringify({
+          "defination": false,
+          "customer": false,
+          "user": false,
+          "stock": 2,
+          "stores": [{
+            "storeId": storeDoc.posIntegration.pos312.storeId
+          }]
+        }),
+      })
+        .then(async resp => {
+          if (resp.ok) {
+            resp
+              .json()
+              .then(result => {
+                resolve(result)
+              })
+              .catch(reject)
+          } else reject(`${await resp.json()}`)
+        })
+        .catch(reject)
+
 
     } catch (err) {
       console.error(err)

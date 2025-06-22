@@ -1,4 +1,4 @@
-const { syncItems_pos312, syncBarcodes_pos312, syncPrices_pos312 } = require('../../posProviders/pos312/pos312Helper')
+const { syncItems_pos312, syncBarcodes_pos312, syncPrices_pos312, syncPriceTrigger_pos312 } = require('../../posProviders/pos312/pos312Helper')
 module.exports = (dbModel, sessionDoc, req, orgDoc) =>
   new Promise(async (resolve, reject) => {
 
@@ -12,7 +12,9 @@ module.exports = (dbModel, sessionDoc, req, orgDoc) =>
       //   break
       case 'POST':
         if (!req.params.param1) return reject(`param1 required`)
-        if (req.params.param2 == 'syncReset') {
+        if (req.params.param2 == 'syncPriceTrigger') {
+          syncPriceTrigger(dbModel, sessionDoc, req, orgDoc).then(resolve).catch(reject)
+        } else if (req.params.param2 == 'syncReset') {
           syncReset(dbModel, sessionDoc, req, orgDoc).then(resolve).catch(reject)
         } else if (req.params.param2 == 'syncItems') {
           syncItems(dbModel, sessionDoc, req, orgDoc).then(resolve).catch(reject)
@@ -33,6 +35,25 @@ module.exports = (dbModel, sessionDoc, req, orgDoc) =>
     }
   })
 
+function syncPriceTrigger(dbModel, sessionDoc, req, orgDoc) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const storeDoc = await db.stores.findOne({ organization: sessionDoc.organization, db: sessionDoc.db, _id: req.params.param1 })
+      if (!storeDoc) return reject('store not found')
+      switch (storeDoc.posIntegration.integrationType) {
+        case 'pos312':
+          syncPriceTrigger_pos312(dbModel, sessionDoc, req, orgDoc, storeDoc).then(resolve).catch(reject)
+          break
+        default:
+          reject('integration type not supported yet')
+          break
+      }
+    } catch (err) {
+      reject(err)
+    }
+
+  })
+}
 function syncReset(dbModel, sessionDoc, req, orgDoc) {
   return new Promise(async (resolve, reject) => {
     try {
