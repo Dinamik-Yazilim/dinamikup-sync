@@ -116,7 +116,7 @@ export default function PosPage({ }: Props) {
                 .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
             }}
           >
-            <Button variant={'outline'} className="flex gap-2 bg-indigo-600"><Grid2x2PlusIcon /> <MoveRightIcon /><ComputerIcon /> Güncellemeleri Kasalara Gönder</Button>
+            <div className="flex gap-2 bg-indigo-600 p-3"><Grid2x2PlusIcon /> <MoveRightIcon /><ComputerIcon /> Güncellemeleri Kasalara Gönder</div>
           </ButtonConfirm>
         }
       </div>

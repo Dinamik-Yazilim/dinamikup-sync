@@ -72,8 +72,8 @@ export function Sidebar({className}:Props) {
       title: t('Reports'),
       icon: <ChartAreaIcon className="h-5 w-5" />,
       submenu: [
-        { title: t('Sales Profit'), href: "/reports/sales-profit" },
-        { title: "Satın Alma Raporu", href: "/module-closed/purchase" },
+        // { title: t('Sales Profit'), href: "/reports/sales-profit" },
+        { title: "Satın Alma Raporu", href: "/reports/purchase" },
         { title: "Satış Devir Hızı", href: "/module-closed/sales-cycle" },
       ],
     },

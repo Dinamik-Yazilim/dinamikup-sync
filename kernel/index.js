@@ -56,18 +56,28 @@ function showAppInfo() {
 
 
 async function test() {
-	// var i = 0
-	// console.time('label')
-
-	// var saydirId = setInterval(() => {
-	// 	if (i >= 100) {
-	// 		clearInterval(saydirId)
-	// 		console.timeEnd('label')
-	// 		} else {
-
-	// 		printLine(`processing %${i + 1}`)
-	// 	}
-	// 	i++
-	// }, 60)
-
+	let barcodeDocs = [
+		{
+			"barcode": "8690559015215",
+			"stockCode": "17026812",
+			"multiplier": 1
+		},
+		{
+			"barcode": "8699270023400",
+			"stockCode": "17026811",
+			"multiplier": 1
+		},
+		{
+			"barcode": "8699270023202",
+			"stockCode": "17026811",
+			"multiplier": 1
+		},
+		{
+			"barcode": "8697623020724",
+			"stockCode": "17026814",
+			"multiplier": 1
+		}
+	]
+	let d = barcodeDocs.filter(e => e.code == '17026811')
+	console.log(d)
 }

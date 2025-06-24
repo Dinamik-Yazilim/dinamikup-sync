@@ -107,6 +107,7 @@
   "Cash Account": "Cash Account",
   "Bank Account": "Bank Account",
   "POS Transactions": "POS Transactions",
-  "New Store": "Yeni Mağaza",
-  "Edit Store": "Mağaza Düzenle"
+  "New Store": "New Store",
+  "Edit Store": "Edit Store",
+  "Purchase Report": "Purchase Report"
 }
