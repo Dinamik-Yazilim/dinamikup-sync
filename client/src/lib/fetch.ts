@@ -63,12 +63,14 @@ export function postItem(path: string, token?: string, item?: any) {
     })
       .then(ret => ret.json())
       .then(result => {
+        console.log('result:', result)
         if (result.success) {
           resolve(result.data)
         } else {
           reject(result.error)
         }
       }).catch(err => {
+        console.log('err:', err)
         if(err=='aborted' || (err.message && err.message=='aborted')){
           resolve(undefined)
         }else{

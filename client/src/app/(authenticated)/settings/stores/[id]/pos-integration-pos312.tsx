@@ -22,25 +22,43 @@ export function PosIntegrationPos312({ t, store, setStore }: Props) {
 
   const pos312Test = () => {
     setTesting(true)
-    fetch(`${store?.posIntegration?.pos312?.webServiceUrl}/auth/loginuser`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: store?.posIntegration?.pos312?.webServiceUsername,
-        password: store?.posIntegration?.pos312?.webServicePassword
+    // try{
+    postItem(`/storeIntegration/${store._id || '0'}/test`, token,
+      {
+        integrationType:store?.posIntegration?.integrationType,
+        webServiceUrl:store?.posIntegration?.pos312?.webServiceUrl,
+        webServiceUsername: store?.posIntegration?.pos312?.webServiceUsername,
+        webServicePassword: store?.posIntegration?.pos312?.webServicePassword,
       })
-    })
-      .then(res => {
-        if (res.ok) {
-          res.json()
-            .then(setResult)
-            .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
-        } else {
-          setResult({ error: res.statusText })
-        }
+      .then(setResult)
+      .catch(err=>{
+        setResult({error:err})
+        // toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' })
       })
-      .catch(err => setResult(err))
       .finally(()=>setTesting(false))
+    // }catch(err){
+    //   setTesting(false)
+    //   setResult(err)
+    // }
+    // fetch(`${store?.posIntegration?.pos312?.webServiceUrl}/auth/loginuser`, {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({
+    //     username: store?.posIntegration?.pos312?.webServiceUsername,
+    //     password: store?.posIntegration?.pos312?.webServicePassword
+    //   })
+    // })
+    //   .then(res => {
+    //     if (res.ok) {
+    //       res.json()
+    //         .then(setResult)
+    //         .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+    //     } else {
+    //       setResult({ error: res.statusText })
+    //     }
+    //   })
+    //   .catch(err => setResult(err))
+    //   .finally(()=>setTesting(false))
 
 
   }

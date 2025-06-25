@@ -32,8 +32,6 @@ module.exports = (app) => {
   })
 
   authControllers(app, '/api/v1/auth/:func/:param1/:param2/:param3')
-  sessionControllers(app, '/api/v1/session/:func/:param1/:param2/:param3')
-  s3Controllers(app, '/api/v1/s3/:func/:param1/:param2/:param3')
   masterControllers(app, '/api/v1/:func/:param1/:param2/:param3')
 
 
@@ -72,29 +70,6 @@ function authControllers(app, route) {
   })
 }
 
-function sessionControllers(app, route) {
-  setRoutes(app, route, (req, res, next) => {
-    const ctl = getController('/session', req.params.func)
-    if (ctl) {
-      passport(req)
-        .then((sessionDoc) => {
-          ctl(db, sessionDoc, req)
-            .then((data) => {
-              if (data == undefined) res.json({ success: true })
-              else if (data == null) res.json({ success: true })
-              else {
-                res.status(200).json({ success: true, data: data })
-              }
-            })
-            .catch(next)
-        })
-        .catch((err) => {
-          res.status(401).json({ success: false, error: err })
-        })
-    } else next()
-  })
-}
-
 
 function masterControllers(app, route) {
   setRoutes(app, route, (req, res, next) => {
@@ -125,56 +100,6 @@ function masterControllers(app, route) {
 
   })
 }
-
-async function s3Controllers(app, route) {
-  const multer = require('multer')
-  const appName = require('./package.json').name
-
-  const storage = multer.memoryStorage()
-  const fileFilter = (req, file, cb) => {
-    // if(file.size>1024*1024){
-    //   cb('Max:1Mb',false)
-    // }else{
-    //   cb(null,true)
-    // }
-    // if ((file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') && file.size < 1048576) {
-    // if ((file.mimetype === 'image/jpeg' || file.mimetype === 'image/png')) {
-    //   cb(null, true)
-    // } else {
-    //   cb(null, false)
-    // }
-    cb(null, true)
-  }
-  const upload = multer({ storage: storage, fileFilter: fileFilter })
-
-  // const cpUpload = upload.fields([{ name: 'file', maxCount: 1 }, { name: 'files', maxCount: 8 }, { name: 'avatar', maxCount: 1 }])
-
-  setRoutes(app, route, upload.array('file', 10), (req, res, next) => {
-    const ctl = getController('/s3', req.params.func)
-    if (ctl) {
-      passport(req)
-        .then((sessionDoc) => {
-          if (sessionDoc) {
-            ctl(db, sessionDoc, req)
-              .then((data) => {
-                if (data == undefined) res.json({ success: true })
-                else if (data == null) res.json({ success: true })
-                else {
-                  res.status(200).json({ success: true, data: data })
-                }
-              })
-              .catch(next)
-          } else {
-            res.status(401).json({ success: false, error: `permission denied` })
-          }
-        })
-        .catch((err) => {
-          res.status(401).json({ success: false, error: err.message || err || 'error' })
-        })
-    } else next()
-  })
-}
-
 
 function sendError(err, req, res) {
   let errorMessage = 'Error'

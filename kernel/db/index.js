@@ -45,7 +45,7 @@ global.db = {
 
 module.exports = () =>
   new Promise((resolve, reject) => {
-    connectMongoDatabase('collections/master', process.env.MONGODB_URI, db)
+    connectMongoDatabase('collections', process.env.MONGODB_URI, db)
       .then(() => {
         // initRepoDb()
         resolve()
