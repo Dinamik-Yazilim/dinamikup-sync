@@ -2,7 +2,8 @@ const axios = require('axios')
 const fs = require('fs')
 const path = require('path')
 const { socketSend } = require('../../lib/socketHelper')
-const { getList, executeSql } = require('../../lib/mikro/mikroHelper')
+const { getList, executeSql, getListDb, executeSqlDb } = require('../../lib/mikro/mikroHelper')
+const { workDataCreatePOQuery, workDataCreatePRHQuery, workDataCreateSTHQuery } = require('../../lib/mikro/workdata')
 
 exports.test = function (webServiceUrl, webServiceUsername, webServicePassword) {
   return new Promise((resolve, reject) => {
@@ -349,10 +350,12 @@ function GetDocuments(webServiceUrl, token, data) {
 exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc) {
   return new Promise(async (resolve, reject) => {
     let token312 = ''
-    const startDate = req.getValue('startDate')
-    const endDate = req.getValue('endDate')
+    const startDate = (req.getValue('startDate') || '').substring(0, 10) + 'T00:00:00'
+    const endDate = (req.getValue('startDate') || '').substring(0, 10) + 'T23:59:59'
     eventLog('[syncGetSales_pos312]'.green, 'startDate:', startDate, 'endDate:', endDate)
     try {
+      socketSend(sessionDoc, { event: 'syncSales_progress', caption: `Mikro WorkData olusturuluyor` })
+      await mikroWorkDataOlustur(orgDoc, storeDoc, startDate)
       socketSend(sessionDoc, { event: 'syncSales_progress', caption: `312 Pos login in` })
       token312 = await exports.login(storeDoc.posIntegration.pos312.webServiceUrl,
         storeDoc.posIntegration.pos312.webServiceUsername,
@@ -361,20 +364,155 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
       eventLog('[syncGetSales_pos312]'.green, 'GetDocuments started')
       socketSend(sessionDoc, { event: 'syncSales_progress', caption: `312 Pos GetDocuments` })
       GetDocuments(storeDoc.posIntegration.pos312.webServiceUrl, token312, { startDate: startDate, endDate: endDate })
-        .then(result => {
-          // eventLog('[syncGetSales_pos312] result:'.green, result)
-          resolve('Mikroya Aktarim Basliyor. Evrak Sayisi:')
-          socketSend(sessionDoc, { event: 'syncSales_progress_end' })
+        .then(fisler => {
+          eventLog('[syncGetSales_pos312] fisler adet:'.green, fisler.length)
+          fs.writeFileSync(path.join(__dirname, 'syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
+
+          resolve('Mikroya Aktarim Basliyor. Evrak Sayisi:' + fisler.length)
+          socketSend(sessionDoc, { event: 'syncSales_progress', caption: `Aktariliyor`, max: fisler.length, position: 0, percent: 0 })
+          let i = 0
+          function calistir() {
+            return new Promise((resolve, reject) => {
+              if (i >= fisler.length) return resolve()
+
+              mikroWorkDataAktar(orgDoc, storeDoc, fisler[i])
+                .then(sonuc => {
+                  // eventLog('[syncGetSales_pos312]'.green, 'sonuc:', sonuc)
+                  socketSend(sessionDoc, { event: 'syncSales_progress', caption: `${fisler[i].id} Kalem:${fisler[i].sales.length}`, max: fisler.length, position: (i + 1), percent: 100 * (i + 1) / fisler.length })
+                  i++
+                  setTimeout(() => calistir().then(resolve).catch(reject), 10)
+                })
+                .catch(reject)
+            })
+          }
+          calistir()
+            .then(() => {
+              eventLog('[syncGetSales_pos312]'.green, 'Bitti')
+              socketSend(sessionDoc, { event: 'syncSales_progress_end' })
+            })
+            .catch(err => {
+              errorLog('[syncGetSales_pos312]'.green, 'Error:', err)
+            })
+            .finally(() => socketSend(sessionDoc, { event: 'syncSales_progress_end' }))
+
         })
-        .catch(reject)
+        .catch(err => {
+          errorLog(`[syncSales_pos312] Error:`, err)
+          socketSend(sessionDoc, { event: 'syncSales_progress_end' })
+          reject(err)
+        })
     } catch (err) {
-      // errorLog(`[syncItems_pos312] Error:`, err)
+      errorLog(`[syncSales_pos312] Error:`, err)
       socketSend(sessionDoc, { event: 'syncSales_progress_end' })
       reject(err)
     }
-
-
-
   })
+}
 
+
+function mikroWorkDataOlustur(orgDoc, storeDoc, tarih) {
+  return new Promise((resolve, reject) => {
+    let query = ``
+    query += workDataCreatePOQuery(tarih, storeDoc.warehouseId) + '\n'
+    query += workDataCreatePRHQuery(tarih, storeDoc.warehouseId) + '\n'
+    query += workDataCreateSTHQuery(tarih, storeDoc.warehouseId) + '\n'
+
+    executeSqlDb(orgDoc, storeDoc.db + '_WORKDATA', query)
+      .then(resolve)
+      .catch(reject)
+  })
+}
+
+function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const posComputerDoc = await db.storePosComputers.findOne({
+        organization: orgDoc._id,
+        db: storeDoc.db,
+        store: storeDoc._id,
+        integrationCode: fisData.stationId,
+      })
+      if (!posComputerDoc) return reject(`POS Bilgisayari tanimlanmamis. stationId:${fisData.stationId}`)
+      if (!posComputerDoc.cashAccountId) reject(`POS Bilgisayari:${posComputerDoc.name} nakit kasa tanimlanmamis`)
+      if (!posComputerDoc.bankAccountId) reject(`POS Bilgisayari:${posComputerDoc.name} banka hesabi tanimlanmamis`)
+
+      let query = `
+
+      `
+      resolve()
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
+const ddd = {
+  "license": null,
+  "id": "0f0c2877-bf14-42f7-ab5b-0a0ef649afc3",
+  "licenseId": "00000000-0000-0000-0000-000000000000",
+  "storeId": 1001,
+  "stationId": 5,
+  "tableId": 0,
+  "date": "2025-06-25T08:13:10",
+  "batchNo": 35,
+  "stanNo": 1,
+  "status": 1,
+  "type": 1,
+  "subType": null,
+  "userId": 36784955,
+  "externalNo": "",
+  "reason": null,
+  "seller": null,
+  "endDate": "2025-06-25T08:13:25",
+  "sales": [
+    {
+      "ordr": 1,
+      "status": true,
+      "barcode": "80966289",
+      "stockCode": "18017900",
+      "unit": 1,
+      "unitPrice": 75,
+      "quantity": 1,
+      "returnUnitPrice": 75,
+      "returnQuantity": 0,
+      "shortName": "VİVİDENT CMF PCK 12X",
+      "departmentId": 0,
+      "departmentValue": 1,
+      "departmentEcrCode": 0,
+      "sourceDevice": null,
+      "prepareStartTime": null,
+      "cancelTimeout": null,
+      "userId": 36784955,
+      "masterOrdr": null,
+      "note": null,
+      "seller": null,
+      "noDiscount": false,
+      "noPromotion": false,
+      "freePrice": false,
+      "rayonId": null,
+      "discounts": []
+    }
+  ],
+  "discounts": [],
+  "payments": [
+    {
+      "ordr": 1,
+      "paymentId": 2,
+      "type": 2,
+      "description": "KREDİ KARTI",
+      "parameter": "2",
+      "change": false,
+      "amount": 75,
+      "status": true,
+      "rate": 1
+    }
+  ],
+  "taxes": [
+    {
+      "departmentId": 2,
+      "taxValue": 1,
+      "taxAmount": 0.74
+    }
+  ],
+  "customers": []
 }

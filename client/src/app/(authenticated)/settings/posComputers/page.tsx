@@ -41,6 +41,7 @@ export default function SettingsPage({ }: Props) {
       onHeaderPaint={() => <div className='grid grid-cols-7 w-full'>
         <div>{t('Store')}</div>
         <div>{t('Name')}</div>
+        <div>{t('Integration Code')}</div>
         <div>{t('Cash')}</div>
         <div>{t('Bank')}</div>
         <div>{t('Responsibility')}</div>
@@ -50,6 +51,7 @@ export default function SettingsPage({ }: Props) {
       onRowPaint={(e:StorePosComputer,colIndex) => <div className='grid grid-cols-7 w-full'>
         <div>{e.store?.name}</div>
         <div>{e.name}</div>
+        <div>{e.integrationCode}</div>
         <div>{e.cashAccount}</div>
         <div>{e.bankAccount}</div>
         <div>{e.responsibility}</div>

@@ -1,82 +1,11 @@
-
-function pad(num, size) {
-  num = num.toString();
-  while (num.length < size) num = "0" + num;
-  return num;
-}
-
-function yyyyMMdd(tarih) {
-  return new Date(tarih).toISOString().substring(0, 10).replaceAll('-', '')
-}
-
-exports.workDataCreatePRHQuery = function (tarih, depoNo) {
-  tarih = yyyyMMdd(tarih)
-  depoNo = pad(depoNo, 3)
-  let q = `
-    SET ANSI_NULLS ON; 
-
-    SET QUOTED_IDENTIFIER ON;
-  IF NOT EXISTS(SELECT * FROM sys.objects WHERE type='U' and name='P_${tarih}_${depoNo}') BEGIN
-    CREATE TABLE [dbo].[P_${tarih}_${depoNo}](
-      [prh_Guid] [uniqueidentifier] NOT NULL,
-      [prh_DBCno] [smallint] NOT NULL,
-      [prh_Spec_Rec_no] [int] NULL,
-      [prh_iptal] [bit] NULL,
-      [prh_fileid] [smallint] NULL,
-      [prh_hidden] [bit] NULL,
-      [prh_kilitli] [bit] NULL,
-      [prh_degisti] [bit] NULL,
-      [prh_checksum] [int] NULL,
-      [prh_create_user] [smallint] NULL,
-      [prh_create_date] [datetime] NOT NULL,
-      [prh_lastup_user] [smallint] NULL,
-      [prh_lastup_date] [datetime] NULL,
-      [prh_special1] [nvarchar](4) NULL,
-      [prh_special2] [nvarchar](4) NULL,
-      [prh_special3] [nvarchar](4) NULL,
-      [prh_firmano] [int] NULL,
-      [prh_subeno] [int] NULL,
-      [prh_promo_kodu] [nvarchar](25) NULL,
-      [prh_evrak_kaynak] [tinyint] NULL,
-      [prh_sth_evraktip] [tinyint] NULL,
-      [prh_evrak_cins] [tinyint] NULL,
-      [prh_sth_evrakno_seri] [dbo].[evrakseri_str] NULL,
-      [prh_sth_evrakno_sira] [int] NULL,
-      [prh_sth_satirno] [int] NULL,
-      [prh_urun_cinsi] [tinyint] NULL,
-      [prh_stok_kodu] [nvarchar](25) NULL,
-      [prh_cari_kodu] [nvarchar](25) NULL,
-      [prh_tarih] [datetime] NULL,
-      [prh_plasiyer_kodu] [nvarchar](25) NULL,
-      [prh_miktar] [float] NULL,
-      [prh_tutar] [float] NULL,
-      [prh_yansiyan_promo_tutari] [float] NULL,
-      [prh_promosyon_tipi] [smallint] NULL,
-      [prh_uygulama_tipi] [smallint] NULL,
-      [integrationCode] [nvarchar](50) NULL,
-    CONSTRAINT [NDX_P_${tarih}_${depoNo}_00] PRIMARY KEY CLUSTERED 
-    (
-      [prh_Guid] ASC
-    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-    ) ON [PRIMARY];
-
-    ALTER TABLE [dbo].[P_${tarih}_${depoNo}] ADD  DEFAULT (newid()) FOR [prh_Guid];
-    ALTER TABLE [dbo].[P_${tarih}_${depoNo}] ADD  DEFAULT ((0)) FOR [prh_DBCno];
-    ALTER TABLE [dbo].[P_${tarih}_${depoNo}] ADD  DEFAULT (getdate()) FOR [prh_create_date];
-    EXEC sys.sp_addextendedproperty @name=N'version', @value=N'35a' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'P_${tarih}_${depoNo}';
-  END
-    `
-  return q
-}
-
-exports.workDataCreatePOQuery = function (tarih, depoNo) {
-  tarih = yyyyMMdd(tarih)
-  depoNo = pad(depoNo, 3)
-  let q = `
+use MikroDesktop_AGROSS_001_WORKDATA;
+      BEGIN TRY
+        BEGIN TRAN T216;
+          
     SET ANSI_NULLS ON;
     SET QUOTED_IDENTIFIER ON;
-  IF NOT EXISTS(SELECT * FROM sys.objects WHERE type='U' and name='O_${tarih}_${depoNo}') BEGIN
-    CREATE TABLE [dbo].[O_${tarih}_${depoNo}](
+  IF NOT EXISTS(SELECT * FROM sys.objects WHERE type='U' and name='O_20250624_1001') BEGIN
+    CREATE TABLE [dbo].[O_20250624_1001](
       [po_Guid] [uniqueidentifier] NOT NULL,
       [po_DBCno] [smallint] NOT NULL,
       [po_SpecRECno] [int] NULL,
@@ -444,28 +373,76 @@ exports.workDataCreatePOQuery = function (tarih, depoNo) {
       [po_GibeGonderildiFl] [bit] NULL,
       [po_KayitSiraNo] [int] IDENTITY(1,1) NOT NULL,
       [integrationCode] [nvarchar](50) NULL,
-    CONSTRAINT [NDX_O_${tarih}_${depoNo}_00] PRIMARY KEY CLUSTERED 
+    CONSTRAINT [NDX_O_20250624_1001_00] PRIMARY KEY CLUSTERED 
     (
       [po_Guid] ASC
     )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
     ) ON [PRIMARY];
-    ALTER TABLE [dbo].[O_${tarih}_${depoNo}] ADD  DEFAULT (newid()) FOR [po_Guid];
-    ALTER TABLE [dbo].[O_${tarih}_${depoNo}] ADD  DEFAULT ((0)) FOR [po_DBCno];
-    ALTER TABLE [dbo].[O_${tarih}_${depoNo}] ADD  DEFAULT (getdate()) FOR [po_create_date];
-    EXEC sys.sp_addextendedproperty @name=N'version', @value=N'33a' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'O_${tarih}_${depoNo}';
+    ALTER TABLE [dbo].[O_20250624_1001] ADD  DEFAULT (newid()) FOR [po_Guid];
+    ALTER TABLE [dbo].[O_20250624_1001] ADD  DEFAULT ((0)) FOR [po_DBCno];
+    ALTER TABLE [dbo].[O_20250624_1001] ADD  DEFAULT (getdate()) FOR [po_create_date];
+    EXEC sys.sp_addextendedproperty @name=N'version', @value=N'33a' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'O_20250624_1001';
   END
-    `
-  return q
-}
+    
 
-exports.workDataCreateSTHQuery = function (tarih, depoNo) {
-  tarih = yyyyMMdd(tarih)
-  depoNo = pad(depoNo, 3)
-  let q = `
+    SET ANSI_NULLS ON; 
+
+    SET QUOTED_IDENTIFIER ON;
+  IF NOT EXISTS(SELECT * FROM sys.objects WHERE type='U' and name='P_20250624_1001') BEGIN
+    CREATE TABLE [dbo].[P_20250624_1001](
+      [prh_Guid] [uniqueidentifier] NOT NULL,
+      [prh_DBCno] [smallint] NOT NULL,
+      [prh_Spec_Rec_no] [int] NULL,
+      [prh_iptal] [bit] NULL,
+      [prh_fileid] [smallint] NULL,
+      [prh_hidden] [bit] NULL,
+      [prh_kilitli] [bit] NULL,
+      [prh_degisti] [bit] NULL,
+      [prh_checksum] [int] NULL,
+      [prh_create_user] [smallint] NULL,
+      [prh_create_date] [datetime] NOT NULL,
+      [prh_lastup_user] [smallint] NULL,
+      [prh_lastup_date] [datetime] NULL,
+      [prh_special1] [nvarchar](4) NULL,
+      [prh_special2] [nvarchar](4) NULL,
+      [prh_special3] [nvarchar](4) NULL,
+      [prh_firmano] [int] NULL,
+      [prh_subeno] [int] NULL,
+      [prh_promo_kodu] [nvarchar](25) NULL,
+      [prh_evrak_kaynak] [tinyint] NULL,
+      [prh_sth_evraktip] [tinyint] NULL,
+      [prh_evrak_cins] [tinyint] NULL,
+      [prh_sth_evrakno_seri] [dbo].[evrakseri_str] NULL,
+      [prh_sth_evrakno_sira] [int] NULL,
+      [prh_sth_satirno] [int] NULL,
+      [prh_urun_cinsi] [tinyint] NULL,
+      [prh_stok_kodu] [nvarchar](25) NULL,
+      [prh_cari_kodu] [nvarchar](25) NULL,
+      [prh_tarih] [datetime] NULL,
+      [prh_plasiyer_kodu] [nvarchar](25) NULL,
+      [prh_miktar] [float] NULL,
+      [prh_tutar] [float] NULL,
+      [prh_yansiyan_promo_tutari] [float] NULL,
+      [prh_promosyon_tipi] [smallint] NULL,
+      [prh_uygulama_tipi] [smallint] NULL,
+      [integrationCode] [nvarchar](50) NULL,
+    CONSTRAINT [NDX_P_20250624_1001_00] PRIMARY KEY CLUSTERED 
+    (
+      [prh_Guid] ASC
+    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+    ) ON [PRIMARY];
+
+    ALTER TABLE [dbo].[P_20250624_1001] ADD  DEFAULT (newid()) FOR [prh_Guid];
+    ALTER TABLE [dbo].[P_20250624_1001] ADD  DEFAULT ((0)) FOR [prh_DBCno];
+    ALTER TABLE [dbo].[P_20250624_1001] ADD  DEFAULT (getdate()) FOR [prh_create_date];
+    EXEC sys.sp_addextendedproperty @name=N'version', @value=N'35a' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'P_20250624_1001';
+  END
+    
+
     SET ANSI_NULLS ON;
     SET QUOTED_IDENTIFIER ON;
-  IF NOT EXISTS(SELECT * FROM sys.objects WHERE type='U' and name='S_${tarih}_${depoNo}') BEGIN
-    CREATE TABLE [dbo].[S_${tarih}_${depoNo}](
+  IF NOT EXISTS(SELECT * FROM sys.objects WHERE type='U' and name='S_20250624_1001') BEGIN
+    CREATE TABLE [dbo].[S_20250624_1001](
       [sth_Guid] [uniqueidentifier] NOT NULL,
       [sth_DBCno] [smallint] NOT NULL,
       [sth_SpecRECno] [int] NULL,
@@ -605,16 +582,32 @@ exports.workDataCreateSTHQuery = function (tarih, depoNo) {
       [sth_bagli_ithalat_kodu] [nvarchar](25) NULL,
       [sth_tevkifat_sifirlandi_fl] [bit] NULL,
       [integrationCode] [nvarchar](50) NULL,
-    CONSTRAINT [NDX_S_${tarih}_${depoNo}_00] PRIMARY KEY CLUSTERED 
+    CONSTRAINT [NDX_S_20250624_1001_00] PRIMARY KEY CLUSTERED 
     (
       [sth_Guid] ASC
     )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
     ) ON [PRIMARY];
-    ALTER TABLE [dbo].[S_${tarih}_${depoNo}] ADD  DEFAULT (newid()) FOR [sth_Guid];
-    ALTER TABLE [dbo].[S_${tarih}_${depoNo}] ADD  DEFAULT ((0)) FOR [sth_DBCno];
-    ALTER TABLE [dbo].[S_${tarih}_${depoNo}] ADD  DEFAULT (getdate()) FOR [sth_create_date];
-    EXEC sys.sp_addextendedproperty @name=N'version', @value=N'37a' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'S_${tarih}_${depoNo}';
+    ALTER TABLE [dbo].[S_20250624_1001] ADD  DEFAULT (newid()) FOR [sth_Guid];
+    ALTER TABLE [dbo].[S_20250624_1001] ADD  DEFAULT ((0)) FOR [sth_DBCno];
+    ALTER TABLE [dbo].[S_20250624_1001] ADD  DEFAULT (getdate()) FOR [sth_create_date];
+    EXEC sys.sp_addextendedproperty @name=N'version', @value=N'37a' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'S_20250624_1001';
   END
-    `
-  return q
-}
+    
+
+        COMMIT TRAN T216;
+      END TRY
+      BEGIN CATCH
+        IF @@TRANCOUNT > 0 
+          ROLLBACK TRAN
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+        
+        SELECT 
+          @ErrorMessage = ERROR_MESSAGE(),
+          @ErrorSeverity = ERROR_SEVERITY(),
+          @ErrorState = ERROR_STATE();
+        
+        RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
+      END CATCH
+      

@@ -82,14 +82,15 @@ export default function EditPage({ params }: Props) {
     loading={loading}
   >
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <TsnSelect title={t('Store')} defaultValue={storePosComputer?.store?._id}
           onValueChange={e => setStorePosComputer({ ...storePosComputer, store: { ...storePosComputer?.store, _id: e } })}
           list={stores}
         />
         <TsnInput title={t('Name')} defaultValue={storePosComputer?.name} onBlur={e => setStorePosComputer({ ...storePosComputer, name: e.target.value })} />
+        <TsnInput title={t('Integration Code')} defaultValue={storePosComputer?.integrationCode} onBlur={e => setStorePosComputer({ ...storePosComputer, integrationCode: e.target.value })} />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <SelectProjectWithLabel caption={storePosComputer?.project} t={t} onSelect={e => { setStorePosComputer({ ...storePosComputer, projectId: e._id, project: e.name }) }} />
         <SelectResponsibilityWithLabel caption={storePosComputer?.responsibility} t={t} onSelect={e => { setStorePosComputer({ ...storePosComputer, responsibilityId: e._id, responsibility: e.name }) }} />
         <SelectCashAccountWithLabel caption={storePosComputer?.cashAccount} t={t} onSelect={e => { setStorePosComputer({ ...storePosComputer, cashAccountId: e._id, cashAccount: e.name }) }} />

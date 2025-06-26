@@ -1,3 +1,6 @@
+const fs = require('fs')
+const path = require('path')
+
 const { mssql } = require('../connectorAbi')
 exports.getDbList = function (connector) {
   return new Promise(async (resolve, reject) => {
@@ -41,6 +44,27 @@ exports.getList = function (sessionDoc, orgDoc, listQuery, dbSuffix = '') {
   })
 }
 
+exports.getListDb = function (orgDoc, db, listQuery) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let query = `use ${db};
+      ${listQuery || ''}
+      `
+      mssql(orgDoc.connector.clientId, orgDoc.connector.clientPass, orgDoc.connector.mssql, query)
+        .then(result => {
+          if (result.recordsets) {
+            resolve(result.recordsets[0])
+          } else {
+            resolve([])
+          }
+        })
+        .catch(reject)
+    } catch (err) {
+      reject(err)
+    }
+  })
+}
+
 exports.executeSql = function (sessionDoc, orgDoc, execQuery, dbSuffix = '') {
   return new Promise(async (resolve, reject) => {
     try {
@@ -65,6 +89,43 @@ exports.executeSql = function (sessionDoc, orgDoc, execQuery, dbSuffix = '') {
         RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
       END CATCH
       `
+      mssql(orgDoc.connector.clientId, orgDoc.connector.clientPass, orgDoc.connector.mssql, query)
+        .then(result => {
+          resolve({ rowsAffected: (result.rowsAffected || []).reduce((a, b) => a + b, 0) })
+        })
+        .catch(reject)
+    } catch (err) {
+      reject(err)
+    }
+  })
+}
+
+exports.executeSqlDb = function (orgDoc, db, execQuery) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let query = `use ${db};
+      BEGIN TRY
+        BEGIN TRAN T216;
+          ${execQuery || ''}
+        COMMIT TRAN T216;
+      END TRY
+      BEGIN CATCH
+        IF @@TRANCOUNT > 0 
+          ROLLBACK TRAN
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+        
+        SELECT 
+          @ErrorMessage = ERROR_MESSAGE(),
+          @ErrorSeverity = ERROR_SEVERITY(),
+          @ErrorState = ERROR_STATE();
+        
+        RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
+      END CATCH
+      `
+      fs.writeFileSync(path.join(__dirname, 'executeSqlDb.txt'), query, 'utf8')
+      console.log('buraya geldi')
       mssql(orgDoc.connector.clientId, orgDoc.connector.clientPass, orgDoc.connector.mssql, query)
         .then(result => {
           resolve({ rowsAffected: (result.rowsAffected || []).reduce((a, b) => a + b, 0) })
