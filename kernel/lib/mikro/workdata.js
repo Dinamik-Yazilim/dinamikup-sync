@@ -1,17 +1,8 @@
 
-function pad(num, size) {
-  num = num.toString();
-  while (num.length < size) num = "0" + num;
-  return num;
-}
-
-function yyyyMMdd(tarih) {
-  return new Date(tarih).toISOString().substring(0, 10).replaceAll('-', '')
-}
 
 exports.workDataCreatePRHQuery = function (tarih, depoNo) {
-  tarih = yyyyMMdd(tarih)
-  depoNo = pad(depoNo, 3)
+  tarih = util.yyyyMMdd(tarih)
+  depoNo = util.pad(depoNo, 3)
   let q = `
     SET ANSI_NULLS ON; 
 
@@ -70,8 +61,8 @@ exports.workDataCreatePRHQuery = function (tarih, depoNo) {
 }
 
 exports.workDataCreatePOQuery = function (tarih, depoNo) {
-  tarih = yyyyMMdd(tarih)
-  depoNo = pad(depoNo, 3)
+  tarih = util.yyyyMMdd(tarih)
+  depoNo = util.pad(depoNo, 3)
   let q = `
     SET ANSI_NULLS ON;
     SET QUOTED_IDENTIFIER ON;
@@ -459,8 +450,8 @@ exports.workDataCreatePOQuery = function (tarih, depoNo) {
 }
 
 exports.workDataCreateSTHQuery = function (tarih, depoNo) {
-  tarih = yyyyMMdd(tarih)
-  depoNo = pad(depoNo, 3)
+  tarih = util.yyyyMMdd(tarih)
+  depoNo = util.pad(depoNo, 3)
   let q = `
     SET ANSI_NULLS ON;
     SET QUOTED_IDENTIFIER ON;

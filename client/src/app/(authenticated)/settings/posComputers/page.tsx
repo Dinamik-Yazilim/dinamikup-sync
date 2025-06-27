@@ -38,9 +38,10 @@ export default function SettingsPage({ }: Props) {
 
       title={t('POS Computers')}
       icon=<ComputerIcon />
-      onHeaderPaint={() => <div className='grid grid-cols-7 w-full'>
+      onHeaderPaint={() => <div className='grid grid-cols-9 w-full'>
         <div>{t('Store')}</div>
         <div>{t('Name')}</div>
+        <div>{t('Sales Serial')}</div>
         <div>{t('Integration Code')}</div>
         <div>{t('Cash')}</div>
         <div>{t('Bank')}</div>
@@ -48,9 +49,10 @@ export default function SettingsPage({ }: Props) {
         <div>{t('Project')}</div>
         <div className='text-center'>{t('Passive?')}</div>
       </div>}
-      onRowPaint={(e:StorePosComputer,colIndex) => <div className='grid grid-cols-7 w-full'>
+      onRowPaint={(e:StorePosComputer,colIndex) => <div className='grid grid-cols-9 w-full'>
         <div>{e.store?.name}</div>
         <div>{e.name}</div>
+        <div>{e.salesDocNoSerial}</div>
         <div>{e.integrationCode}</div>
         <div>{e.cashAccount}</div>
         <div>{e.bankAccount}</div>

@@ -88,7 +88,10 @@ export default function EditPage({ params }: Props) {
           list={stores}
         />
         <TsnInput title={t('Name')} defaultValue={storePosComputer?.name} onBlur={e => setStorePosComputer({ ...storePosComputer, name: e.target.value })} />
-        <TsnInput title={t('Integration Code')} defaultValue={storePosComputer?.integrationCode} onBlur={e => setStorePosComputer({ ...storePosComputer, integrationCode: e.target.value })} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <TsnInput title={t('Integration Code')} defaultValue={storePosComputer?.integrationCode} onBlur={e => setStorePosComputer({ ...storePosComputer, integrationCode: e.target.value })} />
+          <TsnInput title={t('Sales Serial')} maxLength={4} defaultValue={storePosComputer?.salesDocNoSerial} onBlur={e => setStorePosComputer({ ...storePosComputer, salesDocNoSerial: e.target.value })} />
+        </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <SelectProjectWithLabel caption={storePosComputer?.project} t={t} onSelect={e => { setStorePosComputer({ ...storePosComputer, projectId: e._id, project: e.name }) }} />
@@ -97,7 +100,7 @@ export default function EditPage({ params }: Props) {
         <SelectBankAccountWithLabel caption={storePosComputer?.bankAccount} t={t} onSelect={e => { setStorePosComputer({ ...storePosComputer, bankAccountId: e._id, bankAccount: e.name }) }} />
       </div>
       <TsnPanel name='scaleOptions' trigger={'Terazi Ayarlari'} >
-        
+
       </TsnPanel>
       <TsnSwitch title={t('Passive?')} defaultChecked={storePosComputer?.passive} onCheckedChange={e => setStorePosComputer({ ...storePosComputer, passive: e })} />
     </div>

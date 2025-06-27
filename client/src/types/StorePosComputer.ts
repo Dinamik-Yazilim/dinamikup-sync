@@ -14,6 +14,7 @@ export interface StorePosComputer {
   cashAccount?: string
   bankAccountId?: string
   bankAccount?: string
+  salesDocNoSerial?: string
   integrationCode?: string
   paymentDevices?: PaymentDevice[]
   scale?:Scale

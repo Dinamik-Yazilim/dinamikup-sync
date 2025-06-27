@@ -316,3 +316,13 @@ exports.fixOrganizationName = function (name) {
 	name = name.replace(/[^a-z,0-9]+/, '')
 	return name
 }
+
+exports.pad = function (num, size) {
+	num = num.toString();
+	while (num.length < size) num = "0" + num;
+	return num;
+}
+
+exports.yyyyMMdd = function (tarih) {
+	return new Date(tarih).toISOString().substring(0, 10).replaceAll('-', '')
+}

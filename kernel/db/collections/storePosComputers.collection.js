@@ -14,7 +14,9 @@ module.exports = function (dbModel) {
       cashAccount: { type: String, default: '', index: true },
       bankAccountId: { type: String, default: '', index: true },
       bankAccount: { type: String, default: '', index: true },
+      salesDocNoSerial: { type: String, default: '', index: true },
       integrationCode: { type: String, default: '', index: true },
+
       scale: {
         connectionType: { type: String, defaul: '' },
         comPortOptions: {}
