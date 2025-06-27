@@ -324,5 +324,9 @@ exports.pad = function (num, size) {
 }
 
 exports.yyyyMMdd = function (tarih) {
-	return new Date(tarih).toISOString().substring(0, 10).replaceAll('-', '')
+	let t = new Date(tarih)
+	t.setMinutes(t.getMinutes() + (-1 * new Date().getTimezoneOffset()))
+	let sonuc = t.toISOString().substring(0, 10).replaceAll('-', '')
+	// console.log('yyyyMMdd:', sonuc, 'tarih:', tarih)
+	return sonuc
 }

@@ -70,9 +70,9 @@ exports.executeSql = function (sessionDoc, orgDoc, execQuery, dbSuffix = '') {
     try {
       let query = `use ${sessionDoc.db}${dbSuffix};
       BEGIN TRY
-        BEGIN TRAN T216;
+        BEGIN TRAN;
           ${execQuery || ''}
-        COMMIT TRAN T216;
+        COMMIT TRAN;
       END TRY
       BEGIN CATCH
         IF @@TRANCOUNT > 0 
@@ -105,9 +105,9 @@ exports.executeSqlDb = function (orgDoc, db, execQuery) {
     try {
       let query = `use ${db};
       BEGIN TRY
-        BEGIN TRAN T216;
+        BEGIN TRAN;
           ${execQuery || ''}
-        COMMIT TRAN T216;
+        COMMIT TRAN;
       END TRY
       BEGIN CATCH
         IF @@TRANCOUNT > 0 
@@ -125,7 +125,6 @@ exports.executeSqlDb = function (orgDoc, db, execQuery) {
       END CATCH
       `
       fs.writeFileSync(path.join(__dirname, 'executeSqlDb.txt'), query, 'utf8')
-      console.log('buraya geldi')
       mssql(orgDoc.connector.clientId, orgDoc.connector.clientPass, orgDoc.connector.mssql, query)
         .then(result => {
           resolve({ rowsAffected: (result.rowsAffected || []).reduce((a, b) => a + b, 0) })

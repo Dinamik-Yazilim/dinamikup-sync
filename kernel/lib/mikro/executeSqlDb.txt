@@ -1,600 +1,763 @@
 use MikroDesktop_AGROSS_001_WORKDATA;
       BEGIN TRY
-        BEGIN TRAN T216;
+        BEGIN TRAN;
           
-    SET ANSI_NULLS ON;
-    SET QUOTED_IDENTIFIER ON;
-  IF NOT EXISTS(SELECT * FROM sys.objects WHERE type='U' and name='O_20250624_1001') BEGIN
-    CREATE TABLE [dbo].[O_20250624_1001](
-      [po_Guid] [uniqueidentifier] NOT NULL,
-      [po_DBCno] [smallint] NOT NULL,
-      [po_SpecRECno] [int] NULL,
-      [po_iptal] [bit] NULL,
-      [po_fileid] [smallint] NULL,
-      [po_hidden] [bit] NULL,
-      [po_kilitli] [bit] NULL,
-      [po_degisti] [bit] NULL,
-      [po_checksum] [int] NULL,
-      [po_create_user] [smallint] NULL,
-      [po_create_date] [datetime] NOT NULL,
-      [po_lastup_user] [smallint] NULL,
-      [po_lastup_date] [datetime] NULL,
-      [po_special1] [nvarchar](4) NULL,
-      [po_special2] [nvarchar](4) NULL,
-      [po_special3] [nvarchar](4) NULL,
-      [po_firmano] [int] NULL,
-      [po_subeno] [int] NULL,
-      [po_KasaKodu] [nvarchar](4) NULL,
-      [po_BelgeNo] [int] NULL,
-      [po_MyeZNo] [int] NULL,
-      [po_KasiyerKodu] [nvarchar](6) NULL,
-      [po_BelgeTarihi] [datetime] NULL,
-      [po_BelgeToplam] [float] NULL,
-      [po_VerMtrh0] [float] NULL,
-      [po_VerMtrh1] [float] NULL,
-      [po_VerMtrh2] [float] NULL,
-      [po_VerMtrh3] [float] NULL,
-      [po_VerMtrh4] [float] NULL,
-      [po_VerMtrh5] [float] NULL,
-      [po_VerMtrh6] [float] NULL,
-      [po_VerMtrh7] [float] NULL,
-      [po_VerMtrh8] [float] NULL,
-      [po_VerMtrh9] [float] NULL,
-      [po_VerMtrh10] [float] NULL,
-      [po_VerMtrh11] [float] NULL,
-      [po_VerMtrh12] [float] NULL,
-      [po_VerMtrh13] [float] NULL,
-      [po_VerMtrh14] [float] NULL,
-      [po_VerMtrh15] [float] NULL,
-      [po_VerMtrh16] [float] NULL,
-      [po_VerMtrh17] [float] NULL,
-      [po_VerMtrh18] [float] NULL,
-      [po_VerMtrh19] [float] NULL,
-      [po_VerMtrh20] [float] NULL,
-      [po_Vergi1] [float] NULL,
-      [po_Vergi2] [float] NULL,
-      [po_Vergi3] [float] NULL,
-      [po_Vergi4] [float] NULL,
-      [po_Vergi5] [float] NULL,
-      [po_Vergi6] [float] NULL,
-      [po_Vergi7] [float] NULL,
-      [po_Vergi8] [float] NULL,
-      [po_Vergi9] [float] NULL,
-      [po_Vergi10] [float] NULL,
-      [po_Vergi11] [float] NULL,
-      [po_Vergi12] [float] NULL,
-      [po_Vergi13] [float] NULL,
-      [po_Vergi14] [float] NULL,
-      [po_Vergi15] [float] NULL,
-      [po_Vergi16] [float] NULL,
-      [po_Vergi17] [float] NULL,
-      [po_Vergi18] [float] NULL,
-      [po_Vergi19] [float] NULL,
-      [po_Vergi20] [float] NULL,
-      [po_Fisfatura] [tinyint] NULL,
-      [po_Pozisyon] [tinyint] NULL,
-      [po_CariKodu] [nvarchar](25) NULL,
-      [po_Yuvarlama] [float] NULL,
-      [po_Odm_AnaDtut1] [float] NULL,
-      [po_Odm_OrjDtut1] [float] NULL,
-      [po_Odm_AnaDtut2] [float] NULL,
-      [po_Odm_OrjDtut2] [float] NULL,
-      [po_Odm_AnaDtut3] [float] NULL,
-      [po_Odm_OrjDtut3] [float] NULL,
-      [po_Odm_AnaDtut4] [float] NULL,
-      [po_Odm_OrjDtut4] [float] NULL,
-      [po_Odm_AnaDtut5] [float] NULL,
-      [po_Odm_OrjDtut5] [float] NULL,
-      [po_Odm_AnaDtut6] [float] NULL,
-      [po_Odm_OrjDtut6] [float] NULL,
-      [po_Odm_AnaDtut7] [float] NULL,
-      [po_Odm_OrjDtut7] [float] NULL,
-      [po_Odm_AnaDtut8] [float] NULL,
-      [po_Odm_OrjDtut8] [float] NULL,
-      [po_Odm_AnaDtut9] [float] NULL,
-      [po_Odm_OrjDtut9] [float] NULL,
-      [po_Odm_AnaDtut10] [float] NULL,
-      [po_Odm_OrjDtut10] [float] NULL,
-      [po_Odm_AnaDtut11] [float] NULL,
-      [po_Odm_OrjDtut11] [float] NULL,
-      [po_Odm_AnaDtut12] [float] NULL,
-      [po_Odm_OrjDtut12] [float] NULL,
-      [po_Odm_AnaDtut13] [float] NULL,
-      [po_Odm_OrjDtut13] [float] NULL,
-      [po_Odm_AnaDtut14] [float] NULL,
-      [po_Odm_OrjDtut14] [float] NULL,
-      [po_Odm_AnaDtut15] [float] NULL,
-      [po_Odm_OrjDtut15] [float] NULL,
-      [po_Odm_AnaDtut16] [float] NULL,
-      [po_Odm_OrjDtut16] [float] NULL,
-      [po_Odm_AnaDtut17] [float] NULL,
-      [po_Odm_OrjDtut17] [float] NULL,
-      [po_Odm_AnaDtut18] [float] NULL,
-      [po_Odm_OrjDtut18] [float] NULL,
-      [po_Odm_AnaDtut19] [float] NULL,
-      [po_Odm_OrjDtut19] [float] NULL,
-      [po_Odm_AnaDtut20] [float] NULL,
-      [po_Odm_OrjDtut20] [float] NULL,
-      [po_Odm_AnaDtut21] [float] NULL,
-      [po_Odm_OrjDtut21] [float] NULL,
-      [po_Odm_AnaDtut22] [float] NULL,
-      [po_Odm_OrjDtut22] [float] NULL,
-      [po_Odm_AnaDtut23] [float] NULL,
-      [po_Odm_OrjDtut23] [float] NULL,
-      [po_Odm_AnaDtut24] [float] NULL,
-      [po_Odm_OrjDtut24] [float] NULL,
-      [po_Odm_AnaDtut25] [float] NULL,
-      [po_Odm_OrjDtut25] [float] NULL,
-      [po_Odm_AnaDtut26] [float] NULL,
-      [po_Odm_OrjDtut26] [float] NULL,
-      [po_Odm_AnaDtut27] [float] NULL,
-      [po_Odm_OrjDtut27] [float] NULL,
-      [po_Odm_AnaDtut28] [float] NULL,
-      [po_Odm_OrjDtut28] [float] NULL,
-      [po_Odm_AnaDtut29] [float] NULL,
-      [po_Odm_OrjDtut29] [float] NULL,
-      [po_Odm_AnaDtut30] [float] NULL,
-      [po_Odm_OrjDtut30] [float] NULL,
-      [po_Odm_AnaDtut31] [float] NULL,
-      [po_Odm_OrjDtut31] [float] NULL,
-      [po_Odm_AnaDtut32] [float] NULL,
-      [po_Odm_OrjDtut32] [float] NULL,
-      [po_Odm_AnaDtut33] [float] NULL,
-      [po_Odm_OrjDtut33] [float] NULL,
-      [po_Odm_AnaDtut34] [float] NULL,
-      [po_Odm_OrjDtut34] [float] NULL,
-      [po_Odm_AnaDtut35] [float] NULL,
-      [po_Odm_OrjDtut35] [float] NULL,
-      [po_Odm_AnaDtut36] [float] NULL,
-      [po_Odm_OrjDtut36] [float] NULL,
-      [po_Odm_AnaDtut37] [float] NULL,
-      [po_Odm_OrjDtut37] [float] NULL,
-      [po_Odm_AnaDtut38] [float] NULL,
-      [po_Odm_OrjDtut38] [float] NULL,
-      [po_Odm_AnaDtut39] [float] NULL,
-      [po_Odm_OrjDtut39] [float] NULL,
-      [po_Odm_AnaDtut40] [float] NULL,
-      [po_Odm_OrjDtut40] [float] NULL,
-      [po_Odm_AnaDtut41] [float] NULL,
-      [po_Odm_OrjDtut41] [float] NULL,
-      [po_Odm_AnaDtut42] [float] NULL,
-      [po_Odm_OrjDtut42] [float] NULL,
-      [po_Odm_AnaDtut43] [float] NULL,
-      [po_Odm_OrjDtut43] [float] NULL,
-      [po_Odm_AnaDtut44] [float] NULL,
-      [po_Odm_OrjDtut44] [float] NULL,
-      [po_Odm_AnaDtut45] [float] NULL,
-      [po_Odm_OrjDtut45] [float] NULL,
-      [po_Odm_AnaDtut46] [float] NULL,
-      [po_Odm_OrjDtut46] [float] NULL,
-      [po_Odm_AnaDtut47] [float] NULL,
-      [po_Odm_OrjDtut47] [float] NULL,
-      [po_Odm_AnaDtut48] [float] NULL,
-      [po_Odm_OrjDtut48] [float] NULL,
-      [po_Odm_AnaDtut49] [float] NULL,
-      [po_Odm_OrjDtut49] [float] NULL,
-      [po_Odm_AnaDtut50] [float] NULL,
-      [po_Odm_OrjDtut50] [float] NULL,
-      [po_Vadeler_OdemeTipi1] [tinyint] NULL,
-      [po_Vadeler_vade1] [datetime] NULL,
-      [po_Vadeler_Tutar1] [float] NULL,
-      [po_Vadeler_OdemeTipi2] [tinyint] NULL,
-      [po_Vadeler_vade2] [datetime] NULL,
-      [po_Vadeler_Tutar2] [float] NULL,
-      [po_Vadeler_OdemeTipi3] [tinyint] NULL,
-      [po_Vadeler_vade3] [datetime] NULL,
-      [po_Vadeler_Tutar3] [float] NULL,
-      [po_Vadeler_OdemeTipi4] [tinyint] NULL,
-      [po_Vadeler_vade4] [datetime] NULL,
-      [po_Vadeler_Tutar4] [float] NULL,
-      [po_Vadeler_OdemeTipi5] [tinyint] NULL,
-      [po_Vadeler_vade5] [datetime] NULL,
-      [po_Vadeler_Tutar5] [float] NULL,
-      [po_Vadeler_OdemeTipi6] [tinyint] NULL,
-      [po_Vadeler_vade6] [datetime] NULL,
-      [po_Vadeler_Tutar6] [float] NULL,
-      [po_Vadeler_OdemeTipi7] [tinyint] NULL,
-      [po_Vadeler_vade7] [datetime] NULL,
-      [po_Vadeler_Tutar7] [float] NULL,
-      [po_Vadeler_OdemeTipi8] [tinyint] NULL,
-      [po_Vadeler_vade8] [datetime] NULL,
-      [po_Vadeler_Tutar8] [float] NULL,
-      [po_Vadeler_OdemeTipi9] [tinyint] NULL,
-      [po_Vadeler_vade9] [datetime] NULL,
-      [po_Vadeler_Tutar9] [float] NULL,
-      [po_Vadeler_OdemeTipi10] [tinyint] NULL,
-      [po_Vadeler_vade10] [datetime] NULL,
-      [po_Vadeler_Tutar10] [float] NULL,
-      [po_Vadeler_OdemeTipi11] [tinyint] NULL,
-      [po_Vadeler_vade11] [datetime] NULL,
-      [po_Vadeler_Tutar11] [float] NULL,
-      [po_Vadeler_OdemeTipi12] [tinyint] NULL,
-      [po_Vadeler_vade12] [datetime] NULL,
-      [po_Vadeler_Tutar12] [float] NULL,
-      [po_Vadeler_OdemeTipi13] [tinyint] NULL,
-      [po_Vadeler_vade13] [datetime] NULL,
-      [po_Vadeler_Tutar13] [float] NULL,
-      [po_Vadeler_OdemeTipi14] [tinyint] NULL,
-      [po_Vadeler_vade14] [datetime] NULL,
-      [po_Vadeler_Tutar14] [float] NULL,
-      [po_Vadeler_OdemeTipi15] [tinyint] NULL,
-      [po_Vadeler_vade15] [datetime] NULL,
-      [po_Vadeler_Tutar15] [float] NULL,
-      [po_Vadeler_OdemeTipi16] [tinyint] NULL,
-      [po_Vadeler_vade16] [datetime] NULL,
-      [po_Vadeler_Tutar16] [float] NULL,
-      [po_Vadeler_OdemeTipi17] [tinyint] NULL,
-      [po_Vadeler_vade17] [datetime] NULL,
-      [po_Vadeler_Tutar17] [float] NULL,
-      [po_Vadeler_OdemeTipi18] [tinyint] NULL,
-      [po_Vadeler_vade18] [datetime] NULL,
-      [po_Vadeler_Tutar18] [float] NULL,
-      [po_Vadeler_OdemeTipi19] [tinyint] NULL,
-      [po_Vadeler_vade19] [datetime] NULL,
-      [po_Vadeler_Tutar19] [float] NULL,
-      [po_Vadeler_OdemeTipi20] [tinyint] NULL,
-      [po_Vadeler_vade20] [datetime] NULL,
-      [po_Vadeler_Tutar20] [float] NULL,
-      [po_Vadeler_OdemeTipi21] [tinyint] NULL,
-      [po_Vadeler_vade21] [datetime] NULL,
-      [po_Vadeler_Tutar21] [float] NULL,
-      [po_Vadeler_OdemeTipi22] [tinyint] NULL,
-      [po_Vadeler_vade22] [datetime] NULL,
-      [po_Vadeler_Tutar22] [float] NULL,
-      [po_Vadeler_OdemeTipi23] [tinyint] NULL,
-      [po_Vadeler_vade23] [datetime] NULL,
-      [po_Vadeler_Tutar23] [float] NULL,
-      [po_Vadeler_OdemeTipi24] [tinyint] NULL,
-      [po_Vadeler_vade24] [datetime] NULL,
-      [po_Vadeler_Tutar24] [float] NULL,
-      [po_Vadeler_OdemeTipi25] [tinyint] NULL,
-      [po_Vadeler_vade25] [datetime] NULL,
-      [po_Vadeler_Tutar25] [float] NULL,
-      [po_Vadeler_OdemeTipi26] [tinyint] NULL,
-      [po_Vadeler_vade26] [datetime] NULL,
-      [po_Vadeler_Tutar26] [float] NULL,
-      [po_Vadeler_OdemeTipi27] [tinyint] NULL,
-      [po_Vadeler_vade27] [datetime] NULL,
-      [po_Vadeler_Tutar27] [float] NULL,
-      [po_Vadeler_OdemeTipi28] [tinyint] NULL,
-      [po_Vadeler_vade28] [datetime] NULL,
-      [po_Vadeler_Tutar28] [float] NULL,
-      [po_Vadeler_OdemeTipi29] [tinyint] NULL,
-      [po_Vadeler_vade29] [datetime] NULL,
-      [po_Vadeler_Tutar29] [float] NULL,
-      [po_Vadeler_OdemeTipi30] [tinyint] NULL,
-      [po_Vadeler_vade30] [datetime] NULL,
-      [po_Vadeler_Tutar30] [float] NULL,
-      [po_Vadeler_OdemeTipi31] [tinyint] NULL,
-      [po_Vadeler_vade31] [datetime] NULL,
-      [po_Vadeler_Tutar31] [float] NULL,
-      [po_Vadeler_OdemeTipi32] [tinyint] NULL,
-      [po_Vadeler_vade32] [datetime] NULL,
-      [po_Vadeler_Tutar32] [float] NULL,
-      [po_Vadeler_OdemeTipi33] [tinyint] NULL,
-      [po_Vadeler_vade33] [datetime] NULL,
-      [po_Vadeler_Tutar33] [float] NULL,
-      [po_Vadeler_OdemeTipi34] [tinyint] NULL,
-      [po_Vadeler_vade34] [datetime] NULL,
-      [po_Vadeler_Tutar34] [float] NULL,
-      [po_Vadeler_OdemeTipi35] [tinyint] NULL,
-      [po_Vadeler_vade35] [datetime] NULL,
-      [po_Vadeler_Tutar35] [float] NULL,
-      [po_Vadeler_OdemeTipi36] [tinyint] NULL,
-      [po_Vadeler_vade36] [datetime] NULL,
-      [po_Vadeler_Tutar36] [float] NULL,
-      [po_Tks_Satis] [bit] NULL,
-      [po_Tks_Satis_Tutar] [float] NULL,
-      [po_Odm_TaksitTipi1] [tinyint] NULL,
-      [po_Odm_TaksitTipi2] [tinyint] NULL,
-      [po_Odm_TaksitTipi3] [tinyint] NULL,
-      [po_Odm_TaksitTipi4] [tinyint] NULL,
-      [po_Odm_TaksitTipi5] [tinyint] NULL,
-      [po_Odm_TaksitTipi6] [tinyint] NULL,
-      [po_Odm_TaksitTipi7] [tinyint] NULL,
-      [po_Odm_TaksitTipi8] [tinyint] NULL,
-      [po_Odm_TaksitTipi9] [tinyint] NULL,
-      [po_Odm_TaksitTipi10] [tinyint] NULL,
-      [po_Odm_TaksitTipi11] [tinyint] NULL,
-      [po_Odm_TaksitTipi12] [tinyint] NULL,
-      [po_Odm_TaksitTipi13] [tinyint] NULL,
-      [po_Odm_TaksitTipi14] [tinyint] NULL,
-      [po_Odm_TaksitTipi15] [tinyint] NULL,
-      [po_Odm_TaksitTipi16] [tinyint] NULL,
-      [po_Odm_TaksitTipi17] [tinyint] NULL,
-      [po_Odm_TaksitTipi18] [tinyint] NULL,
-      [po_Odm_TaksitTipi19] [tinyint] NULL,
-      [po_Odm_TaksitTipi20] [tinyint] NULL,
-      [po_Odm_TaksitTipi21] [tinyint] NULL,
-      [po_Odm_TaksitTipi22] [tinyint] NULL,
-      [po_Odm_TaksitTipi23] [tinyint] NULL,
-      [po_Odm_TaksitTipi24] [tinyint] NULL,
-      [po_Odm_TaksitTipi25] [tinyint] NULL,
-      [po_Odm_TaksitTipi26] [tinyint] NULL,
-      [po_Odm_TaksitTipi27] [tinyint] NULL,
-      [po_Odm_TaksitTipi28] [tinyint] NULL,
-      [po_Odm_TaksitTipi29] [tinyint] NULL,
-      [po_Odm_TaksitTipi30] [tinyint] NULL,
-      [po_Odm_TaksitTipi31] [tinyint] NULL,
-      [po_Odm_TaksitTipi32] [tinyint] NULL,
-      [po_Odm_TaksitTipi33] [tinyint] NULL,
-      [po_Odm_TaksitTipi34] [tinyint] NULL,
-      [po_Odm_TaksitTipi35] [tinyint] NULL,
-      [po_Odm_TaksitTipi36] [tinyint] NULL,
-      [po_Odm_TaksitTipi37] [tinyint] NULL,
-      [po_Odm_TaksitTipi38] [tinyint] NULL,
-      [po_Odm_TaksitTipi39] [tinyint] NULL,
-      [po_Odm_TaksitTipi40] [tinyint] NULL,
-      [po_Odm_TaksitTipi41] [tinyint] NULL,
-      [po_Odm_TaksitTipi42] [tinyint] NULL,
-      [po_Odm_TaksitTipi43] [tinyint] NULL,
-      [po_Odm_TaksitTipi44] [tinyint] NULL,
-      [po_Odm_TaksitTipi45] [tinyint] NULL,
-      [po_Odm_TaksitTipi46] [tinyint] NULL,
-      [po_Odm_TaksitTipi47] [tinyint] NULL,
-      [po_Odm_TaksitTipi48] [tinyint] NULL,
-      [po_Odm_TaksitTipi49] [tinyint] NULL,
-      [po_Odm_TaksitTipi50] [tinyint] NULL,
-      [po_OdemeNo1] [tinyint] NULL,
-      [po_ProvizyonKodu1] [nvarchar](10) NULL,
-      [po_ProvizyonTutari1] [float] NULL,
-      [po_OdemeNo2] [tinyint] NULL,
-      [po_ProvizyonKodu2] [nvarchar](10) NULL,
-      [po_ProvizyonTutari2] [float] NULL,
-      [po_OdemeNo3] [tinyint] NULL,
-      [po_ProvizyonKodu3] [nvarchar](10) NULL,
-      [po_ProvizyonTutari3] [float] NULL,
-      [po_OdemeNo4] [tinyint] NULL,
-      [po_ProvizyonKodu4] [nvarchar](10) NULL,
-      [po_ProvizyonTutari4] [float] NULL,
-      [po_OdemeNo5] [tinyint] NULL,
-      [po_ProvizyonKodu5] [nvarchar](10) NULL,
-      [po_ProvizyonTutari5] [float] NULL,
-      [po_OdemeNo6] [tinyint] NULL,
-      [po_ProvizyonKodu6] [nvarchar](10) NULL,
-      [po_ProvizyonTutari6] [float] NULL,
-      [po_Tahsilat_evrakno_seri] [dbo].[evrakseri_str] NULL,
-      [po_Tahsilat_evrakno_sira] [int] NULL,
-      [po_Tahsilat_Tutari] [float] NULL,
-      [po_ParaUstuOdemeTipi] [tinyint] NULL,
-      [po_ParaUstuAnaDtut] [float] NULL,
-      [po_ParaUstuOrjDtut] [float] NULL,
-      [po_EvrakID] [nvarchar](40) NULL,
-      [po_AdresNo] [int] NULL,
-      [po_EArsivSeri] [nvarchar](7) NULL,
-      [po_EArsivSira] [int] NULL,
-      [po_ZNo] [int] NULL,
-      [po_FNo] [int] NULL,
-      [po_EJNo] [int] NULL,
-      [po_OKCEvrakID] [nvarchar](40) NULL,
-      [po_YolcuBeraberKod] [nvarchar](25) NULL,
-      [po_YolcuBeraberIstisnaKodu] [nvarchar](5) NULL,
-      [po_YolcuBeraberAraciKurumKodu] [nvarchar](25) NULL,
-      [po_GibeGonderildiFl] [bit] NULL,
-      [po_KayitSiraNo] [int] IDENTITY(1,1) NOT NULL,
-      [integrationCode] [nvarchar](50) NULL,
-    CONSTRAINT [NDX_O_20250624_1001_00] PRIMARY KEY CLUSTERED 
-    (
-      [po_Guid] ASC
-    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-    ) ON [PRIMARY];
-    ALTER TABLE [dbo].[O_20250624_1001] ADD  DEFAULT (newid()) FOR [po_Guid];
-    ALTER TABLE [dbo].[O_20250624_1001] ADD  DEFAULT ((0)) FOR [po_DBCno];
-    ALTER TABLE [dbo].[O_20250624_1001] ADD  DEFAULT (getdate()) FOR [po_create_date];
-    EXEC sys.sp_addextendedproperty @name=N'version', @value=N'33a' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'O_20250624_1001';
-  END
-    
+        DECLARE @Tarih DATETIME='2025-06-22'
+        DECLARE @EvrakSira INT=00000;
+        DECLARE @EvrakSeri VARCHAR(50)='K002';
+        DECLARE @DepoNo INT = 1001;
+        DECLARE @MikroUserNo INT = 99;
+        DECLARE @SatirNo INT = -1;
+        DECLARE @VergiPntr INT = 0;
+        DECLARE @VergiYuzde FLOAT = 0;
+        DECLARE @VergiMatrah0 FLOAT=0;
+        DECLARE @VergiMatrah1 FLOAT=0;
+        DECLARE @VergiMatrah2 FLOAT=0;
+        DECLARE @VergiMatrah3 FLOAT=0;
+        DECLARE @VergiMatrah4 FLOAT=0;
+        DECLARE @VergiMatrah5 FLOAT=0;
+        DECLARE @VergiMatrah6 FLOAT=0;
 
-    SET ANSI_NULLS ON; 
+        DECLARE @Vergi0 FLOAT=0;
+        DECLARE @Vergi1 FLOAT=0;
+        DECLARE @Vergi2 FLOAT=0;
+        DECLARE @Vergi3 FLOAT=0;
+        DECLARE @Vergi4 FLOAT=0;
+        DECLARE @Vergi5 FLOAT=0;
+        DECLARE @Vergi6 FLOAT=0;
+        DECLARE @OdemeOran FLOAT=0;
 
-    SET QUOTED_IDENTIFIER ON;
-  IF NOT EXISTS(SELECT * FROM sys.objects WHERE type='U' and name='P_20250624_1001') BEGIN
-    CREATE TABLE [dbo].[P_20250624_1001](
-      [prh_Guid] [uniqueidentifier] NOT NULL,
-      [prh_DBCno] [smallint] NOT NULL,
-      [prh_Spec_Rec_no] [int] NULL,
-      [prh_iptal] [bit] NULL,
-      [prh_fileid] [smallint] NULL,
-      [prh_hidden] [bit] NULL,
-      [prh_kilitli] [bit] NULL,
-      [prh_degisti] [bit] NULL,
-      [prh_checksum] [int] NULL,
-      [prh_create_user] [smallint] NULL,
-      [prh_create_date] [datetime] NOT NULL,
-      [prh_lastup_user] [smallint] NULL,
-      [prh_lastup_date] [datetime] NULL,
-      [prh_special1] [nvarchar](4) NULL,
-      [prh_special2] [nvarchar](4) NULL,
-      [prh_special3] [nvarchar](4) NULL,
-      [prh_firmano] [int] NULL,
-      [prh_subeno] [int] NULL,
-      [prh_promo_kodu] [nvarchar](25) NULL,
-      [prh_evrak_kaynak] [tinyint] NULL,
-      [prh_sth_evraktip] [tinyint] NULL,
-      [prh_evrak_cins] [tinyint] NULL,
-      [prh_sth_evrakno_seri] [dbo].[evrakseri_str] NULL,
-      [prh_sth_evrakno_sira] [int] NULL,
-      [prh_sth_satirno] [int] NULL,
-      [prh_urun_cinsi] [tinyint] NULL,
-      [prh_stok_kodu] [nvarchar](25) NULL,
-      [prh_cari_kodu] [nvarchar](25) NULL,
-      [prh_tarih] [datetime] NULL,
-      [prh_plasiyer_kodu] [nvarchar](25) NULL,
-      [prh_miktar] [float] NULL,
-      [prh_tutar] [float] NULL,
-      [prh_yansiyan_promo_tutari] [float] NULL,
-      [prh_promosyon_tipi] [smallint] NULL,
-      [prh_uygulama_tipi] [smallint] NULL,
-      [integrationCode] [nvarchar](50) NULL,
-    CONSTRAINT [NDX_P_20250624_1001_00] PRIMARY KEY CLUSTERED 
-    (
-      [prh_Guid] ASC
-    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-    ) ON [PRIMARY];
+        IF NOT EXISTS(SELECT * FROM S_20250622_1001 WHERE integrationCode='05a51a7a-2299-4232-8183-96dc224ebba1') BEGIN
+      
+          SET @SatirNo=@SatirNo+1;
+          SET @VergiYuzde=1;
+          SELECT @VergiPntr=CASE WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(0)=@VergiYuzde THEN 0
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(1)=@VergiYuzde THEN 1
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(2)=@VergiYuzde THEN 2
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(3)=@VergiYuzde THEN 3
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(4)=@VergiYuzde THEN 4
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(5)=@VergiYuzde THEN 5
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(6)=@VergiYuzde THEN 6
+          ELSE 0 END;
 
-    ALTER TABLE [dbo].[P_20250624_1001] ADD  DEFAULT (newid()) FOR [prh_Guid];
-    ALTER TABLE [dbo].[P_20250624_1001] ADD  DEFAULT ((0)) FOR [prh_DBCno];
-    ALTER TABLE [dbo].[P_20250624_1001] ADD  DEFAULT (getdate()) FOR [prh_create_date];
-    EXEC sys.sp_addextendedproperty @name=N'version', @value=N'35a' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'P_20250624_1001';
-  END
-    
+          SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN 272.2772277227723 ELSE 0 END;
+          SELECT @VergiMatrah1=@VergiMatrah1 + CASE WHEN @VergiPntr=1 THEN 272.2772277227723 ELSE 0 END;
+          SELECT @VergiMatrah2=@VergiMatrah2 + CASE WHEN @VergiPntr=2 THEN 272.2772277227723 ELSE 0 END;
+          SELECT @VergiMatrah3=@VergiMatrah3 + CASE WHEN @VergiPntr=3 THEN 272.2772277227723 ELSE 0 END;
+          SELECT @VergiMatrah4=@VergiMatrah4 + CASE WHEN @VergiPntr=4 THEN 272.2772277227723 ELSE 0 END;
+          SELECT @VergiMatrah5=@VergiMatrah5 + CASE WHEN @VergiPntr=5 THEN 272.2772277227723 ELSE 0 END;
+          SELECT @VergiMatrah6=@VergiMatrah6 + CASE WHEN @VergiPntr=6 THEN 272.2772277227723 ELSE 0 END;
 
-    SET ANSI_NULLS ON;
-    SET QUOTED_IDENTIFIER ON;
-  IF NOT EXISTS(SELECT * FROM sys.objects WHERE type='U' and name='S_20250624_1001') BEGIN
-    CREATE TABLE [dbo].[S_20250624_1001](
-      [sth_Guid] [uniqueidentifier] NOT NULL,
-      [sth_DBCno] [smallint] NOT NULL,
-      [sth_SpecRECno] [int] NULL,
-      [sth_iptal] [bit] NULL,
-      [sth_fileid] [smallint] NULL,
-      [sth_hidden] [bit] NULL,
-      [sth_kilitli] [bit] NULL,
-      [sth_degisti] [bit] NULL,
-      [sth_checksum] [int] NULL,
-      [sth_create_user] [smallint] NULL,
-      [sth_create_date] [datetime] NOT NULL,
-      [sth_lastup_user] [smallint] NULL,
-      [sth_lastup_date] [datetime] NULL,
-      [sth_special1] [nvarchar](4) NULL,
-      [sth_special2] [nvarchar](4) NULL,
-      [sth_special3] [nvarchar](4) NULL,
-      [sth_firmano] [int] NULL,
-      [sth_subeno] [int] NULL,
-      [sth_tarih] [datetime] NULL,
-      [sth_tip] [tinyint] NULL,
-      [sth_cins] [tinyint] NULL,
-      [sth_normal_iade] [tinyint] NULL,
-      [sth_evraktip] [tinyint] NULL,
-      [sth_evrakno_seri] [dbo].[evrakseri_str] NULL,
-      [sth_evrakno_sira] [int] NULL,
-      [sth_satirno] [int] NULL,
-      [sth_belge_no] [dbo].[belgeno_str] NULL,
-      [sth_belge_tarih] [datetime] NULL,
-      [sth_stok_kod] [nvarchar](25) NULL,
-      [sth_isk_mas1] [tinyint] NULL,
-      [sth_isk_mas2] [tinyint] NULL,
-      [sth_isk_mas3] [tinyint] NULL,
-      [sth_isk_mas4] [tinyint] NULL,
-      [sth_isk_mas5] [tinyint] NULL,
-      [sth_isk_mas6] [tinyint] NULL,
-      [sth_isk_mas7] [tinyint] NULL,
-      [sth_isk_mas8] [tinyint] NULL,
-      [sth_isk_mas9] [tinyint] NULL,
-      [sth_isk_mas10] [tinyint] NULL,
-      [sth_sat_iskmas1] [bit] NULL,
-      [sth_sat_iskmas2] [bit] NULL,
-      [sth_sat_iskmas3] [bit] NULL,
-      [sth_sat_iskmas4] [bit] NULL,
-      [sth_sat_iskmas5] [bit] NULL,
-      [sth_sat_iskmas6] [bit] NULL,
-      [sth_sat_iskmas7] [bit] NULL,
-      [sth_sat_iskmas8] [bit] NULL,
-      [sth_sat_iskmas9] [bit] NULL,
-      [sth_sat_iskmas10] [bit] NULL,
-      [sth_pos_satis] [tinyint] NULL,
-      [sth_promosyon_fl] [bit] NULL,
-      [sth_cari_cinsi] [tinyint] NULL,
-      [sth_cari_kodu] [nvarchar](25) NULL,
-      [sth_cari_grup_no] [tinyint] NULL,
-      [sth_isemri_gider_kodu] [nvarchar](25) NULL,
-      [sth_plasiyer_kodu] [nvarchar](25) NULL,
-      [sth_har_doviz_cinsi] [tinyint] NULL,
-      [sth_har_doviz_kuru] [float] NULL,
-      [sth_alt_doviz_kuru] [float] NULL,
-      [sth_stok_doviz_cinsi] [tinyint] NULL,
-      [sth_stok_doviz_kuru] [float] NULL,
-      [sth_miktar] [float] NULL,
-      [sth_miktar2] [float] NULL,
-      [sth_birim_pntr] [tinyint] NULL,
-      [sth_tutar] [float] NULL,
-      [sth_iskonto1] [float] NULL,
-      [sth_iskonto2] [float] NULL,
-      [sth_iskonto3] [float] NULL,
-      [sth_iskonto4] [float] NULL,
-      [sth_iskonto5] [float] NULL,
-      [sth_iskonto6] [float] NULL,
-      [sth_masraf1] [float] NULL,
-      [sth_masraf2] [float] NULL,
-      [sth_masraf3] [float] NULL,
-      [sth_masraf4] [float] NULL,
-      [sth_vergi_pntr] [tinyint] NULL,
-      [sth_vergi] [float] NULL,
-      [sth_masraf_vergi_pntr] [tinyint] NULL,
-      [sth_masraf_vergi] [float] NULL,
-      [sth_netagirlik] [float] NULL,
-      [sth_odeme_op] [int] NULL,
-      [sth_aciklama] [nvarchar](50) NULL,
-      [sth_sip_uid] [uniqueidentifier] NULL,
-      [sth_fat_uid] [uniqueidentifier] NULL,
-      [sth_giris_depo_no] [int] NULL,
-      [sth_cikis_depo_no] [int] NULL,
-      [sth_malkbl_sevk_tarihi] [datetime] NULL,
-      [sth_cari_srm_merkezi] [nvarchar](25) NULL,
-      [sth_stok_srm_merkezi] [nvarchar](25) NULL,
-      [sth_fis_tarihi] [datetime] NULL,
-      [sth_fis_sirano] [int] NULL,
-      [sth_vergisiz_fl] [bit] NULL,
-      [sth_maliyet_ana] [float] NULL,
-      [sth_maliyet_alternatif] [float] NULL,
-      [sth_maliyet_orjinal] [float] NULL,
-      [sth_adres_no] [int] NULL,
-      [sth_parti_kodu] [nvarchar](25) NULL,
-      [sth_lot_no] [int] NULL,
-      [sth_kons_uid] [uniqueidentifier] NULL,
-      [sth_proje_kodu] [nvarchar](25) NULL,
-      [sth_exim_kodu] [nvarchar](25) NULL,
-      [sth_otv_pntr] [tinyint] NULL,
-      [sth_otv_vergi] [float] NULL,
-      [sth_brutagirlik] [float] NULL,
-      [sth_disticaret_turu] [tinyint] NULL,
-      [sth_otvtutari] [float] NULL,
-      [sth_otvvergisiz_fl] [bit] NULL,
-      [sth_oiv_pntr] [tinyint] NULL,
-      [sth_oiv_vergi] [float] NULL,
-      [sth_oivvergisiz_fl] [bit] NULL,
-      [sth_fiyat_liste_no] [int] NULL,
-      [sth_oivtutari] [float] NULL,
-      [sth_Tevkifat_turu] [tinyint] NULL,
-      [sth_nakliyedeposu] [int] NULL,
-      [sth_nakliyedurumu] [tinyint] NULL,
-      [sth_yetkili_uid] [uniqueidentifier] NULL,
-      [sth_taxfree_fl] [bit] NULL,
-      [sth_ilave_edilecek_kdv] [float] NULL,
-      [sth_ismerkezi_kodu] [nvarchar](25) NULL,
-      [sth_HareketGrupKodu1] [nvarchar](25) NULL,
-      [sth_HareketGrupKodu2] [nvarchar](25) NULL,
-      [sth_HareketGrupKodu3] [nvarchar](25) NULL,
-      [sth_Olcu1] [float] NULL,
-      [sth_Olcu2] [float] NULL,
-      [sth_Olcu3] [float] NULL,
-      [sth_Olcu4] [float] NULL,
-      [sth_Olcu5] [float] NULL,
-      [sth_FormulMiktarNo] [tinyint] NULL,
-      [sth_FormulMiktar] [float] NULL,
-      [sth_eirs_senaryo] [tinyint] NULL,
-      [sth_eirs_tipi] [tinyint] NULL,
-      [sth_teslim_tarihi] [datetime] NULL,
-      [sth_matbu_fl] [bit] NULL,
-      [sth_satis_fiyat_doviz_cinsi] [tinyint] NULL,
-      [sth_satis_fiyat_doviz_kuru] [float] NULL,
-      [sth_eticaret_kanal_kodu] [nvarchar](25) NULL,
-      [sth_bagli_ithalat_kodu] [nvarchar](25) NULL,
-      [sth_tevkifat_sifirlandi_fl] [bit] NULL,
-      [integrationCode] [nvarchar](50) NULL,
-    CONSTRAINT [NDX_S_20250624_1001_00] PRIMARY KEY CLUSTERED 
-    (
-      [sth_Guid] ASC
-    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-    ) ON [PRIMARY];
-    ALTER TABLE [dbo].[S_20250624_1001] ADD  DEFAULT (newid()) FOR [sth_Guid];
-    ALTER TABLE [dbo].[S_20250624_1001] ADD  DEFAULT ((0)) FOR [sth_DBCno];
-    ALTER TABLE [dbo].[S_20250624_1001] ADD  DEFAULT (getdate()) FOR [sth_create_date];
-    EXEC sys.sp_addextendedproperty @name=N'version', @value=N'37a' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'S_20250624_1001';
-  END
-    
+          SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN 2.7227722772277048 ELSE 0 END;
+          SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN 2.7227722772277048 ELSE 0 END;
+          SELECT @Vergi2=@Vergi2 + CASE WHEN @VergiPntr=2 THEN 2.7227722772277048 ELSE 0 END;
+          SELECT @Vergi3=@Vergi3 + CASE WHEN @VergiPntr=3 THEN 2.7227722772277048 ELSE 0 END;
+          SELECT @Vergi4=@Vergi4 + CASE WHEN @VergiPntr=4 THEN 2.7227722772277048 ELSE 0 END;
+          SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN 2.7227722772277048 ELSE 0 END;
+          SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN 2.7227722772277048 ELSE 0 END;
+        
+          INSERT INTO S_20250622_1001 (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
+          sth_tevkifat_sifirlandi_fl, integrationCode)
+          VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), 
+          '', '', '', 0, 0, @Tarih, 1 /*sth_tip*/, 1 /*sth_cins*/, 0 /*sth_normal_iade*/,1 /*sth_evraktip*/, 
+          @EvrakSeri, @EvrakSira, @SatirNo, '0' /*sth_belge_no*/, @Tarih /*sth_belge_tarih*/,
+          '14013784' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
+          0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
+          0 /*sth_sat_iskmas4*/, 0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/,
+          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, '' /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
+          '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 0 /*sth_har_doviz_cinsi*/, 0 /*sth_har_doviz_kuru*/, 0 /*sth_alt_doviz_kuru*/, 
+          0 /*sth_stok_doviz_cinsi*/, 0 /*sth_stok_doviz_kuru*/, 5 /*sth_miktar*/, 0 /*sth_miktar2*/, 1 /*sth_birim_pntr*/, 
+          272.2772277227723 /*sth_tutar*/, 0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 
+          0 /*sth_masraf1*/, 0 /*sth_masraf2*/, 0 /*sth_masraf3*/, 0 /*sth_masraf4*/, @VergiPntr /*sth_vergi_pntr*/, 
+          2.7227722772277048 /*sth_vergi*/, 0 /*sth_masraf_vergi_pntr*/, 0 /*sth_masraf_vergi*/, 0 /*sth_netagirlik*/, 0 /*sth_odeme_op*/,
+          '8692813005116' /*sth_aciklama*/, '00000000-0000-0000-0000-000000000000' /*sth_sip_uid*/, '00000000-0000-0000-0000-000000000000' /*sth_fat_uid*/, 
+          0 /*sth_giris_depo_no*/, @DepoNo /*sth_cikis_depo_no*/, @Tarih /*sth_malkbl_sevk_tarihi*/, '1001' /*sth_cari_srm_merkezi*/, 
+          '1001' /*sth_stok_srm_merkezi*/, '1899-12-30 00:00:00.000' /*sth_fis_tarihi*/, 0 /*sth_fis_sirano*/, 
+          0 /*sth_vergisiz_fl*/, 0 /*sth_maliyet_ana*/, 0 /*sth_maliyet_alternatif*/, 0 /*sth_maliyet_orjinal*/, 0 /*sth_adres_no*/, 
+          '' /*sth_parti_kodu*/, 0 /*sth_lot_no*/, '00000000-0000-0000-0000-000000000000' /*sth_kons_uid*/, 
+          '' /*sth_proje_kodu*/, '' /*sth_exim_kodu*/, 0 /*sth_otv_pntr*/, 0 /*sth_otv_vergi*/, 
+          0 /*sth_brutagirlik*/, 1 /*sth_disticaret_turu*/, 0 /*sth_otvtutari*/, 0 /*sth_otvvergisiz_fl*/, 0 /*sth_oiv_pntr*/, 
+          0 /*sth_oiv_vergi*/, 0 /*sth_oivvergisiz_fl*/, 1 /*sth_fiyat_liste_no*/, 0 /*sth_oivtutari*/, 0 /*sth_Tevkifat_turu*/, 
+          0 /*sth_nakliyedeposu*/, 0 /*sth_nakliyedurumu*/, '00000000-0000-0000-0000-000000000000' /*sth_yetkili_uid*/, 0 /*sth_taxfree_fl*/, 
+          0 /*sth_ilave_edilecek_kdv*/, '' /*sth_ismerkezi_kodu*/, '' /*sth_HareketGrupKodu1*/, '' /*sth_HareketGrupKodu2*/, '' /*sth_HareketGrupKodu3*/, 
+          0 /*sth_Olcu1*/, 0 /*sth_Olcu2*/, 0 /*sth_Olcu3*/, 0 /*sth_Olcu4*/, 0 /*sth_Olcu5*/, 0 /*sth_FormulMiktarNo*/, 0 /*sth_FormulMiktar*/, 
+          0 /*sth_eirs_senaryo*/, 0 /*sth_eirs_tipi*/, '1899-12-30 00:00:00.000' /*sth_teslim_tarihi*/, 0 /*sth_matbu_fl*/, 0 /*sth_satis_fiyat_doviz_cinsi*/, 
+          0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/,
+          '05a51a7a-2299-4232-8183-96dc224ebba1');
+        
+          SET @SatirNo=@SatirNo+1;
+          SET @VergiYuzde=10;
+          SELECT @VergiPntr=CASE WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(0)=@VergiYuzde THEN 0
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(1)=@VergiYuzde THEN 1
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(2)=@VergiYuzde THEN 2
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(3)=@VergiYuzde THEN 3
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(4)=@VergiYuzde THEN 4
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(5)=@VergiYuzde THEN 5
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(6)=@VergiYuzde THEN 6
+          ELSE 0 END;
 
-        COMMIT TRAN T216;
+          SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN 136.36363636363635 ELSE 0 END;
+          SELECT @VergiMatrah1=@VergiMatrah1 + CASE WHEN @VergiPntr=1 THEN 136.36363636363635 ELSE 0 END;
+          SELECT @VergiMatrah2=@VergiMatrah2 + CASE WHEN @VergiPntr=2 THEN 136.36363636363635 ELSE 0 END;
+          SELECT @VergiMatrah3=@VergiMatrah3 + CASE WHEN @VergiPntr=3 THEN 136.36363636363635 ELSE 0 END;
+          SELECT @VergiMatrah4=@VergiMatrah4 + CASE WHEN @VergiPntr=4 THEN 136.36363636363635 ELSE 0 END;
+          SELECT @VergiMatrah5=@VergiMatrah5 + CASE WHEN @VergiPntr=5 THEN 136.36363636363635 ELSE 0 END;
+          SELECT @VergiMatrah6=@VergiMatrah6 + CASE WHEN @VergiPntr=6 THEN 136.36363636363635 ELSE 0 END;
+
+          SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN 13.636363636363654 ELSE 0 END;
+          SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN 13.636363636363654 ELSE 0 END;
+          SELECT @Vergi2=@Vergi2 + CASE WHEN @VergiPntr=2 THEN 13.636363636363654 ELSE 0 END;
+          SELECT @Vergi3=@Vergi3 + CASE WHEN @VergiPntr=3 THEN 13.636363636363654 ELSE 0 END;
+          SELECT @Vergi4=@Vergi4 + CASE WHEN @VergiPntr=4 THEN 13.636363636363654 ELSE 0 END;
+          SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN 13.636363636363654 ELSE 0 END;
+          SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN 13.636363636363654 ELSE 0 END;
+        
+          INSERT INTO S_20250622_1001 (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
+          sth_tevkifat_sifirlandi_fl, integrationCode)
+          VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), 
+          '', '', '', 0, 0, @Tarih, 1 /*sth_tip*/, 1 /*sth_cins*/, 0 /*sth_normal_iade*/,1 /*sth_evraktip*/, 
+          @EvrakSeri, @EvrakSira, @SatirNo, '0' /*sth_belge_no*/, @Tarih /*sth_belge_tarih*/,
+          '14021519' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
+          0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
+          0 /*sth_sat_iskmas4*/, 0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/,
+          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, '' /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
+          '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 0 /*sth_har_doviz_cinsi*/, 0 /*sth_har_doviz_kuru*/, 0 /*sth_alt_doviz_kuru*/, 
+          0 /*sth_stok_doviz_cinsi*/, 0 /*sth_stok_doviz_kuru*/, 1 /*sth_miktar*/, 0 /*sth_miktar2*/, 1 /*sth_birim_pntr*/, 
+          136.36363636363635 /*sth_tutar*/, 0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 
+          0 /*sth_masraf1*/, 0 /*sth_masraf2*/, 0 /*sth_masraf3*/, 0 /*sth_masraf4*/, @VergiPntr /*sth_vergi_pntr*/, 
+          13.636363636363654 /*sth_vergi*/, 0 /*sth_masraf_vergi_pntr*/, 0 /*sth_masraf_vergi*/, 0 /*sth_netagirlik*/, 0 /*sth_odeme_op*/,
+          '8680014081060' /*sth_aciklama*/, '00000000-0000-0000-0000-000000000000' /*sth_sip_uid*/, '00000000-0000-0000-0000-000000000000' /*sth_fat_uid*/, 
+          0 /*sth_giris_depo_no*/, @DepoNo /*sth_cikis_depo_no*/, @Tarih /*sth_malkbl_sevk_tarihi*/, '1001' /*sth_cari_srm_merkezi*/, 
+          '1001' /*sth_stok_srm_merkezi*/, '1899-12-30 00:00:00.000' /*sth_fis_tarihi*/, 0 /*sth_fis_sirano*/, 
+          0 /*sth_vergisiz_fl*/, 0 /*sth_maliyet_ana*/, 0 /*sth_maliyet_alternatif*/, 0 /*sth_maliyet_orjinal*/, 0 /*sth_adres_no*/, 
+          '' /*sth_parti_kodu*/, 0 /*sth_lot_no*/, '00000000-0000-0000-0000-000000000000' /*sth_kons_uid*/, 
+          '' /*sth_proje_kodu*/, '' /*sth_exim_kodu*/, 0 /*sth_otv_pntr*/, 0 /*sth_otv_vergi*/, 
+          0 /*sth_brutagirlik*/, 1 /*sth_disticaret_turu*/, 0 /*sth_otvtutari*/, 0 /*sth_otvvergisiz_fl*/, 0 /*sth_oiv_pntr*/, 
+          0 /*sth_oiv_vergi*/, 0 /*sth_oivvergisiz_fl*/, 1 /*sth_fiyat_liste_no*/, 0 /*sth_oivtutari*/, 0 /*sth_Tevkifat_turu*/, 
+          0 /*sth_nakliyedeposu*/, 0 /*sth_nakliyedurumu*/, '00000000-0000-0000-0000-000000000000' /*sth_yetkili_uid*/, 0 /*sth_taxfree_fl*/, 
+          0 /*sth_ilave_edilecek_kdv*/, '' /*sth_ismerkezi_kodu*/, '' /*sth_HareketGrupKodu1*/, '' /*sth_HareketGrupKodu2*/, '' /*sth_HareketGrupKodu3*/, 
+          0 /*sth_Olcu1*/, 0 /*sth_Olcu2*/, 0 /*sth_Olcu3*/, 0 /*sth_Olcu4*/, 0 /*sth_Olcu5*/, 0 /*sth_FormulMiktarNo*/, 0 /*sth_FormulMiktar*/, 
+          0 /*sth_eirs_senaryo*/, 0 /*sth_eirs_tipi*/, '1899-12-30 00:00:00.000' /*sth_teslim_tarihi*/, 0 /*sth_matbu_fl*/, 0 /*sth_satis_fiyat_doviz_cinsi*/, 
+          0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/,
+          '05a51a7a-2299-4232-8183-96dc224ebba1');
+        
+          SET @SatirNo=@SatirNo+1;
+          SET @VergiYuzde=1;
+          SELECT @VergiPntr=CASE WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(0)=@VergiYuzde THEN 0
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(1)=@VergiYuzde THEN 1
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(2)=@VergiYuzde THEN 2
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(3)=@VergiYuzde THEN 3
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(4)=@VergiYuzde THEN 4
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(5)=@VergiYuzde THEN 5
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(6)=@VergiYuzde THEN 6
+          ELSE 0 END;
+
+          SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN 69.3069306930693 ELSE 0 END;
+          SELECT @VergiMatrah1=@VergiMatrah1 + CASE WHEN @VergiPntr=1 THEN 69.3069306930693 ELSE 0 END;
+          SELECT @VergiMatrah2=@VergiMatrah2 + CASE WHEN @VergiPntr=2 THEN 69.3069306930693 ELSE 0 END;
+          SELECT @VergiMatrah3=@VergiMatrah3 + CASE WHEN @VergiPntr=3 THEN 69.3069306930693 ELSE 0 END;
+          SELECT @VergiMatrah4=@VergiMatrah4 + CASE WHEN @VergiPntr=4 THEN 69.3069306930693 ELSE 0 END;
+          SELECT @VergiMatrah5=@VergiMatrah5 + CASE WHEN @VergiPntr=5 THEN 69.3069306930693 ELSE 0 END;
+          SELECT @VergiMatrah6=@VergiMatrah6 + CASE WHEN @VergiPntr=6 THEN 69.3069306930693 ELSE 0 END;
+
+          SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN 0.6930693069306955 ELSE 0 END;
+          SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN 0.6930693069306955 ELSE 0 END;
+          SELECT @Vergi2=@Vergi2 + CASE WHEN @VergiPntr=2 THEN 0.6930693069306955 ELSE 0 END;
+          SELECT @Vergi3=@Vergi3 + CASE WHEN @VergiPntr=3 THEN 0.6930693069306955 ELSE 0 END;
+          SELECT @Vergi4=@Vergi4 + CASE WHEN @VergiPntr=4 THEN 0.6930693069306955 ELSE 0 END;
+          SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN 0.6930693069306955 ELSE 0 END;
+          SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN 0.6930693069306955 ELSE 0 END;
+        
+          INSERT INTO S_20250622_1001 (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
+          sth_tevkifat_sifirlandi_fl, integrationCode)
+          VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), 
+          '', '', '', 0, 0, @Tarih, 1 /*sth_tip*/, 1 /*sth_cins*/, 0 /*sth_normal_iade*/,1 /*sth_evraktip*/, 
+          @EvrakSeri, @EvrakSira, @SatirNo, '0' /*sth_belge_no*/, @Tarih /*sth_belge_tarih*/,
+          '14026623' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
+          0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
+          0 /*sth_sat_iskmas4*/, 0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/,
+          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, '' /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
+          '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 0 /*sth_har_doviz_cinsi*/, 0 /*sth_har_doviz_kuru*/, 0 /*sth_alt_doviz_kuru*/, 
+          0 /*sth_stok_doviz_cinsi*/, 0 /*sth_stok_doviz_kuru*/, 1 /*sth_miktar*/, 0 /*sth_miktar2*/, 1 /*sth_birim_pntr*/, 
+          69.3069306930693 /*sth_tutar*/, 0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 
+          0 /*sth_masraf1*/, 0 /*sth_masraf2*/, 0 /*sth_masraf3*/, 0 /*sth_masraf4*/, @VergiPntr /*sth_vergi_pntr*/, 
+          0.6930693069306955 /*sth_vergi*/, 0 /*sth_masraf_vergi_pntr*/, 0 /*sth_masraf_vergi*/, 0 /*sth_netagirlik*/, 0 /*sth_odeme_op*/,
+          '08697432340174' /*sth_aciklama*/, '00000000-0000-0000-0000-000000000000' /*sth_sip_uid*/, '00000000-0000-0000-0000-000000000000' /*sth_fat_uid*/, 
+          0 /*sth_giris_depo_no*/, @DepoNo /*sth_cikis_depo_no*/, @Tarih /*sth_malkbl_sevk_tarihi*/, '1001' /*sth_cari_srm_merkezi*/, 
+          '1001' /*sth_stok_srm_merkezi*/, '1899-12-30 00:00:00.000' /*sth_fis_tarihi*/, 0 /*sth_fis_sirano*/, 
+          0 /*sth_vergisiz_fl*/, 0 /*sth_maliyet_ana*/, 0 /*sth_maliyet_alternatif*/, 0 /*sth_maliyet_orjinal*/, 0 /*sth_adres_no*/, 
+          '' /*sth_parti_kodu*/, 0 /*sth_lot_no*/, '00000000-0000-0000-0000-000000000000' /*sth_kons_uid*/, 
+          '' /*sth_proje_kodu*/, '' /*sth_exim_kodu*/, 0 /*sth_otv_pntr*/, 0 /*sth_otv_vergi*/, 
+          0 /*sth_brutagirlik*/, 1 /*sth_disticaret_turu*/, 0 /*sth_otvtutari*/, 0 /*sth_otvvergisiz_fl*/, 0 /*sth_oiv_pntr*/, 
+          0 /*sth_oiv_vergi*/, 0 /*sth_oivvergisiz_fl*/, 1 /*sth_fiyat_liste_no*/, 0 /*sth_oivtutari*/, 0 /*sth_Tevkifat_turu*/, 
+          0 /*sth_nakliyedeposu*/, 0 /*sth_nakliyedurumu*/, '00000000-0000-0000-0000-000000000000' /*sth_yetkili_uid*/, 0 /*sth_taxfree_fl*/, 
+          0 /*sth_ilave_edilecek_kdv*/, '' /*sth_ismerkezi_kodu*/, '' /*sth_HareketGrupKodu1*/, '' /*sth_HareketGrupKodu2*/, '' /*sth_HareketGrupKodu3*/, 
+          0 /*sth_Olcu1*/, 0 /*sth_Olcu2*/, 0 /*sth_Olcu3*/, 0 /*sth_Olcu4*/, 0 /*sth_Olcu5*/, 0 /*sth_FormulMiktarNo*/, 0 /*sth_FormulMiktar*/, 
+          0 /*sth_eirs_senaryo*/, 0 /*sth_eirs_tipi*/, '1899-12-30 00:00:00.000' /*sth_teslim_tarihi*/, 0 /*sth_matbu_fl*/, 0 /*sth_satis_fiyat_doviz_cinsi*/, 
+          0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/,
+          '05a51a7a-2299-4232-8183-96dc224ebba1');
+        
+          SET @SatirNo=@SatirNo+1;
+          SET @VergiYuzde=10;
+          SELECT @VergiPntr=CASE WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(0)=@VergiYuzde THEN 0
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(1)=@VergiYuzde THEN 1
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(2)=@VergiYuzde THEN 2
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(3)=@VergiYuzde THEN 3
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(4)=@VergiYuzde THEN 4
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(5)=@VergiYuzde THEN 5
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(6)=@VergiYuzde THEN 6
+          ELSE 0 END;
+
+          SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN 134.0909090909091 ELSE 0 END;
+          SELECT @VergiMatrah1=@VergiMatrah1 + CASE WHEN @VergiPntr=1 THEN 134.0909090909091 ELSE 0 END;
+          SELECT @VergiMatrah2=@VergiMatrah2 + CASE WHEN @VergiPntr=2 THEN 134.0909090909091 ELSE 0 END;
+          SELECT @VergiMatrah3=@VergiMatrah3 + CASE WHEN @VergiPntr=3 THEN 134.0909090909091 ELSE 0 END;
+          SELECT @VergiMatrah4=@VergiMatrah4 + CASE WHEN @VergiPntr=4 THEN 134.0909090909091 ELSE 0 END;
+          SELECT @VergiMatrah5=@VergiMatrah5 + CASE WHEN @VergiPntr=5 THEN 134.0909090909091 ELSE 0 END;
+          SELECT @VergiMatrah6=@VergiMatrah6 + CASE WHEN @VergiPntr=6 THEN 134.0909090909091 ELSE 0 END;
+
+          SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN 13.409090909090907 ELSE 0 END;
+          SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN 13.409090909090907 ELSE 0 END;
+          SELECT @Vergi2=@Vergi2 + CASE WHEN @VergiPntr=2 THEN 13.409090909090907 ELSE 0 END;
+          SELECT @Vergi3=@Vergi3 + CASE WHEN @VergiPntr=3 THEN 13.409090909090907 ELSE 0 END;
+          SELECT @Vergi4=@Vergi4 + CASE WHEN @VergiPntr=4 THEN 13.409090909090907 ELSE 0 END;
+          SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN 13.409090909090907 ELSE 0 END;
+          SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN 13.409090909090907 ELSE 0 END;
+        
+          INSERT INTO S_20250622_1001 (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
+          sth_tevkifat_sifirlandi_fl, integrationCode)
+          VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), 
+          '', '', '', 0, 0, @Tarih, 1 /*sth_tip*/, 1 /*sth_cins*/, 0 /*sth_normal_iade*/,1 /*sth_evraktip*/, 
+          @EvrakSeri, @EvrakSira, @SatirNo, '0' /*sth_belge_no*/, @Tarih /*sth_belge_tarih*/,
+          '2800000537' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
+          0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
+          0 /*sth_sat_iskmas4*/, 0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/,
+          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, '' /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
+          '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 0 /*sth_har_doviz_cinsi*/, 0 /*sth_har_doviz_kuru*/, 0 /*sth_alt_doviz_kuru*/, 
+          0 /*sth_stok_doviz_cinsi*/, 0 /*sth_stok_doviz_kuru*/, 1 /*sth_miktar*/, 0 /*sth_miktar2*/, 1 /*sth_birim_pntr*/, 
+          134.0909090909091 /*sth_tutar*/, 0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 
+          0 /*sth_masraf1*/, 0 /*sth_masraf2*/, 0 /*sth_masraf3*/, 0 /*sth_masraf4*/, @VergiPntr /*sth_vergi_pntr*/, 
+          13.409090909090907 /*sth_vergi*/, 0 /*sth_masraf_vergi_pntr*/, 0 /*sth_masraf_vergi*/, 0 /*sth_netagirlik*/, 0 /*sth_odeme_op*/,
+          '8690525500875' /*sth_aciklama*/, '00000000-0000-0000-0000-000000000000' /*sth_sip_uid*/, '00000000-0000-0000-0000-000000000000' /*sth_fat_uid*/, 
+          0 /*sth_giris_depo_no*/, @DepoNo /*sth_cikis_depo_no*/, @Tarih /*sth_malkbl_sevk_tarihi*/, '1001' /*sth_cari_srm_merkezi*/, 
+          '1001' /*sth_stok_srm_merkezi*/, '1899-12-30 00:00:00.000' /*sth_fis_tarihi*/, 0 /*sth_fis_sirano*/, 
+          0 /*sth_vergisiz_fl*/, 0 /*sth_maliyet_ana*/, 0 /*sth_maliyet_alternatif*/, 0 /*sth_maliyet_orjinal*/, 0 /*sth_adres_no*/, 
+          '' /*sth_parti_kodu*/, 0 /*sth_lot_no*/, '00000000-0000-0000-0000-000000000000' /*sth_kons_uid*/, 
+          '' /*sth_proje_kodu*/, '' /*sth_exim_kodu*/, 0 /*sth_otv_pntr*/, 0 /*sth_otv_vergi*/, 
+          0 /*sth_brutagirlik*/, 1 /*sth_disticaret_turu*/, 0 /*sth_otvtutari*/, 0 /*sth_otvvergisiz_fl*/, 0 /*sth_oiv_pntr*/, 
+          0 /*sth_oiv_vergi*/, 0 /*sth_oivvergisiz_fl*/, 1 /*sth_fiyat_liste_no*/, 0 /*sth_oivtutari*/, 0 /*sth_Tevkifat_turu*/, 
+          0 /*sth_nakliyedeposu*/, 0 /*sth_nakliyedurumu*/, '00000000-0000-0000-0000-000000000000' /*sth_yetkili_uid*/, 0 /*sth_taxfree_fl*/, 
+          0 /*sth_ilave_edilecek_kdv*/, '' /*sth_ismerkezi_kodu*/, '' /*sth_HareketGrupKodu1*/, '' /*sth_HareketGrupKodu2*/, '' /*sth_HareketGrupKodu3*/, 
+          0 /*sth_Olcu1*/, 0 /*sth_Olcu2*/, 0 /*sth_Olcu3*/, 0 /*sth_Olcu4*/, 0 /*sth_Olcu5*/, 0 /*sth_FormulMiktarNo*/, 0 /*sth_FormulMiktar*/, 
+          0 /*sth_eirs_senaryo*/, 0 /*sth_eirs_tipi*/, '1899-12-30 00:00:00.000' /*sth_teslim_tarihi*/, 0 /*sth_matbu_fl*/, 0 /*sth_satis_fiyat_doviz_cinsi*/, 
+          0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/,
+          '05a51a7a-2299-4232-8183-96dc224ebba1');
+        
+          SET @SatirNo=@SatirNo+1;
+          SET @VergiYuzde=1;
+          SELECT @VergiPntr=CASE WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(0)=@VergiYuzde THEN 0
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(1)=@VergiYuzde THEN 1
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(2)=@VergiYuzde THEN 2
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(3)=@VergiYuzde THEN 3
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(4)=@VergiYuzde THEN 4
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(5)=@VergiYuzde THEN 5
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(6)=@VergiYuzde THEN 6
+          ELSE 0 END;
+
+          SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN 79.20792079207921 ELSE 0 END;
+          SELECT @VergiMatrah1=@VergiMatrah1 + CASE WHEN @VergiPntr=1 THEN 79.20792079207921 ELSE 0 END;
+          SELECT @VergiMatrah2=@VergiMatrah2 + CASE WHEN @VergiPntr=2 THEN 79.20792079207921 ELSE 0 END;
+          SELECT @VergiMatrah3=@VergiMatrah3 + CASE WHEN @VergiPntr=3 THEN 79.20792079207921 ELSE 0 END;
+          SELECT @VergiMatrah4=@VergiMatrah4 + CASE WHEN @VergiPntr=4 THEN 79.20792079207921 ELSE 0 END;
+          SELECT @VergiMatrah5=@VergiMatrah5 + CASE WHEN @VergiPntr=5 THEN 79.20792079207921 ELSE 0 END;
+          SELECT @VergiMatrah6=@VergiMatrah6 + CASE WHEN @VergiPntr=6 THEN 79.20792079207921 ELSE 0 END;
+
+          SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN 0.7920792079207928 ELSE 0 END;
+          SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN 0.7920792079207928 ELSE 0 END;
+          SELECT @Vergi2=@Vergi2 + CASE WHEN @VergiPntr=2 THEN 0.7920792079207928 ELSE 0 END;
+          SELECT @Vergi3=@Vergi3 + CASE WHEN @VergiPntr=3 THEN 0.7920792079207928 ELSE 0 END;
+          SELECT @Vergi4=@Vergi4 + CASE WHEN @VergiPntr=4 THEN 0.7920792079207928 ELSE 0 END;
+          SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN 0.7920792079207928 ELSE 0 END;
+          SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN 0.7920792079207928 ELSE 0 END;
+        
+          INSERT INTO S_20250622_1001 (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
+          sth_tevkifat_sifirlandi_fl, integrationCode)
+          VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), 
+          '', '', '', 0, 0, @Tarih, 1 /*sth_tip*/, 1 /*sth_cins*/, 0 /*sth_normal_iade*/,1 /*sth_evraktip*/, 
+          @EvrakSeri, @EvrakSira, @SatirNo, '0' /*sth_belge_no*/, @Tarih /*sth_belge_tarih*/,
+          '2800000533' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
+          0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
+          0 /*sth_sat_iskmas4*/, 0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/,
+          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, '' /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
+          '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 0 /*sth_har_doviz_cinsi*/, 0 /*sth_har_doviz_kuru*/, 0 /*sth_alt_doviz_kuru*/, 
+          0 /*sth_stok_doviz_cinsi*/, 0 /*sth_stok_doviz_kuru*/, 1 /*sth_miktar*/, 0 /*sth_miktar2*/, 1 /*sth_birim_pntr*/, 
+          79.20792079207921 /*sth_tutar*/, 0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 
+          0 /*sth_masraf1*/, 0 /*sth_masraf2*/, 0 /*sth_masraf3*/, 0 /*sth_masraf4*/, @VergiPntr /*sth_vergi_pntr*/, 
+          0.7920792079207928 /*sth_vergi*/, 0 /*sth_masraf_vergi_pntr*/, 0 /*sth_masraf_vergi*/, 0 /*sth_netagirlik*/, 0 /*sth_odeme_op*/,
+          '8690525041453' /*sth_aciklama*/, '00000000-0000-0000-0000-000000000000' /*sth_sip_uid*/, '00000000-0000-0000-0000-000000000000' /*sth_fat_uid*/, 
+          0 /*sth_giris_depo_no*/, @DepoNo /*sth_cikis_depo_no*/, @Tarih /*sth_malkbl_sevk_tarihi*/, '1001' /*sth_cari_srm_merkezi*/, 
+          '1001' /*sth_stok_srm_merkezi*/, '1899-12-30 00:00:00.000' /*sth_fis_tarihi*/, 0 /*sth_fis_sirano*/, 
+          0 /*sth_vergisiz_fl*/, 0 /*sth_maliyet_ana*/, 0 /*sth_maliyet_alternatif*/, 0 /*sth_maliyet_orjinal*/, 0 /*sth_adres_no*/, 
+          '' /*sth_parti_kodu*/, 0 /*sth_lot_no*/, '00000000-0000-0000-0000-000000000000' /*sth_kons_uid*/, 
+          '' /*sth_proje_kodu*/, '' /*sth_exim_kodu*/, 0 /*sth_otv_pntr*/, 0 /*sth_otv_vergi*/, 
+          0 /*sth_brutagirlik*/, 1 /*sth_disticaret_turu*/, 0 /*sth_otvtutari*/, 0 /*sth_otvvergisiz_fl*/, 0 /*sth_oiv_pntr*/, 
+          0 /*sth_oiv_vergi*/, 0 /*sth_oivvergisiz_fl*/, 1 /*sth_fiyat_liste_no*/, 0 /*sth_oivtutari*/, 0 /*sth_Tevkifat_turu*/, 
+          0 /*sth_nakliyedeposu*/, 0 /*sth_nakliyedurumu*/, '00000000-0000-0000-0000-000000000000' /*sth_yetkili_uid*/, 0 /*sth_taxfree_fl*/, 
+          0 /*sth_ilave_edilecek_kdv*/, '' /*sth_ismerkezi_kodu*/, '' /*sth_HareketGrupKodu1*/, '' /*sth_HareketGrupKodu2*/, '' /*sth_HareketGrupKodu3*/, 
+          0 /*sth_Olcu1*/, 0 /*sth_Olcu2*/, 0 /*sth_Olcu3*/, 0 /*sth_Olcu4*/, 0 /*sth_Olcu5*/, 0 /*sth_FormulMiktarNo*/, 0 /*sth_FormulMiktar*/, 
+          0 /*sth_eirs_senaryo*/, 0 /*sth_eirs_tipi*/, '1899-12-30 00:00:00.000' /*sth_teslim_tarihi*/, 0 /*sth_matbu_fl*/, 0 /*sth_satis_fiyat_doviz_cinsi*/, 
+          0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/,
+          '05a51a7a-2299-4232-8183-96dc224ebba1');
+        
+          SET @SatirNo=@SatirNo+1;
+          SET @VergiYuzde=10;
+          SELECT @VergiPntr=CASE WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(0)=@VergiYuzde THEN 0
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(1)=@VergiYuzde THEN 1
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(2)=@VergiYuzde THEN 2
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(3)=@VergiYuzde THEN 3
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(4)=@VergiYuzde THEN 4
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(5)=@VergiYuzde THEN 5
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(6)=@VergiYuzde THEN 6
+          ELSE 0 END;
+
+          SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN 138.18181818181816 ELSE 0 END;
+          SELECT @VergiMatrah1=@VergiMatrah1 + CASE WHEN @VergiPntr=1 THEN 138.18181818181816 ELSE 0 END;
+          SELECT @VergiMatrah2=@VergiMatrah2 + CASE WHEN @VergiPntr=2 THEN 138.18181818181816 ELSE 0 END;
+          SELECT @VergiMatrah3=@VergiMatrah3 + CASE WHEN @VergiPntr=3 THEN 138.18181818181816 ELSE 0 END;
+          SELECT @VergiMatrah4=@VergiMatrah4 + CASE WHEN @VergiPntr=4 THEN 138.18181818181816 ELSE 0 END;
+          SELECT @VergiMatrah5=@VergiMatrah5 + CASE WHEN @VergiPntr=5 THEN 138.18181818181816 ELSE 0 END;
+          SELECT @VergiMatrah6=@VergiMatrah6 + CASE WHEN @VergiPntr=6 THEN 138.18181818181816 ELSE 0 END;
+
+          SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN 13.818181818181841 ELSE 0 END;
+          SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN 13.818181818181841 ELSE 0 END;
+          SELECT @Vergi2=@Vergi2 + CASE WHEN @VergiPntr=2 THEN 13.818181818181841 ELSE 0 END;
+          SELECT @Vergi3=@Vergi3 + CASE WHEN @VergiPntr=3 THEN 13.818181818181841 ELSE 0 END;
+          SELECT @Vergi4=@Vergi4 + CASE WHEN @VergiPntr=4 THEN 13.818181818181841 ELSE 0 END;
+          SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN 13.818181818181841 ELSE 0 END;
+          SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN 13.818181818181841 ELSE 0 END;
+        
+          INSERT INTO S_20250622_1001 (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
+          sth_tevkifat_sifirlandi_fl, integrationCode)
+          VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), 
+          '', '', '', 0, 0, @Tarih, 1 /*sth_tip*/, 1 /*sth_cins*/, 0 /*sth_normal_iade*/,1 /*sth_evraktip*/, 
+          @EvrakSeri, @EvrakSira, @SatirNo, '0' /*sth_belge_no*/, @Tarih /*sth_belge_tarih*/,
+          '1403606' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
+          0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
+          0 /*sth_sat_iskmas4*/, 0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/,
+          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, '' /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
+          '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 0 /*sth_har_doviz_cinsi*/, 0 /*sth_har_doviz_kuru*/, 0 /*sth_alt_doviz_kuru*/, 
+          0 /*sth_stok_doviz_cinsi*/, 0 /*sth_stok_doviz_kuru*/, 1 /*sth_miktar*/, 0 /*sth_miktar2*/, 1 /*sth_birim_pntr*/, 
+          138.18181818181816 /*sth_tutar*/, 0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 
+          0 /*sth_masraf1*/, 0 /*sth_masraf2*/, 0 /*sth_masraf3*/, 0 /*sth_masraf4*/, @VergiPntr /*sth_vergi_pntr*/, 
+          13.818181818181841 /*sth_vergi*/, 0 /*sth_masraf_vergi_pntr*/, 0 /*sth_masraf_vergi*/, 0 /*sth_netagirlik*/, 0 /*sth_odeme_op*/,
+          '5000112665338' /*sth_aciklama*/, '00000000-0000-0000-0000-000000000000' /*sth_sip_uid*/, '00000000-0000-0000-0000-000000000000' /*sth_fat_uid*/, 
+          0 /*sth_giris_depo_no*/, @DepoNo /*sth_cikis_depo_no*/, @Tarih /*sth_malkbl_sevk_tarihi*/, '1001' /*sth_cari_srm_merkezi*/, 
+          '1001' /*sth_stok_srm_merkezi*/, '1899-12-30 00:00:00.000' /*sth_fis_tarihi*/, 0 /*sth_fis_sirano*/, 
+          0 /*sth_vergisiz_fl*/, 0 /*sth_maliyet_ana*/, 0 /*sth_maliyet_alternatif*/, 0 /*sth_maliyet_orjinal*/, 0 /*sth_adres_no*/, 
+          '' /*sth_parti_kodu*/, 0 /*sth_lot_no*/, '00000000-0000-0000-0000-000000000000' /*sth_kons_uid*/, 
+          '' /*sth_proje_kodu*/, '' /*sth_exim_kodu*/, 0 /*sth_otv_pntr*/, 0 /*sth_otv_vergi*/, 
+          0 /*sth_brutagirlik*/, 1 /*sth_disticaret_turu*/, 0 /*sth_otvtutari*/, 0 /*sth_otvvergisiz_fl*/, 0 /*sth_oiv_pntr*/, 
+          0 /*sth_oiv_vergi*/, 0 /*sth_oivvergisiz_fl*/, 1 /*sth_fiyat_liste_no*/, 0 /*sth_oivtutari*/, 0 /*sth_Tevkifat_turu*/, 
+          0 /*sth_nakliyedeposu*/, 0 /*sth_nakliyedurumu*/, '00000000-0000-0000-0000-000000000000' /*sth_yetkili_uid*/, 0 /*sth_taxfree_fl*/, 
+          0 /*sth_ilave_edilecek_kdv*/, '' /*sth_ismerkezi_kodu*/, '' /*sth_HareketGrupKodu1*/, '' /*sth_HareketGrupKodu2*/, '' /*sth_HareketGrupKodu3*/, 
+          0 /*sth_Olcu1*/, 0 /*sth_Olcu2*/, 0 /*sth_Olcu3*/, 0 /*sth_Olcu4*/, 0 /*sth_Olcu5*/, 0 /*sth_FormulMiktarNo*/, 0 /*sth_FormulMiktar*/, 
+          0 /*sth_eirs_senaryo*/, 0 /*sth_eirs_tipi*/, '1899-12-30 00:00:00.000' /*sth_teslim_tarihi*/, 0 /*sth_matbu_fl*/, 0 /*sth_satis_fiyat_doviz_cinsi*/, 
+          0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/,
+          '05a51a7a-2299-4232-8183-96dc224ebba1');
+        
+          SET @SatirNo=@SatirNo+1;
+          SET @VergiYuzde=10;
+          SELECT @VergiPntr=CASE WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(0)=@VergiYuzde THEN 0
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(1)=@VergiYuzde THEN 1
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(2)=@VergiYuzde THEN 2
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(3)=@VergiYuzde THEN 3
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(4)=@VergiYuzde THEN 4
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(5)=@VergiYuzde THEN 5
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(6)=@VergiYuzde THEN 6
+          ELSE 0 END;
+
+          SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN 268.1818181818182 ELSE 0 END;
+          SELECT @VergiMatrah1=@VergiMatrah1 + CASE WHEN @VergiPntr=1 THEN 268.1818181818182 ELSE 0 END;
+          SELECT @VergiMatrah2=@VergiMatrah2 + CASE WHEN @VergiPntr=2 THEN 268.1818181818182 ELSE 0 END;
+          SELECT @VergiMatrah3=@VergiMatrah3 + CASE WHEN @VergiPntr=3 THEN 268.1818181818182 ELSE 0 END;
+          SELECT @VergiMatrah4=@VergiMatrah4 + CASE WHEN @VergiPntr=4 THEN 268.1818181818182 ELSE 0 END;
+          SELECT @VergiMatrah5=@VergiMatrah5 + CASE WHEN @VergiPntr=5 THEN 268.1818181818182 ELSE 0 END;
+          SELECT @VergiMatrah6=@VergiMatrah6 + CASE WHEN @VergiPntr=6 THEN 268.1818181818182 ELSE 0 END;
+
+          SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN 26.818181818181813 ELSE 0 END;
+          SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN 26.818181818181813 ELSE 0 END;
+          SELECT @Vergi2=@Vergi2 + CASE WHEN @VergiPntr=2 THEN 26.818181818181813 ELSE 0 END;
+          SELECT @Vergi3=@Vergi3 + CASE WHEN @VergiPntr=3 THEN 26.818181818181813 ELSE 0 END;
+          SELECT @Vergi4=@Vergi4 + CASE WHEN @VergiPntr=4 THEN 26.818181818181813 ELSE 0 END;
+          SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN 26.818181818181813 ELSE 0 END;
+          SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN 26.818181818181813 ELSE 0 END;
+        
+          INSERT INTO S_20250622_1001 (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
+          sth_tevkifat_sifirlandi_fl, integrationCode)
+          VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), 
+          '', '', '', 0, 0, @Tarih, 1 /*sth_tip*/, 1 /*sth_cins*/, 0 /*sth_normal_iade*/,1 /*sth_evraktip*/, 
+          @EvrakSeri, @EvrakSira, @SatirNo, '0' /*sth_belge_no*/, @Tarih /*sth_belge_tarih*/,
+          '14026834' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
+          0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
+          0 /*sth_sat_iskmas4*/, 0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/,
+          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, '' /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
+          '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 0 /*sth_har_doviz_cinsi*/, 0 /*sth_har_doviz_kuru*/, 0 /*sth_alt_doviz_kuru*/, 
+          0 /*sth_stok_doviz_cinsi*/, 0 /*sth_stok_doviz_kuru*/, 1 /*sth_miktar*/, 0 /*sth_miktar2*/, 1 /*sth_birim_pntr*/, 
+          268.1818181818182 /*sth_tutar*/, 0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 
+          0 /*sth_masraf1*/, 0 /*sth_masraf2*/, 0 /*sth_masraf3*/, 0 /*sth_masraf4*/, @VergiPntr /*sth_vergi_pntr*/, 
+          26.818181818181813 /*sth_vergi*/, 0 /*sth_masraf_vergi_pntr*/, 0 /*sth_masraf_vergi*/, 0 /*sth_netagirlik*/, 0 /*sth_odeme_op*/,
+          '8683789551707' /*sth_aciklama*/, '00000000-0000-0000-0000-000000000000' /*sth_sip_uid*/, '00000000-0000-0000-0000-000000000000' /*sth_fat_uid*/, 
+          0 /*sth_giris_depo_no*/, @DepoNo /*sth_cikis_depo_no*/, @Tarih /*sth_malkbl_sevk_tarihi*/, '1001' /*sth_cari_srm_merkezi*/, 
+          '1001' /*sth_stok_srm_merkezi*/, '1899-12-30 00:00:00.000' /*sth_fis_tarihi*/, 0 /*sth_fis_sirano*/, 
+          0 /*sth_vergisiz_fl*/, 0 /*sth_maliyet_ana*/, 0 /*sth_maliyet_alternatif*/, 0 /*sth_maliyet_orjinal*/, 0 /*sth_adres_no*/, 
+          '' /*sth_parti_kodu*/, 0 /*sth_lot_no*/, '00000000-0000-0000-0000-000000000000' /*sth_kons_uid*/, 
+          '' /*sth_proje_kodu*/, '' /*sth_exim_kodu*/, 0 /*sth_otv_pntr*/, 0 /*sth_otv_vergi*/, 
+          0 /*sth_brutagirlik*/, 1 /*sth_disticaret_turu*/, 0 /*sth_otvtutari*/, 0 /*sth_otvvergisiz_fl*/, 0 /*sth_oiv_pntr*/, 
+          0 /*sth_oiv_vergi*/, 0 /*sth_oivvergisiz_fl*/, 1 /*sth_fiyat_liste_no*/, 0 /*sth_oivtutari*/, 0 /*sth_Tevkifat_turu*/, 
+          0 /*sth_nakliyedeposu*/, 0 /*sth_nakliyedurumu*/, '00000000-0000-0000-0000-000000000000' /*sth_yetkili_uid*/, 0 /*sth_taxfree_fl*/, 
+          0 /*sth_ilave_edilecek_kdv*/, '' /*sth_ismerkezi_kodu*/, '' /*sth_HareketGrupKodu1*/, '' /*sth_HareketGrupKodu2*/, '' /*sth_HareketGrupKodu3*/, 
+          0 /*sth_Olcu1*/, 0 /*sth_Olcu2*/, 0 /*sth_Olcu3*/, 0 /*sth_Olcu4*/, 0 /*sth_Olcu5*/, 0 /*sth_FormulMiktarNo*/, 0 /*sth_FormulMiktar*/, 
+          0 /*sth_eirs_senaryo*/, 0 /*sth_eirs_tipi*/, '1899-12-30 00:00:00.000' /*sth_teslim_tarihi*/, 0 /*sth_matbu_fl*/, 0 /*sth_satis_fiyat_doviz_cinsi*/, 
+          0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/,
+          '05a51a7a-2299-4232-8183-96dc224ebba1');
+        
+          SET @SatirNo=@SatirNo+1;
+          SET @VergiYuzde=1;
+          SELECT @VergiPntr=CASE WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(0)=@VergiYuzde THEN 0
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(1)=@VergiYuzde THEN 1
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(2)=@VergiYuzde THEN 2
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(3)=@VergiYuzde THEN 3
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(4)=@VergiYuzde THEN 4
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(5)=@VergiYuzde THEN 5
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(6)=@VergiYuzde THEN 6
+          ELSE 0 END;
+
+          SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN 56.93069306930693 ELSE 0 END;
+          SELECT @VergiMatrah1=@VergiMatrah1 + CASE WHEN @VergiPntr=1 THEN 56.93069306930693 ELSE 0 END;
+          SELECT @VergiMatrah2=@VergiMatrah2 + CASE WHEN @VergiPntr=2 THEN 56.93069306930693 ELSE 0 END;
+          SELECT @VergiMatrah3=@VergiMatrah3 + CASE WHEN @VergiPntr=3 THEN 56.93069306930693 ELSE 0 END;
+          SELECT @VergiMatrah4=@VergiMatrah4 + CASE WHEN @VergiPntr=4 THEN 56.93069306930693 ELSE 0 END;
+          SELECT @VergiMatrah5=@VergiMatrah5 + CASE WHEN @VergiPntr=5 THEN 56.93069306930693 ELSE 0 END;
+          SELECT @VergiMatrah6=@VergiMatrah6 + CASE WHEN @VergiPntr=6 THEN 56.93069306930693 ELSE 0 END;
+
+          SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN 0.5693069306930667 ELSE 0 END;
+          SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN 0.5693069306930667 ELSE 0 END;
+          SELECT @Vergi2=@Vergi2 + CASE WHEN @VergiPntr=2 THEN 0.5693069306930667 ELSE 0 END;
+          SELECT @Vergi3=@Vergi3 + CASE WHEN @VergiPntr=3 THEN 0.5693069306930667 ELSE 0 END;
+          SELECT @Vergi4=@Vergi4 + CASE WHEN @VergiPntr=4 THEN 0.5693069306930667 ELSE 0 END;
+          SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN 0.5693069306930667 ELSE 0 END;
+          SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN 0.5693069306930667 ELSE 0 END;
+        
+          INSERT INTO S_20250622_1001 (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
+          sth_tevkifat_sifirlandi_fl, integrationCode)
+          VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), 
+          '', '', '', 0, 0, @Tarih, 1 /*sth_tip*/, 1 /*sth_cins*/, 0 /*sth_normal_iade*/,1 /*sth_evraktip*/, 
+          @EvrakSeri, @EvrakSira, @SatirNo, '0' /*sth_belge_no*/, @Tarih /*sth_belge_tarih*/,
+          '18016516' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
+          0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
+          0 /*sth_sat_iskmas4*/, 0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/,
+          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, '' /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
+          '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 0 /*sth_har_doviz_cinsi*/, 0 /*sth_har_doviz_kuru*/, 0 /*sth_alt_doviz_kuru*/, 
+          0 /*sth_stok_doviz_cinsi*/, 0 /*sth_stok_doviz_kuru*/, 1 /*sth_miktar*/, 0 /*sth_miktar2*/, 1 /*sth_birim_pntr*/, 
+          56.93069306930693 /*sth_tutar*/, 0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 
+          0 /*sth_masraf1*/, 0 /*sth_masraf2*/, 0 /*sth_masraf3*/, 0 /*sth_masraf4*/, @VergiPntr /*sth_vergi_pntr*/, 
+          0.5693069306930667 /*sth_vergi*/, 0 /*sth_masraf_vergi_pntr*/, 0 /*sth_masraf_vergi*/, 0 /*sth_netagirlik*/, 0 /*sth_odeme_op*/,
+          '68690504186689' /*sth_aciklama*/, '00000000-0000-0000-0000-000000000000' /*sth_sip_uid*/, '00000000-0000-0000-0000-000000000000' /*sth_fat_uid*/, 
+          0 /*sth_giris_depo_no*/, @DepoNo /*sth_cikis_depo_no*/, @Tarih /*sth_malkbl_sevk_tarihi*/, '1001' /*sth_cari_srm_merkezi*/, 
+          '1001' /*sth_stok_srm_merkezi*/, '1899-12-30 00:00:00.000' /*sth_fis_tarihi*/, 0 /*sth_fis_sirano*/, 
+          0 /*sth_vergisiz_fl*/, 0 /*sth_maliyet_ana*/, 0 /*sth_maliyet_alternatif*/, 0 /*sth_maliyet_orjinal*/, 0 /*sth_adres_no*/, 
+          '' /*sth_parti_kodu*/, 0 /*sth_lot_no*/, '00000000-0000-0000-0000-000000000000' /*sth_kons_uid*/, 
+          '' /*sth_proje_kodu*/, '' /*sth_exim_kodu*/, 0 /*sth_otv_pntr*/, 0 /*sth_otv_vergi*/, 
+          0 /*sth_brutagirlik*/, 1 /*sth_disticaret_turu*/, 0 /*sth_otvtutari*/, 0 /*sth_otvvergisiz_fl*/, 0 /*sth_oiv_pntr*/, 
+          0 /*sth_oiv_vergi*/, 0 /*sth_oivvergisiz_fl*/, 1 /*sth_fiyat_liste_no*/, 0 /*sth_oivtutari*/, 0 /*sth_Tevkifat_turu*/, 
+          0 /*sth_nakliyedeposu*/, 0 /*sth_nakliyedurumu*/, '00000000-0000-0000-0000-000000000000' /*sth_yetkili_uid*/, 0 /*sth_taxfree_fl*/, 
+          0 /*sth_ilave_edilecek_kdv*/, '' /*sth_ismerkezi_kodu*/, '' /*sth_HareketGrupKodu1*/, '' /*sth_HareketGrupKodu2*/, '' /*sth_HareketGrupKodu3*/, 
+          0 /*sth_Olcu1*/, 0 /*sth_Olcu2*/, 0 /*sth_Olcu3*/, 0 /*sth_Olcu4*/, 0 /*sth_Olcu5*/, 0 /*sth_FormulMiktarNo*/, 0 /*sth_FormulMiktar*/, 
+          0 /*sth_eirs_senaryo*/, 0 /*sth_eirs_tipi*/, '1899-12-30 00:00:00.000' /*sth_teslim_tarihi*/, 0 /*sth_matbu_fl*/, 0 /*sth_satis_fiyat_doviz_cinsi*/, 
+          0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/,
+          '05a51a7a-2299-4232-8183-96dc224ebba1');
+        
+          SET @SatirNo=@SatirNo+1;
+          SET @VergiYuzde=10;
+          SELECT @VergiPntr=CASE WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(0)=@VergiYuzde THEN 0
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(1)=@VergiYuzde THEN 1
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(2)=@VergiYuzde THEN 2
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(3)=@VergiYuzde THEN 3
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(4)=@VergiYuzde THEN 4
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(5)=@VergiYuzde THEN 5
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(6)=@VergiYuzde THEN 6
+          ELSE 0 END;
+
+          SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN 268.1818181818182 ELSE 0 END;
+          SELECT @VergiMatrah1=@VergiMatrah1 + CASE WHEN @VergiPntr=1 THEN 268.1818181818182 ELSE 0 END;
+          SELECT @VergiMatrah2=@VergiMatrah2 + CASE WHEN @VergiPntr=2 THEN 268.1818181818182 ELSE 0 END;
+          SELECT @VergiMatrah3=@VergiMatrah3 + CASE WHEN @VergiPntr=3 THEN 268.1818181818182 ELSE 0 END;
+          SELECT @VergiMatrah4=@VergiMatrah4 + CASE WHEN @VergiPntr=4 THEN 268.1818181818182 ELSE 0 END;
+          SELECT @VergiMatrah5=@VergiMatrah5 + CASE WHEN @VergiPntr=5 THEN 268.1818181818182 ELSE 0 END;
+          SELECT @VergiMatrah6=@VergiMatrah6 + CASE WHEN @VergiPntr=6 THEN 268.1818181818182 ELSE 0 END;
+
+          SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN 26.818181818181813 ELSE 0 END;
+          SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN 26.818181818181813 ELSE 0 END;
+          SELECT @Vergi2=@Vergi2 + CASE WHEN @VergiPntr=2 THEN 26.818181818181813 ELSE 0 END;
+          SELECT @Vergi3=@Vergi3 + CASE WHEN @VergiPntr=3 THEN 26.818181818181813 ELSE 0 END;
+          SELECT @Vergi4=@Vergi4 + CASE WHEN @VergiPntr=4 THEN 26.818181818181813 ELSE 0 END;
+          SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN 26.818181818181813 ELSE 0 END;
+          SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN 26.818181818181813 ELSE 0 END;
+        
+          INSERT INTO S_20250622_1001 (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
+          sth_tevkifat_sifirlandi_fl, integrationCode)
+          VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), 
+          '', '', '', 0, 0, @Tarih, 1 /*sth_tip*/, 1 /*sth_cins*/, 0 /*sth_normal_iade*/,1 /*sth_evraktip*/, 
+          @EvrakSeri, @EvrakSira, @SatirNo, '0' /*sth_belge_no*/, @Tarih /*sth_belge_tarih*/,
+          '14026833' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
+          0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
+          0 /*sth_sat_iskmas4*/, 0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/,
+          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, '' /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
+          '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 0 /*sth_har_doviz_cinsi*/, 0 /*sth_har_doviz_kuru*/, 0 /*sth_alt_doviz_kuru*/, 
+          0 /*sth_stok_doviz_cinsi*/, 0 /*sth_stok_doviz_kuru*/, 1 /*sth_miktar*/, 0 /*sth_miktar2*/, 1 /*sth_birim_pntr*/, 
+          268.1818181818182 /*sth_tutar*/, 0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 
+          0 /*sth_masraf1*/, 0 /*sth_masraf2*/, 0 /*sth_masraf3*/, 0 /*sth_masraf4*/, @VergiPntr /*sth_vergi_pntr*/, 
+          26.818181818181813 /*sth_vergi*/, 0 /*sth_masraf_vergi_pntr*/, 0 /*sth_masraf_vergi*/, 0 /*sth_netagirlik*/, 0 /*sth_odeme_op*/,
+          '8683789551721' /*sth_aciklama*/, '00000000-0000-0000-0000-000000000000' /*sth_sip_uid*/, '00000000-0000-0000-0000-000000000000' /*sth_fat_uid*/, 
+          0 /*sth_giris_depo_no*/, @DepoNo /*sth_cikis_depo_no*/, @Tarih /*sth_malkbl_sevk_tarihi*/, '1001' /*sth_cari_srm_merkezi*/, 
+          '1001' /*sth_stok_srm_merkezi*/, '1899-12-30 00:00:00.000' /*sth_fis_tarihi*/, 0 /*sth_fis_sirano*/, 
+          0 /*sth_vergisiz_fl*/, 0 /*sth_maliyet_ana*/, 0 /*sth_maliyet_alternatif*/, 0 /*sth_maliyet_orjinal*/, 0 /*sth_adres_no*/, 
+          '' /*sth_parti_kodu*/, 0 /*sth_lot_no*/, '00000000-0000-0000-0000-000000000000' /*sth_kons_uid*/, 
+          '' /*sth_proje_kodu*/, '' /*sth_exim_kodu*/, 0 /*sth_otv_pntr*/, 0 /*sth_otv_vergi*/, 
+          0 /*sth_brutagirlik*/, 1 /*sth_disticaret_turu*/, 0 /*sth_otvtutari*/, 0 /*sth_otvvergisiz_fl*/, 0 /*sth_oiv_pntr*/, 
+          0 /*sth_oiv_vergi*/, 0 /*sth_oivvergisiz_fl*/, 1 /*sth_fiyat_liste_no*/, 0 /*sth_oivtutari*/, 0 /*sth_Tevkifat_turu*/, 
+          0 /*sth_nakliyedeposu*/, 0 /*sth_nakliyedurumu*/, '00000000-0000-0000-0000-000000000000' /*sth_yetkili_uid*/, 0 /*sth_taxfree_fl*/, 
+          0 /*sth_ilave_edilecek_kdv*/, '' /*sth_ismerkezi_kodu*/, '' /*sth_HareketGrupKodu1*/, '' /*sth_HareketGrupKodu2*/, '' /*sth_HareketGrupKodu3*/, 
+          0 /*sth_Olcu1*/, 0 /*sth_Olcu2*/, 0 /*sth_Olcu3*/, 0 /*sth_Olcu4*/, 0 /*sth_Olcu5*/, 0 /*sth_FormulMiktarNo*/, 0 /*sth_FormulMiktar*/, 
+          0 /*sth_eirs_senaryo*/, 0 /*sth_eirs_tipi*/, '1899-12-30 00:00:00.000' /*sth_teslim_tarihi*/, 0 /*sth_matbu_fl*/, 0 /*sth_satis_fiyat_doviz_cinsi*/, 
+          0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/,
+          '05a51a7a-2299-4232-8183-96dc224ebba1');
+        
+          SET @SatirNo=@SatirNo+1;
+          SET @VergiYuzde=10;
+          SELECT @VergiPntr=CASE WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(0)=@VergiYuzde THEN 0
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(1)=@VergiYuzde THEN 1
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(2)=@VergiYuzde THEN 2
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(3)=@VergiYuzde THEN 3
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(4)=@VergiYuzde THEN 4
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(5)=@VergiYuzde THEN 5
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(6)=@VergiYuzde THEN 6
+          ELSE 0 END;
+
+          SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN 427.27272727272725 ELSE 0 END;
+          SELECT @VergiMatrah1=@VergiMatrah1 + CASE WHEN @VergiPntr=1 THEN 427.27272727272725 ELSE 0 END;
+          SELECT @VergiMatrah2=@VergiMatrah2 + CASE WHEN @VergiPntr=2 THEN 427.27272727272725 ELSE 0 END;
+          SELECT @VergiMatrah3=@VergiMatrah3 + CASE WHEN @VergiPntr=3 THEN 427.27272727272725 ELSE 0 END;
+          SELECT @VergiMatrah4=@VergiMatrah4 + CASE WHEN @VergiPntr=4 THEN 427.27272727272725 ELSE 0 END;
+          SELECT @VergiMatrah5=@VergiMatrah5 + CASE WHEN @VergiPntr=5 THEN 427.27272727272725 ELSE 0 END;
+          SELECT @VergiMatrah6=@VergiMatrah6 + CASE WHEN @VergiPntr=6 THEN 427.27272727272725 ELSE 0 END;
+
+          SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN 42.72727272727275 ELSE 0 END;
+          SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN 42.72727272727275 ELSE 0 END;
+          SELECT @Vergi2=@Vergi2 + CASE WHEN @VergiPntr=2 THEN 42.72727272727275 ELSE 0 END;
+          SELECT @Vergi3=@Vergi3 + CASE WHEN @VergiPntr=3 THEN 42.72727272727275 ELSE 0 END;
+          SELECT @Vergi4=@Vergi4 + CASE WHEN @VergiPntr=4 THEN 42.72727272727275 ELSE 0 END;
+          SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN 42.72727272727275 ELSE 0 END;
+          SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN 42.72727272727275 ELSE 0 END;
+        
+          INSERT INTO S_20250622_1001 (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
+          sth_tevkifat_sifirlandi_fl, integrationCode)
+          VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), 
+          '', '', '', 0, 0, @Tarih, 1 /*sth_tip*/, 1 /*sth_cins*/, 0 /*sth_normal_iade*/,1 /*sth_evraktip*/, 
+          @EvrakSeri, @EvrakSira, @SatirNo, '0' /*sth_belge_no*/, @Tarih /*sth_belge_tarih*/,
+          '14021275' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
+          0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
+          0 /*sth_sat_iskmas4*/, 0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/,
+          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, '' /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
+          '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 0 /*sth_har_doviz_cinsi*/, 0 /*sth_har_doviz_kuru*/, 0 /*sth_alt_doviz_kuru*/, 
+          0 /*sth_stok_doviz_cinsi*/, 0 /*sth_stok_doviz_kuru*/, 2 /*sth_miktar*/, 0 /*sth_miktar2*/, 1 /*sth_birim_pntr*/, 
+          427.27272727272725 /*sth_tutar*/, 0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 
+          0 /*sth_masraf1*/, 0 /*sth_masraf2*/, 0 /*sth_masraf3*/, 0 /*sth_masraf4*/, @VergiPntr /*sth_vergi_pntr*/, 
+          42.72727272727275 /*sth_vergi*/, 0 /*sth_masraf_vergi_pntr*/, 0 /*sth_masraf_vergi*/, 0 /*sth_netagirlik*/, 0 /*sth_odeme_op*/,
+          '8698720867199' /*sth_aciklama*/, '00000000-0000-0000-0000-000000000000' /*sth_sip_uid*/, '00000000-0000-0000-0000-000000000000' /*sth_fat_uid*/, 
+          0 /*sth_giris_depo_no*/, @DepoNo /*sth_cikis_depo_no*/, @Tarih /*sth_malkbl_sevk_tarihi*/, '1001' /*sth_cari_srm_merkezi*/, 
+          '1001' /*sth_stok_srm_merkezi*/, '1899-12-30 00:00:00.000' /*sth_fis_tarihi*/, 0 /*sth_fis_sirano*/, 
+          0 /*sth_vergisiz_fl*/, 0 /*sth_maliyet_ana*/, 0 /*sth_maliyet_alternatif*/, 0 /*sth_maliyet_orjinal*/, 0 /*sth_adres_no*/, 
+          '' /*sth_parti_kodu*/, 0 /*sth_lot_no*/, '00000000-0000-0000-0000-000000000000' /*sth_kons_uid*/, 
+          '' /*sth_proje_kodu*/, '' /*sth_exim_kodu*/, 0 /*sth_otv_pntr*/, 0 /*sth_otv_vergi*/, 
+          0 /*sth_brutagirlik*/, 1 /*sth_disticaret_turu*/, 0 /*sth_otvtutari*/, 0 /*sth_otvvergisiz_fl*/, 0 /*sth_oiv_pntr*/, 
+          0 /*sth_oiv_vergi*/, 0 /*sth_oivvergisiz_fl*/, 1 /*sth_fiyat_liste_no*/, 0 /*sth_oivtutari*/, 0 /*sth_Tevkifat_turu*/, 
+          0 /*sth_nakliyedeposu*/, 0 /*sth_nakliyedurumu*/, '00000000-0000-0000-0000-000000000000' /*sth_yetkili_uid*/, 0 /*sth_taxfree_fl*/, 
+          0 /*sth_ilave_edilecek_kdv*/, '' /*sth_ismerkezi_kodu*/, '' /*sth_HareketGrupKodu1*/, '' /*sth_HareketGrupKodu2*/, '' /*sth_HareketGrupKodu3*/, 
+          0 /*sth_Olcu1*/, 0 /*sth_Olcu2*/, 0 /*sth_Olcu3*/, 0 /*sth_Olcu4*/, 0 /*sth_Olcu5*/, 0 /*sth_FormulMiktarNo*/, 0 /*sth_FormulMiktar*/, 
+          0 /*sth_eirs_senaryo*/, 0 /*sth_eirs_tipi*/, '1899-12-30 00:00:00.000' /*sth_teslim_tarihi*/, 0 /*sth_matbu_fl*/, 0 /*sth_satis_fiyat_doviz_cinsi*/, 
+          0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/,
+          '05a51a7a-2299-4232-8183-96dc224ebba1');
+        
+          SET @SatirNo=@SatirNo+1;
+          SET @VergiYuzde=10;
+          SELECT @VergiPntr=CASE WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(0)=@VergiYuzde THEN 0
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(1)=@VergiYuzde THEN 1
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(2)=@VergiYuzde THEN 2
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(3)=@VergiYuzde THEN 3
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(4)=@VergiYuzde THEN 4
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(5)=@VergiYuzde THEN 5
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(6)=@VergiYuzde THEN 6
+          ELSE 0 END;
+
+          SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN 213.63636363636363 ELSE 0 END;
+          SELECT @VergiMatrah1=@VergiMatrah1 + CASE WHEN @VergiPntr=1 THEN 213.63636363636363 ELSE 0 END;
+          SELECT @VergiMatrah2=@VergiMatrah2 + CASE WHEN @VergiPntr=2 THEN 213.63636363636363 ELSE 0 END;
+          SELECT @VergiMatrah3=@VergiMatrah3 + CASE WHEN @VergiPntr=3 THEN 213.63636363636363 ELSE 0 END;
+          SELECT @VergiMatrah4=@VergiMatrah4 + CASE WHEN @VergiPntr=4 THEN 213.63636363636363 ELSE 0 END;
+          SELECT @VergiMatrah5=@VergiMatrah5 + CASE WHEN @VergiPntr=5 THEN 213.63636363636363 ELSE 0 END;
+          SELECT @VergiMatrah6=@VergiMatrah6 + CASE WHEN @VergiPntr=6 THEN 213.63636363636363 ELSE 0 END;
+
+          SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN 21.363636363636374 ELSE 0 END;
+          SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN 21.363636363636374 ELSE 0 END;
+          SELECT @Vergi2=@Vergi2 + CASE WHEN @VergiPntr=2 THEN 21.363636363636374 ELSE 0 END;
+          SELECT @Vergi3=@Vergi3 + CASE WHEN @VergiPntr=3 THEN 21.363636363636374 ELSE 0 END;
+          SELECT @Vergi4=@Vergi4 + CASE WHEN @VergiPntr=4 THEN 21.363636363636374 ELSE 0 END;
+          SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN 21.363636363636374 ELSE 0 END;
+          SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN 21.363636363636374 ELSE 0 END;
+        
+          INSERT INTO S_20250622_1001 (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
+          sth_tevkifat_sifirlandi_fl, integrationCode)
+          VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), 
+          '', '', '', 0, 0, @Tarih, 1 /*sth_tip*/, 1 /*sth_cins*/, 0 /*sth_normal_iade*/,1 /*sth_evraktip*/, 
+          @EvrakSeri, @EvrakSira, @SatirNo, '0' /*sth_belge_no*/, @Tarih /*sth_belge_tarih*/,
+          '14021274' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
+          0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
+          0 /*sth_sat_iskmas4*/, 0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/,
+          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, '' /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
+          '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 0 /*sth_har_doviz_cinsi*/, 0 /*sth_har_doviz_kuru*/, 0 /*sth_alt_doviz_kuru*/, 
+          0 /*sth_stok_doviz_cinsi*/, 0 /*sth_stok_doviz_kuru*/, 1 /*sth_miktar*/, 0 /*sth_miktar2*/, 1 /*sth_birim_pntr*/, 
+          213.63636363636363 /*sth_tutar*/, 0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 
+          0 /*sth_masraf1*/, 0 /*sth_masraf2*/, 0 /*sth_masraf3*/, 0 /*sth_masraf4*/, @VergiPntr /*sth_vergi_pntr*/, 
+          21.363636363636374 /*sth_vergi*/, 0 /*sth_masraf_vergi_pntr*/, 0 /*sth_masraf_vergi*/, 0 /*sth_netagirlik*/, 0 /*sth_odeme_op*/,
+          '8698720867205' /*sth_aciklama*/, '00000000-0000-0000-0000-000000000000' /*sth_sip_uid*/, '00000000-0000-0000-0000-000000000000' /*sth_fat_uid*/, 
+          0 /*sth_giris_depo_no*/, @DepoNo /*sth_cikis_depo_no*/, @Tarih /*sth_malkbl_sevk_tarihi*/, '1001' /*sth_cari_srm_merkezi*/, 
+          '1001' /*sth_stok_srm_merkezi*/, '1899-12-30 00:00:00.000' /*sth_fis_tarihi*/, 0 /*sth_fis_sirano*/, 
+          0 /*sth_vergisiz_fl*/, 0 /*sth_maliyet_ana*/, 0 /*sth_maliyet_alternatif*/, 0 /*sth_maliyet_orjinal*/, 0 /*sth_adres_no*/, 
+          '' /*sth_parti_kodu*/, 0 /*sth_lot_no*/, '00000000-0000-0000-0000-000000000000' /*sth_kons_uid*/, 
+          '' /*sth_proje_kodu*/, '' /*sth_exim_kodu*/, 0 /*sth_otv_pntr*/, 0 /*sth_otv_vergi*/, 
+          0 /*sth_brutagirlik*/, 1 /*sth_disticaret_turu*/, 0 /*sth_otvtutari*/, 0 /*sth_otvvergisiz_fl*/, 0 /*sth_oiv_pntr*/, 
+          0 /*sth_oiv_vergi*/, 0 /*sth_oivvergisiz_fl*/, 1 /*sth_fiyat_liste_no*/, 0 /*sth_oivtutari*/, 0 /*sth_Tevkifat_turu*/, 
+          0 /*sth_nakliyedeposu*/, 0 /*sth_nakliyedurumu*/, '00000000-0000-0000-0000-000000000000' /*sth_yetkili_uid*/, 0 /*sth_taxfree_fl*/, 
+          0 /*sth_ilave_edilecek_kdv*/, '' /*sth_ismerkezi_kodu*/, '' /*sth_HareketGrupKodu1*/, '' /*sth_HareketGrupKodu2*/, '' /*sth_HareketGrupKodu3*/, 
+          0 /*sth_Olcu1*/, 0 /*sth_Olcu2*/, 0 /*sth_Olcu3*/, 0 /*sth_Olcu4*/, 0 /*sth_Olcu5*/, 0 /*sth_FormulMiktarNo*/, 0 /*sth_FormulMiktar*/, 
+          0 /*sth_eirs_senaryo*/, 0 /*sth_eirs_tipi*/, '1899-12-30 00:00:00.000' /*sth_teslim_tarihi*/, 0 /*sth_matbu_fl*/, 0 /*sth_satis_fiyat_doviz_cinsi*/, 
+          0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/,
+          '05a51a7a-2299-4232-8183-96dc224ebba1');
+        
+          SET @SatirNo=@SatirNo+1;
+          SET @VergiYuzde=10;
+          SELECT @VergiPntr=CASE WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(0)=@VergiYuzde THEN 0
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(1)=@VergiYuzde THEN 1
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(2)=@VergiYuzde THEN 2
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(3)=@VergiYuzde THEN 3
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(4)=@VergiYuzde THEN 4
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(5)=@VergiYuzde THEN 5
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(6)=@VergiYuzde THEN 6
+          ELSE 0 END;
+
+          SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN 213.63636363636363 ELSE 0 END;
+          SELECT @VergiMatrah1=@VergiMatrah1 + CASE WHEN @VergiPntr=1 THEN 213.63636363636363 ELSE 0 END;
+          SELECT @VergiMatrah2=@VergiMatrah2 + CASE WHEN @VergiPntr=2 THEN 213.63636363636363 ELSE 0 END;
+          SELECT @VergiMatrah3=@VergiMatrah3 + CASE WHEN @VergiPntr=3 THEN 213.63636363636363 ELSE 0 END;
+          SELECT @VergiMatrah4=@VergiMatrah4 + CASE WHEN @VergiPntr=4 THEN 213.63636363636363 ELSE 0 END;
+          SELECT @VergiMatrah5=@VergiMatrah5 + CASE WHEN @VergiPntr=5 THEN 213.63636363636363 ELSE 0 END;
+          SELECT @VergiMatrah6=@VergiMatrah6 + CASE WHEN @VergiPntr=6 THEN 213.63636363636363 ELSE 0 END;
+
+          SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN 21.363636363636374 ELSE 0 END;
+          SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN 21.363636363636374 ELSE 0 END;
+          SELECT @Vergi2=@Vergi2 + CASE WHEN @VergiPntr=2 THEN 21.363636363636374 ELSE 0 END;
+          SELECT @Vergi3=@Vergi3 + CASE WHEN @VergiPntr=3 THEN 21.363636363636374 ELSE 0 END;
+          SELECT @Vergi4=@Vergi4 + CASE WHEN @VergiPntr=4 THEN 21.363636363636374 ELSE 0 END;
+          SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN 21.363636363636374 ELSE 0 END;
+          SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN 21.363636363636374 ELSE 0 END;
+        
+          INSERT INTO S_20250622_1001 (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
+          sth_tevkifat_sifirlandi_fl, integrationCode)
+          VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), 
+          '', '', '', 0, 0, @Tarih, 1 /*sth_tip*/, 1 /*sth_cins*/, 0 /*sth_normal_iade*/,1 /*sth_evraktip*/, 
+          @EvrakSeri, @EvrakSira, @SatirNo, '0' /*sth_belge_no*/, @Tarih /*sth_belge_tarih*/,
+          '14021272' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
+          0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
+          0 /*sth_sat_iskmas4*/, 0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/,
+          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, '' /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
+          '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 0 /*sth_har_doviz_cinsi*/, 0 /*sth_har_doviz_kuru*/, 0 /*sth_alt_doviz_kuru*/, 
+          0 /*sth_stok_doviz_cinsi*/, 0 /*sth_stok_doviz_kuru*/, 1 /*sth_miktar*/, 0 /*sth_miktar2*/, 1 /*sth_birim_pntr*/, 
+          213.63636363636363 /*sth_tutar*/, 0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 
+          0 /*sth_masraf1*/, 0 /*sth_masraf2*/, 0 /*sth_masraf3*/, 0 /*sth_masraf4*/, @VergiPntr /*sth_vergi_pntr*/, 
+          21.363636363636374 /*sth_vergi*/, 0 /*sth_masraf_vergi_pntr*/, 0 /*sth_masraf_vergi*/, 0 /*sth_netagirlik*/, 0 /*sth_odeme_op*/,
+          '8698720867212' /*sth_aciklama*/, '00000000-0000-0000-0000-000000000000' /*sth_sip_uid*/, '00000000-0000-0000-0000-000000000000' /*sth_fat_uid*/, 
+          0 /*sth_giris_depo_no*/, @DepoNo /*sth_cikis_depo_no*/, @Tarih /*sth_malkbl_sevk_tarihi*/, '1001' /*sth_cari_srm_merkezi*/, 
+          '1001' /*sth_stok_srm_merkezi*/, '1899-12-30 00:00:00.000' /*sth_fis_tarihi*/, 0 /*sth_fis_sirano*/, 
+          0 /*sth_vergisiz_fl*/, 0 /*sth_maliyet_ana*/, 0 /*sth_maliyet_alternatif*/, 0 /*sth_maliyet_orjinal*/, 0 /*sth_adres_no*/, 
+          '' /*sth_parti_kodu*/, 0 /*sth_lot_no*/, '00000000-0000-0000-0000-000000000000' /*sth_kons_uid*/, 
+          '' /*sth_proje_kodu*/, '' /*sth_exim_kodu*/, 0 /*sth_otv_pntr*/, 0 /*sth_otv_vergi*/, 
+          0 /*sth_brutagirlik*/, 1 /*sth_disticaret_turu*/, 0 /*sth_otvtutari*/, 0 /*sth_otvvergisiz_fl*/, 0 /*sth_oiv_pntr*/, 
+          0 /*sth_oiv_vergi*/, 0 /*sth_oivvergisiz_fl*/, 1 /*sth_fiyat_liste_no*/, 0 /*sth_oivtutari*/, 0 /*sth_Tevkifat_turu*/, 
+          0 /*sth_nakliyedeposu*/, 0 /*sth_nakliyedurumu*/, '00000000-0000-0000-0000-000000000000' /*sth_yetkili_uid*/, 0 /*sth_taxfree_fl*/, 
+          0 /*sth_ilave_edilecek_kdv*/, '' /*sth_ismerkezi_kodu*/, '' /*sth_HareketGrupKodu1*/, '' /*sth_HareketGrupKodu2*/, '' /*sth_HareketGrupKodu3*/, 
+          0 /*sth_Olcu1*/, 0 /*sth_Olcu2*/, 0 /*sth_Olcu3*/, 0 /*sth_Olcu4*/, 0 /*sth_Olcu5*/, 0 /*sth_FormulMiktarNo*/, 0 /*sth_FormulMiktar*/, 
+          0 /*sth_eirs_senaryo*/, 0 /*sth_eirs_tipi*/, '1899-12-30 00:00:00.000' /*sth_teslim_tarihi*/, 0 /*sth_matbu_fl*/, 0 /*sth_satis_fiyat_doviz_cinsi*/, 
+          0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/,
+          '05a51a7a-2299-4232-8183-96dc224ebba1');
+        
+          SET @SatirNo=@SatirNo+1;
+          SET @VergiYuzde=10;
+          SELECT @VergiPntr=CASE WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(0)=@VergiYuzde THEN 0
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(1)=@VergiYuzde THEN 1
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(2)=@VergiYuzde THEN 2
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(3)=@VergiYuzde THEN 3
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(4)=@VergiYuzde THEN 4
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(5)=@VergiYuzde THEN 5
+          WHEN MikroDesktop_AGROSS_001.dbo.fn_VergiYuzde(6)=@VergiYuzde THEN 6
+          ELSE 0 END;
+
+          SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN 124.99999999999999 ELSE 0 END;
+          SELECT @VergiMatrah1=@VergiMatrah1 + CASE WHEN @VergiPntr=1 THEN 124.99999999999999 ELSE 0 END;
+          SELECT @VergiMatrah2=@VergiMatrah2 + CASE WHEN @VergiPntr=2 THEN 124.99999999999999 ELSE 0 END;
+          SELECT @VergiMatrah3=@VergiMatrah3 + CASE WHEN @VergiPntr=3 THEN 124.99999999999999 ELSE 0 END;
+          SELECT @VergiMatrah4=@VergiMatrah4 + CASE WHEN @VergiPntr=4 THEN 124.99999999999999 ELSE 0 END;
+          SELECT @VergiMatrah5=@VergiMatrah5 + CASE WHEN @VergiPntr=5 THEN 124.99999999999999 ELSE 0 END;
+          SELECT @VergiMatrah6=@VergiMatrah6 + CASE WHEN @VergiPntr=6 THEN 124.99999999999999 ELSE 0 END;
+
+          SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN 12.500000000000014 ELSE 0 END;
+          SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN 12.500000000000014 ELSE 0 END;
+          SELECT @Vergi2=@Vergi2 + CASE WHEN @VergiPntr=2 THEN 12.500000000000014 ELSE 0 END;
+          SELECT @Vergi3=@Vergi3 + CASE WHEN @VergiPntr=3 THEN 12.500000000000014 ELSE 0 END;
+          SELECT @Vergi4=@Vergi4 + CASE WHEN @VergiPntr=4 THEN 12.500000000000014 ELSE 0 END;
+          SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN 12.500000000000014 ELSE 0 END;
+          SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN 12.500000000000014 ELSE 0 END;
+        
+          INSERT INTO S_20250622_1001 (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
+          sth_tevkifat_sifirlandi_fl, integrationCode)
+          VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), 
+          '', '', '', 0, 0, @Tarih, 1 /*sth_tip*/, 1 /*sth_cins*/, 0 /*sth_normal_iade*/,1 /*sth_evraktip*/, 
+          @EvrakSeri, @EvrakSira, @SatirNo, '0' /*sth_belge_no*/, @Tarih /*sth_belge_tarih*/,
+          '14021343' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
+          0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
+          0 /*sth_sat_iskmas4*/, 0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/,
+          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, '' /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
+          '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 0 /*sth_har_doviz_cinsi*/, 0 /*sth_har_doviz_kuru*/, 0 /*sth_alt_doviz_kuru*/, 
+          0 /*sth_stok_doviz_cinsi*/, 0 /*sth_stok_doviz_kuru*/, 1 /*sth_miktar*/, 0 /*sth_miktar2*/, 1 /*sth_birim_pntr*/, 
+          124.99999999999999 /*sth_tutar*/, 0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 
+          0 /*sth_masraf1*/, 0 /*sth_masraf2*/, 0 /*sth_masraf3*/, 0 /*sth_masraf4*/, @VergiPntr /*sth_vergi_pntr*/, 
+          12.500000000000014 /*sth_vergi*/, 0 /*sth_masraf_vergi_pntr*/, 0 /*sth_masraf_vergi*/, 0 /*sth_netagirlik*/, 0 /*sth_odeme_op*/,
+          '5000112665055' /*sth_aciklama*/, '00000000-0000-0000-0000-000000000000' /*sth_sip_uid*/, '00000000-0000-0000-0000-000000000000' /*sth_fat_uid*/, 
+          0 /*sth_giris_depo_no*/, @DepoNo /*sth_cikis_depo_no*/, @Tarih /*sth_malkbl_sevk_tarihi*/, '1001' /*sth_cari_srm_merkezi*/, 
+          '1001' /*sth_stok_srm_merkezi*/, '1899-12-30 00:00:00.000' /*sth_fis_tarihi*/, 0 /*sth_fis_sirano*/, 
+          0 /*sth_vergisiz_fl*/, 0 /*sth_maliyet_ana*/, 0 /*sth_maliyet_alternatif*/, 0 /*sth_maliyet_orjinal*/, 0 /*sth_adres_no*/, 
+          '' /*sth_parti_kodu*/, 0 /*sth_lot_no*/, '00000000-0000-0000-0000-000000000000' /*sth_kons_uid*/, 
+          '' /*sth_proje_kodu*/, '' /*sth_exim_kodu*/, 0 /*sth_otv_pntr*/, 0 /*sth_otv_vergi*/, 
+          0 /*sth_brutagirlik*/, 1 /*sth_disticaret_turu*/, 0 /*sth_otvtutari*/, 0 /*sth_otvvergisiz_fl*/, 0 /*sth_oiv_pntr*/, 
+          0 /*sth_oiv_vergi*/, 0 /*sth_oivvergisiz_fl*/, 1 /*sth_fiyat_liste_no*/, 0 /*sth_oivtutari*/, 0 /*sth_Tevkifat_turu*/, 
+          0 /*sth_nakliyedeposu*/, 0 /*sth_nakliyedurumu*/, '00000000-0000-0000-0000-000000000000' /*sth_yetkili_uid*/, 0 /*sth_taxfree_fl*/, 
+          0 /*sth_ilave_edilecek_kdv*/, '' /*sth_ismerkezi_kodu*/, '' /*sth_HareketGrupKodu1*/, '' /*sth_HareketGrupKodu2*/, '' /*sth_HareketGrupKodu3*/, 
+          0 /*sth_Olcu1*/, 0 /*sth_Olcu2*/, 0 /*sth_Olcu3*/, 0 /*sth_Olcu4*/, 0 /*sth_Olcu5*/, 0 /*sth_FormulMiktarNo*/, 0 /*sth_FormulMiktar*/, 
+          0 /*sth_eirs_senaryo*/, 0 /*sth_eirs_tipi*/, '1899-12-30 00:00:00.000' /*sth_teslim_tarihi*/, 0 /*sth_matbu_fl*/, 0 /*sth_satis_fiyat_doviz_cinsi*/, 
+          0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/,
+          '05a51a7a-2299-4232-8183-96dc224ebba1');
+        SET @SatirNo=-1;END;
+        COMMIT TRAN;
       END TRY
       BEGIN CATCH
         IF @@TRANCOUNT > 0 
