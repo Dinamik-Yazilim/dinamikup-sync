@@ -5,7 +5,6 @@ const { socketSend } = require('../../lib/socketHelper')
 const { getList, executeSql, getListDb, executeSqlDb } = require('../../lib/mikro/mikroHelper')
 const { workDataCreatePOQuery, workDataCreatePRHQuery, workDataCreateSTHQuery } = require('../../lib/mikro/workdata')
 
-
 exports.test = function (webServiceUrl, webServiceUsername, webServicePassword) {
   return new Promise((resolve, reject) => {
     axios({
@@ -141,14 +140,16 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
       }
       devLog('Kdvler:', Kdvler)
 
-      // TODO: 10 rakami kaldirilacak, 
-      let docs = await getList(sessionDoc, orgDoc, `SELECT TOP 10 sto_kod as code, sto_isim as [name], 
+      let docs = await getList(sessionDoc, orgDoc, `SELECT sto_kod as code, sto_isim as [name], 
           CASE WHEN sto_kisa_ismi<>'' THEN sto_kisa_ismi ELSE SUBSTRING(sto_isim,1,20) END as shortName, 
           sto_birim1_ad as unit, sto_birim2_ad as unit2, dbo.fn_VergiYuzde(sto_perakende_vergi) as vatRate ,
           sto_lastup_date as updatedAt , sto_reyon_kodu as rayon
            FROM STOKLAR
-            WHERE (sto_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}')
-            AND sto_kod in (SELECT sfiyat_stokkod FROM STOK_SATIS_FIYAT_LISTELERI WHERE sfiyat_listesirano=1)
+            WHERE sto_kod in (SELECT sfiyat_stokkod FROM STOK_SATIS_FIYAT_LISTELERI WHERE sfiyat_listesirano=1)
+            AND (sto_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}' 
+              OR sto_kod IN (SELECT bar_stokkodu FROM BARKOD_TANIMLARI WHERE bar_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}') 
+              OR sto_kod IN (SELECT sfiyat_stokkod FROM STOK_SATIS_FIYAT_LISTELERI WHERE sfiyat_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}') 
+            )
             ORDER BY sto_lastup_date`)
 
       if (docs.length == 0) {
@@ -330,6 +331,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
 function GetDocuments(webServiceUrl, token, data) {
   return new Promise((resolve, reject) => {
+    //return resolve([ddd])
     axios({
       method: 'post',
       url: `${webServiceUrl}/integration/getdocuments`,
@@ -369,7 +371,7 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
       GetDocuments(storeDoc.posIntegration.pos312.webServiceUrl, token312, { startDate: startDate, endDate: endDate })
         .then(fisler => {
           eventLog('[syncGetSales_pos312] fisler adet:'.green, fisler.length)
-          fs.writeFileSync(path.join(__dirname, 'syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
+          // fs.writeFileSync(path.join(__dirname, 'syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
           resolve('Mikroya Aktarim Basliyor. Evrak Sayisi:' + fisler.length)
           socketSend(sessionDoc, { event: 'syncSales_progress', caption: `Aktariliyor`, max: fisler.length, position: 0, percent: 0 })
           let i = 0
@@ -377,13 +379,13 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             return new Promise((resolve, reject) => {
               if (i >= fisler.length) return resolve()
 
-              fs.writeFileSync(path.join(__dirname, 'fisData.json.txt'), JSON.stringify(fisler[i], null, 2), 'utf8')
+              // fs.writeFileSync(path.join(__dirname, 'fisData.json.txt'), JSON.stringify(fisler[i], null, 2), 'utf8')
               mikroWorkDataAktar(orgDoc, storeDoc, fisler[i])
                 .then(sonuc => {
                   // eventLog('[syncGetSales_pos312]'.green, 'sonuc:', sonuc)
                   socketSend(sessionDoc, { event: 'syncSales_progress', caption: `${fisler[i].date} Kalem:${fisler[i].sales.length} Station:${fisler[i].stationId} Batch:${fisler[i].batchNo}/${fisler[i].stanNo}`, max: fisler.length, position: (i + 1), percent: 100 * (i + 1) / fisler.length })
                   i++
-                  setTimeout(() => calistir().then(resolve).catch(reject), 10)
+                  setTimeout(() => calistir().then(resolve).catch(reject), 100)
                 })
                 .catch(reject)
             })
@@ -420,7 +422,6 @@ function mikroWorkDataOlustur(orgDoc, storeDoc, startDate, endDate) {
     let d1 = new Date(startDate + ' 11:00:00')
     let d2 = new Date(endDate + ' 11:00:00')
     let tarih = d1
-    console.log('tarih0:', tarih)
     while (tarih <= d2) {
       let query = ``
       query += workDataCreatePOQuery(tarih, storeDoc.warehouseId) + '\n'
@@ -439,6 +440,8 @@ function mikroWorkDataOlustur(orgDoc, storeDoc, startDate, endDate) {
 function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
   return new Promise(async (resolve, reject) => {
     try {
+      if (!fisData.batchNo) return resolve()
+      if (!fisData.stanNo) return resolve()
       const posComputerDoc = await db.storePosComputers.findOne({
         organization: orgDoc._id,
         db: storeDoc.db,
@@ -449,10 +452,10 @@ function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
       if (!posComputerDoc.cashAccountId) reject(`POS Bilgisayari:${posComputerDoc.name} nakit kasa tanimlanmamis`)
       if (!posComputerDoc.bankAccountId) reject(`POS Bilgisayari:${posComputerDoc.name} banka hesabi tanimlanmamis`)
 
-      const tarih = util.yyyyMMdd(fisData.endDate)
+      const tarih = util.yyyyMMdd(fisData.date)
       const depoNo = util.pad(storeDoc.warehouseId, 3)
       let query = `
-        DECLARE @Tarih DATETIME='${fisData.endDate.substring(0, 10)}'
+        DECLARE @Tarih DATETIME='${fisData.date.substring(0, 10)}'
         DECLARE @EvrakSira INT=${fisData.batchNo || 0}${util.pad(fisData.stanNo || 0, 4)};
         DECLARE @EvrakSeri VARCHAR(50)='${posComputerDoc.salesDocNoSerial || ''}';
         DECLARE @DepoNo INT = ${storeDoc.warehouseId};
@@ -637,7 +640,7 @@ function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
       })
       query += `END;`
 
-      fs.writeFileSync(path.join(__dirname, 'workdataInsert_query.sql'), query, 'utf8')
+      // fs.writeFileSync(path.join(__dirname, 'workdataInsert_query.sql'), query, 'utf8')
       executeSqlDb(orgDoc, storeDoc.db + '_WORKDATA', query)
         .then(resolve)
         .catch(reject)
@@ -645,4 +648,43 @@ function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
       reject(error)
     }
   })
+}
+
+exports.syncPriceTrigger_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const token312 = await exports.login(storeDoc.posIntegration.pos312.webServiceUrl,
+        storeDoc.posIntegration.pos312.webServiceUsername,
+        storeDoc.posIntegration.pos312.webServicePassword)
+      fetch(`${storeDoc.posIntegration.pos312.webServiceUrl}/integration/addtransfer`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token312}` },
+        body: JSON.stringify({
+          "defination": false,
+          "customer": false,
+          "user": false,
+          "stock": 2,
+          "stores": [{
+            "storeId": storeDoc.posIntegration.pos312.storeId
+          }]
+        }),
+      })
+        .then(async resp => {
+          if (resp.ok) {
+            resp
+              .json()
+              .then(result => {
+                resolve(result)
+              })
+              .catch(reject)
+          } else reject(`${await resp.json()}`)
+        })
+        .catch(reject)
+
+
+    } catch (err) {
+      console.error(err)
+      reject(err)
+    }
+  })
+
 }

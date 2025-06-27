@@ -324,9 +324,18 @@ exports.pad = function (num, size) {
 }
 
 exports.yyyyMMdd = function (tarih) {
-	let t = new Date(tarih)
-	t.setMinutes(t.getMinutes() + (-1 * new Date().getTimezoneOffset()))
-	let sonuc = t.toISOString().substring(0, 10).replaceAll('-', '')
-	// console.log('yyyyMMdd:', sonuc, 'tarih:', tarih)
-	return sonuc
+	// let t = new Date(tarih)
+	// t.setMinutes(t.getMinutes() + (-1 * new Date().getTimezoneOffset()))
+	// let sonuc = t.toISOString().substring(0, 10).replaceAll('-', '')
+	if (typeof tarih == 'string') {
+		let s = tarih.substring(0, 10).replaceAll('-', '')
+		return s
+	} else {
+		let t = new Date(tarih)
+		t.setHours(11)
+		return t.toISOString().substring(0, 10).replaceAll('-', '')
+	}
+
+	// console.log('yyyyMMdd:', s, 'tarih:', tarih)
+
 }
