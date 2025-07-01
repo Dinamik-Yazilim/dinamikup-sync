@@ -23,10 +23,13 @@ export default function VerifyPage() {
   const router = useRouter()
   const { toast } = useToast()
   const username = useSearchParams().get('username')
+  const deviceId = Cookies.get('deviceId') || ''
+
   const verify = () => {
     postItem(`/auth/verify`, '', {
       authCode: authCode,
       username: username,
+      deviceId: deviceId,
     })
       .then(result => {
         Cookies.set('token', result.token)

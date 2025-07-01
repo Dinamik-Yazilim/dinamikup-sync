@@ -329,6 +329,230 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
 }
 
+function AddCustomer(webServiceUrl, token, data) {
+  return new Promise((resolve, reject) => {
+    axios({
+      method: 'post',
+      url: `${webServiceUrl}/integration/addcustomer`,
+      timeout: 120 * 60 * 1000, // 120 dakika
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      data: data
+    })
+      .then(resp => {
+        eventLog('resp:', resp.data)
+        resolve(resp.data)
+      })
+      .catch(err => {
+        errorLog('[pos312 SetStock] Error:', err)
+        reject(err)
+      })
+
+  })
+}
+
+exports.syncCustomers_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc) {
+  return new Promise(async (resolve, reject) => {
+    let token312 = ''
+
+
+    try {
+      socketSend(sessionDoc, { event: 'syncCustomers_progress', caption: `312 Pos login in` })
+      token312 = await exports.login(storeDoc.posIntegration.pos312.webServiceUrl,
+        storeDoc.posIntegration.pos312.webServiceUsername,
+        storeDoc.posIntegration.pos312.webServicePassword)
+
+
+      socketSend(sessionDoc, { event: 'syncCustomers_progress', caption: `Mikrodan cari kartlar listeleniyor` })
+
+
+      let docs = await getList(sessionDoc, orgDoc, `SELECT sto_kod as code, sto_isim as [name], 
+          CASE WHEN sto_kisa_ismi<>'' THEN sto_kisa_ismi ELSE SUBSTRING(sto_isim,1,20) END as shortName, 
+          sto_birim1_ad as unit, sto_birim2_ad as unit2, dbo.fn_VergiYuzde(sto_perakende_vergi) as vatRate ,
+          sto_lastup_date as updatedAt , sto_reyon_kodu as rayon
+           FROM STOKLAR
+            WHERE sto_kod in (SELECT sfiyat_stokkod FROM STOK_SATIS_FIYAT_LISTELERI WHERE sfiyat_listesirano=1)
+            AND (sto_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}' 
+              OR sto_kod IN (SELECT bar_stokkodu FROM BARKOD_TANIMLARI WHERE bar_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}') 
+              OR sto_kod IN (SELECT sfiyat_stokkod FROM STOK_SATIS_FIYAT_LISTELERI WHERE sfiyat_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}') 
+            )
+            ORDER BY sto_lastup_date`)
+
+      if (docs.length == 0) {
+        socketSend(sessionDoc, { event: 'syncItems_progress_end' })
+        return resolve('stok kartlari zaten guncel')
+      }
+      let barcodeDocs = await getList(sessionDoc, orgDoc, `SELECT  bar_kodu as barcode, bar_stokkodu as code,
+        CASE 
+            WHEN B.bar_birimpntr=1 OR B.bar_birimpntr=0 THEN S.sto_birim1_katsayi 
+            WHEN B.bar_birimpntr=2 THEN S.sto_birim2_katsayi 
+            WHEN B.bar_birimpntr=3 THEN S.sto_birim3_katsayi 
+            WHEN B.bar_birimpntr=4 THEN S.sto_birim4_katsayi 
+            ELSE 1 END as Multiplier, bar_lastup_date as updatedAt FROM BARKOD_TANIMLARI B INNER JOIN
+          STOKLAR S ON S.sto_kod=B.bar_stokkodu
+        WHERE S.sto_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}'`)
+
+
+      let priceDocs = await getList(sessionDoc, orgDoc, `SELECT sfiyat_stokkod as code, 0 as isBarcode, 0 as ordr, sfiyat_deposirano as storeId, GETDATE() as startDate, GETDATE() as endDate, sfiyat_fiyati as price, sfiyat_fiyati as newPrice, 0 as [deleted] FROM STOK_SATIS_FIYAT_LISTELERI F 
+        INNER JOIN STOKLAR S ON S.sto_kod=F.sfiyat_stokkod
+        WHERE sfiyat_listesirano=1 AND S.sto_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}'`)
+
+      console.log('priceDocs.length', priceDocs.length)
+
+      socketSend(sessionDoc, { event: 'syncItems_progress', caption: `Mikrodan Kartlar cekildi` })
+      resolve(`${docs.length} adet stok karti aktarilacak. baslama:${new Date().toString()}`)
+      let i = 0
+      function calistir() {
+        return new Promise((resolve, reject) => {
+          if (i >= docs.length) return resolve(true)
+          let t1 = new Date().getTime() / 1000
+          let Scale = false
+          let unit = 1
+          if (['KİLOGRAM', 'KILOGRAM', 'KG', 'kg', 'kilogram', 'KİLO', 'kilo', 'Kilogram'].includes(docs[i].unit)) {
+            unit = 2
+            Scale = true
+          }
+          let DepartmentId = 0
+          let StockBarcodes = []
+          let StockPrices = []
+          const Kdv = Kdvler.find(e => e.taxValue == docs[i].vatRate)
+          if (Kdv) {
+            DepartmentId = Kdv.id
+            StockBarcodes = (barcodeDocs || []).filter(e => e.code == docs[i].code).map(e => {
+              if (e.Multiplier <= 0) e.Multiplier = 1
+              return {
+                "barcode": e.barcode,
+                "stockCode": e.code,
+                "multiplier": e.Multiplier
+              }
+            })
+            let tartiliUrunMu = StockBarcodes.find(e => (e.barcode.startsWith('28') || e.barcode.startsWith('29')) && e.barcode.length == 7)
+            if (tartiliUrunMu) {
+              if (!Scale) Scale = true
+            }
+            StockPrices = (priceDocs || []).filter(e => e.code == docs[i].code).map(e => {
+              return {
+                master: e.code,
+                isBarcode: false,
+                ordr: 1,
+                storeId: e.storeId,
+                startDate: new Date().toISOString(),
+                endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 12)).toISOString(),
+                price: e.price,
+                newPrice: e.newPrice,
+                deleted: false
+              }
+            })
+
+
+            let dataItem = {
+              "Code": docs[i].code,
+              "Name": docs[i].name.replaceAll('İ', 'I'),
+              "ShortName": docs[i].shortName,
+              "Unit": unit,
+              "Status": true,
+              "Scale": Scale,
+              "CancelTimeout": 0,
+              "NoDiscount": false,
+              "NoPromotion": false,
+              "FreePrice": false,
+              "Tare": 0,
+              "MaxSale": 0,
+              "LastSaleTime": "00:00:00",
+              "TagUnit": 0,
+              "UnitWeight": 0,
+              "Returnable": true,
+              "Manufacturer": "TANIMSIZ",  // TODO: buraya markasini getirelim
+              "Contents": "",
+              "StorageConditions": null,
+              "ProductionPlace": "TR",
+              "LegalDocument": "",
+              "Warnings": "",
+              "ImprintNumber": "",
+              "ImprintName": "",
+              "ProductionMethod": "",
+              "ProductionDate": "2000-01-01T00:00:00",
+              "BusinessName": "",
+              "DomesticProduction": null,
+              "StockBarcodes": StockBarcodes,
+              "StockDepartments": [
+                {
+                  "DepartmentId": DepartmentId,
+                  "StockCode": docs[i].code,
+                  "Type": 1
+                }
+              ],
+              "StockGroups": [
+                {
+                  "GroupId": 1,
+                  "StockCode": docs[i].code
+                }
+              ],
+              "StockPrices": StockPrices.length > 0 ? [StockPrices[0]] : [],
+              "StockRayons": [
+                {
+                  "RayonId": !isNaN(Number(docs[i].rayon)) && Number(docs[i].rayon) != 0 ? Number(docs[i].rayon) : 1,
+                  "StockCode": docs[i].code
+                }
+              ],
+              "StockStores": null,
+              "StockOptionGroups": null,
+              "isNew": null,
+              "Barcode": null,
+              "Price": null,
+              "LastChange": null,
+              "CreateDate": null,
+              "UpdateDate": null
+            }
+            SetStock2(storeDoc.posIntegration.pos312.webServiceUrl, token312, [dataItem])
+              .then(async sonuc => {
+                if (sonuc) {
+                  storeDoc.posIntegration.lastUpdate_items = docs[i].updatedAt
+                  await storeDoc.save()
+                }
+
+                let t2 = new Date().getTime() / 1000
+                socketSend(sessionDoc, {
+                  event: 'syncItems_progress',
+                  max: docs.length,
+                  position: i + 1,
+                  percent: Math.round(10 * 100 * (i + 1) / docs.length) / 10,
+                  caption: `Time:${Math.round(10 * (t2 - t1)) / 10}sn ${i + 1}/${docs.length} ${docs[i].code} - ${docs[i].shortName}`
+                })
+                i++
+                setTimeout(() => calistir().then(resolve).catch(reject), 5)
+              })
+              .catch(err => {
+                errorLog(`[syncItems_pos312] calistir() Error:`, err)
+                i++
+                return reject(err)
+                //setTimeout(() => calistir().then(resolve).catch(reject), 50)
+              })
+          } else {
+            i++
+            setTimeout(() => calistir().then(resolve).catch(reject), 50)
+          }
+        })
+      }
+
+      calistir()
+        .then(() => {
+          socketSend(sessionDoc, { event: 'syncItems_progress_end' })
+        })
+        .catch(err => {
+          errorLog(`[syncItems_pos312] Error:`, err)
+          socketSend(sessionDoc, { event: 'syncItems_progress_end' })
+        })
+    } catch (err) {
+      errorLog(`[syncItems_pos312] Error:`, err)
+      socketSend(sessionDoc, { event: 'syncItems_progress_end' })
+      reject(err)
+    }
+
+
+
+  })
+
+}
 function GetDocuments(webServiceUrl, token, data) {
   return new Promise((resolve, reject) => {
     //return resolve([ddd])
@@ -371,7 +595,7 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
       GetDocuments(storeDoc.posIntegration.pos312.webServiceUrl, token312, { startDate: startDate, endDate: endDate })
         .then(fisler => {
           eventLog('[syncGetSales_pos312] fisler adet:'.green, fisler.length)
-          // fs.writeFileSync(path.join(__dirname, 'syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
+          fs.writeFileSync(path.join(__dirname, 'syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
           resolve('Mikroya Aktarim Basliyor. Evrak Sayisi:' + fisler.length)
           socketSend(sessionDoc, { event: 'syncSales_progress', caption: `Aktariliyor`, max: fisler.length, position: 0, percent: 0 })
           let i = 0
@@ -379,13 +603,13 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             return new Promise((resolve, reject) => {
               if (i >= fisler.length) return resolve()
 
-              // fs.writeFileSync(path.join(__dirname, 'fisData.json.txt'), JSON.stringify(fisler[i], null, 2), 'utf8')
+              fs.writeFileSync(path.join(__dirname, 'fisData.json.txt'), JSON.stringify(fisler[i], null, 2), 'utf8')
               mikroWorkDataAktar(orgDoc, storeDoc, fisler[i])
                 .then(sonuc => {
                   // eventLog('[syncGetSales_pos312]'.green, 'sonuc:', sonuc)
                   socketSend(sessionDoc, { event: 'syncSales_progress', caption: `${fisler[i].date} Kalem:${fisler[i].sales.length} Station:${fisler[i].stationId} Batch:${fisler[i].batchNo}/${fisler[i].stanNo}`, max: fisler.length, position: (i + 1), percent: 100 * (i + 1) / fisler.length })
                   i++
-                  setTimeout(() => calistir().then(resolve).catch(reject), 100)
+                  setTimeout(() => calistir().then(resolve).catch(reject), 50)
                 })
                 .catch(reject)
             })
@@ -440,8 +664,9 @@ function mikroWorkDataOlustur(orgDoc, storeDoc, startDate, endDate) {
 function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!fisData.batchNo) return resolve()
-      if (!fisData.stanNo) return resolve()
+      if (fisData.status != 1) return resolve()
+      // if (!fisData.batchNo) return resolve()
+      // if (!fisData.stanNo) return resolve()
       const posComputerDoc = await db.storePosComputers.findOne({
         organization: orgDoc._id,
         db: storeDoc.db,
@@ -452,13 +677,17 @@ function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
       if (!posComputerDoc.cashAccountId) reject(`POS Bilgisayari:${posComputerDoc.name} nakit kasa tanimlanmamis`)
       if (!posComputerDoc.bankAccountId) reject(`POS Bilgisayari:${posComputerDoc.name} banka hesabi tanimlanmamis`)
 
-      const tarih = util.yyyyMMdd(fisData.date)
+      const tarih = util.yyyyMMdd(fisData.endDate)
       const depoNo = util.pad(storeDoc.warehouseId, 3)
       let query = `
-        DECLARE @Tarih DATETIME='${fisData.date.substring(0, 10)}'
+        DECLARE @Tarih DATETIME='${fisData.endDate.substring(0, 10)}'
         DECLARE @EvrakSira INT=${fisData.batchNo || 0}${util.pad(fisData.stanNo || 0, 4)};
         DECLARE @EvrakSeri VARCHAR(50)='${posComputerDoc.salesDocNoSerial || ''}';
         DECLARE @DepoNo INT = ${storeDoc.warehouseId};
+        DECLARE @STH_TIP INT = ${fisData.type == 3 ? 0 : 1};
+        DECLARE @STH_CINS INT = 1;
+        DECLARE @STH_IADE INT = ${fisData.type == 3 ? 1 : 0};
+        DECLARE @STH_EVRAKTIP INT = ${fisData.type == 3 ? 13 : 1};
         DECLARE @MikroUserNo INT = 99;
         DECLARE @SatirNo INT = -1;
         DECLARE @VergiPntr INT = 0;
@@ -482,12 +711,14 @@ function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
 
         IF NOT EXISTS(SELECT * FROM S_${tarih}_${depoNo} WHERE integrationCode='${fisData.id}') BEGIN
       `
-
+      let satisToplam = 0
       fisData.sales.forEach((e, rowIndex) => {
-        let netTutar = e.unitPrice * e.quantity
-        let tutar = netTutar / (1 + e.departmentValue / 100)
-        let vergi = netTutar - tutar
-        query += `
+        if (e.status) {
+          let netTutar = e.returnUnitPrice * e.quantity
+          let tutar = netTutar / (1 + e.departmentValue / 100)
+          let vergi = netTutar - tutar
+          satisToplam += netTutar
+          query += `
           SET @SatirNo=@SatirNo+1;
           SET @VergiYuzde=${e.departmentValue};
           SELECT @VergiPntr=CASE WHEN ${storeDoc.db}.dbo.fn_VergiYuzde(0)=@VergiYuzde THEN 0
@@ -518,7 +749,7 @@ function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
           INSERT INTO S_${tarih}_${depoNo} (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
           sth_tevkifat_sifirlandi_fl, integrationCode)
           VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), 
-          '', '', '', 0, 0, @Tarih, 1 /*sth_tip*/, 1 /*sth_cins*/, 0 /*sth_normal_iade*/,1 /*sth_evraktip*/, 
+          '', '', '', 0, 0, @Tarih, @STH_TIP /*sth_tip*/, @STH_CINS /*sth_cins*/, @STH_IADE /*sth_normal_iade*/,@STH_EVRAKTIP /*sth_evraktip*/, 
           @EvrakSeri, @EvrakSira, @SatirNo, '${fisData.batchNo || 0}' /*sth_belge_no*/, @Tarih /*sth_belge_tarih*/,
           '${e.stockCode}' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
           0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
@@ -544,16 +775,65 @@ function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
           0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/,
           '${fisData.id}');
         `
+        }
       })
       query += `SET @SatirNo=-1;`
       let odemeToplam = 0
+      let nakitToplam = 0
+      let krediToplam = 0
+      let digerToplam = 0
       fisData.payments.forEach(e => {
-        odemeToplam += e.amount
+        if (e.status) {
+          if (e.change == false) {
+            odemeToplam += e.amount
+          } else {
+            odemeToplam -= e.amount
+          }
+          if (e.type == 1) {
+            if (e.change == false) {
+              nakitToplam += e.amount
+            } else {
+              nakitToplam -= e.amount
+            }
+          } else if (e.type == 2) {
+            krediToplam += e.amount
+          } else {
+            digerToplam += e.amount
+          }
+        }
       })
 
-      fisData.payments.forEach(e => {
-        query += `SET @SatirNo=@SatirNo+1;
-          SET @OdemeOran=${e.amount}/${odemeToplam};
+
+      // if (nakitToplam > 0) {
+      //   query += `SET @SatirNo=@SatirNo+1;\n`
+      //   query += odemeInsert(fisData, tarih, depoNo, nakitToplam, odemeToplam)
+      // }
+      // if (krediToplam > 0) {
+      //   query += `SET @SatirNo=@SatirNo+1;\n`
+      //   query += odemeInsert(fisData, tarih, depoNo, krediToplam, odemeToplam)
+      // }
+      // if (digerToplam > 0) {
+      //   query += `SET @SatirNo=@SatirNo+1;\n`
+      //   query += odemeInsert(fisData, tarih, depoNo, digerToplam, odemeToplam)
+      // }
+
+      query += `SET @SatirNo=@SatirNo+1;\n`
+      query += odemeInsert(fisData, tarih, depoNo, odemeToplam, odemeToplam)
+
+      query += `END;`
+
+      // fs.writeFileSync(path.join(__dirname, 'workdataInsert_query.sql'), query, 'utf8')
+      executeSqlDb(orgDoc, storeDoc.db + '_WORKDATA', query)
+        .then(resolve)
+        .catch(reject)
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
+function odemeInsert(fisData, tarih, depoNo, amount, odemeToplam) {
+  let q = `SET @OdemeOran=${amount}/${odemeToplam};
           INSERT INTO O_${tarih}_${depoNo} (po_Guid, po_DBCno, po_SpecRECno, po_iptal, po_fileid, po_hidden, po_kilitli, po_degisti, po_checksum, po_create_user, po_create_date, po_lastup_user, po_lastup_date, po_special1, po_special2, po_special3, po_firmano, po_subeno, po_KasaKodu, po_BelgeNo, po_MyeZNo, po_KasiyerKodu, po_BelgeTarihi, po_BelgeToplam, po_VerMtrh0, po_VerMtrh1, po_VerMtrh2, po_VerMtrh3, po_VerMtrh4, po_VerMtrh5, po_VerMtrh6, po_VerMtrh7, po_VerMtrh8, po_VerMtrh9, po_VerMtrh10, po_VerMtrh11, po_VerMtrh12, po_VerMtrh13, po_VerMtrh14, po_VerMtrh15, po_VerMtrh16, po_VerMtrh17, po_VerMtrh18, po_VerMtrh19, po_VerMtrh20, po_Vergi1, po_Vergi2, po_Vergi3, po_Vergi4, po_Vergi5, po_Vergi6, po_Vergi7, po_Vergi8, po_Vergi9, po_Vergi10, po_Vergi11, po_Vergi12, po_Vergi13, po_Vergi14, po_Vergi15, po_Vergi16, po_Vergi17, po_Vergi18, po_Vergi19, po_Vergi20, po_Fisfatura, po_Pozisyon, po_CariKodu, po_Yuvarlama, po_Odm_AnaDtut1, po_Odm_OrjDtut1, po_Odm_AnaDtut2, po_Odm_OrjDtut2, po_Odm_AnaDtut3, po_Odm_OrjDtut3, po_Odm_AnaDtut4, po_Odm_OrjDtut4, po_Odm_AnaDtut5, po_Odm_OrjDtut5, po_Odm_AnaDtut6, po_Odm_OrjDtut6, po_Odm_AnaDtut7, po_Odm_OrjDtut7, po_Odm_AnaDtut8, po_Odm_OrjDtut8, po_Odm_AnaDtut9, po_Odm_OrjDtut9, po_Odm_AnaDtut10, po_Odm_OrjDtut10, po_Odm_AnaDtut11, po_Odm_OrjDtut11, po_Odm_AnaDtut12, po_Odm_OrjDtut12, po_Odm_AnaDtut13, po_Odm_OrjDtut13, po_Odm_AnaDtut14, po_Odm_OrjDtut14, po_Odm_AnaDtut15, po_Odm_OrjDtut15, po_Odm_AnaDtut16, po_Odm_OrjDtut16, po_Odm_AnaDtut17, po_Odm_OrjDtut17, po_Odm_AnaDtut18, po_Odm_OrjDtut18, po_Odm_AnaDtut19, po_Odm_OrjDtut19, po_Odm_AnaDtut20, po_Odm_OrjDtut20, po_Odm_AnaDtut21, po_Odm_OrjDtut21, po_Odm_AnaDtut22, po_Odm_OrjDtut22, po_Odm_AnaDtut23, po_Odm_OrjDtut23, po_Odm_AnaDtut24, po_Odm_OrjDtut24, po_Odm_AnaDtut25, po_Odm_OrjDtut25, po_Odm_AnaDtut26, po_Odm_OrjDtut26, po_Odm_AnaDtut27, po_Odm_OrjDtut27, po_Odm_AnaDtut28, po_Odm_OrjDtut28, po_Odm_AnaDtut29, po_Odm_OrjDtut29, po_Odm_AnaDtut30, po_Odm_OrjDtut30, po_Odm_AnaDtut31, po_Odm_OrjDtut31, po_Odm_AnaDtut32, po_Odm_OrjDtut32, po_Odm_AnaDtut33, po_Odm_OrjDtut33, po_Odm_AnaDtut34, po_Odm_OrjDtut34, po_Odm_AnaDtut35, po_Odm_OrjDtut35, po_Odm_AnaDtut36, po_Odm_OrjDtut36, po_Odm_AnaDtut37, po_Odm_OrjDtut37, 
             po_Odm_AnaDtut38, po_Odm_OrjDtut38, po_Odm_AnaDtut39, po_Odm_OrjDtut39, po_Odm_AnaDtut40, po_Odm_OrjDtut40, po_Odm_AnaDtut41, po_Odm_OrjDtut41, po_Odm_AnaDtut42, po_Odm_OrjDtut42, po_Odm_AnaDtut43, po_Odm_OrjDtut43, po_Odm_AnaDtut44, po_Odm_OrjDtut44, po_Odm_AnaDtut45, po_Odm_OrjDtut45, po_Odm_AnaDtut46, po_Odm_OrjDtut46, po_Odm_AnaDtut47, po_Odm_OrjDtut47, po_Odm_AnaDtut48, po_Odm_OrjDtut48, po_Odm_AnaDtut49, po_Odm_OrjDtut49, po_Odm_AnaDtut50, po_Odm_OrjDtut50, po_Vadeler_OdemeTipi1, po_Vadeler_vade1, 
             po_Vadeler_Tutar1, po_Vadeler_OdemeTipi2, po_Vadeler_vade2, po_Vadeler_Tutar2, po_Vadeler_OdemeTipi3, po_Vadeler_vade3, po_Vadeler_Tutar3, po_Vadeler_OdemeTipi4, po_Vadeler_vade4, po_Vadeler_Tutar4, po_Vadeler_OdemeTipi5, po_Vadeler_vade5, po_Vadeler_Tutar5, po_Vadeler_OdemeTipi6, po_Vadeler_vade6, po_Vadeler_Tutar6, po_Vadeler_OdemeTipi7, po_Vadeler_vade7, po_Vadeler_Tutar7, po_Vadeler_OdemeTipi8, po_Vadeler_vade8, po_Vadeler_Tutar8, po_Vadeler_OdemeTipi9, po_Vadeler_vade9, po_Vadeler_Tutar9, po_Vadeler_OdemeTipi10, po_Vadeler_vade10, po_Vadeler_Tutar10, po_Vadeler_OdemeTipi11, po_Vadeler_vade11, po_Vadeler_Tutar11, po_Vadeler_OdemeTipi12, po_Vadeler_vade12, po_Vadeler_Tutar12, po_Vadeler_OdemeTipi13, po_Vadeler_vade13, po_Vadeler_Tutar13, po_Vadeler_OdemeTipi14, po_Vadeler_vade14, po_Vadeler_Tutar14, po_Vadeler_OdemeTipi15, po_Vadeler_vade15, po_Vadeler_Tutar15, po_Vadeler_OdemeTipi16, po_Vadeler_vade16, po_Vadeler_Tutar16, po_Vadeler_OdemeTipi17, po_Vadeler_vade17, po_Vadeler_Tutar17, po_Vadeler_OdemeTipi18, po_Vadeler_vade18, po_Vadeler_Tutar18, po_Vadeler_OdemeTipi19, po_Vadeler_vade19, po_Vadeler_Tutar19, po_Vadeler_OdemeTipi20, po_Vadeler_vade20, po_Vadeler_Tutar20, po_Vadeler_OdemeTipi21, po_Vadeler_vade21, po_Vadeler_Tutar21, po_Vadeler_OdemeTipi22, po_Vadeler_vade22, po_Vadeler_Tutar22, po_Vadeler_OdemeTipi23, po_Vadeler_vade23, po_Vadeler_Tutar23, po_Vadeler_OdemeTipi24, po_Vadeler_vade24, po_Vadeler_Tutar24, po_Vadeler_OdemeTipi25, po_Vadeler_vade25, po_Vadeler_Tutar25, po_Vadeler_OdemeTipi26, po_Vadeler_vade26, po_Vadeler_Tutar26, po_Vadeler_OdemeTipi27, po_Vadeler_vade27, po_Vadeler_Tutar27, po_Vadeler_OdemeTipi28, po_Vadeler_vade28, po_Vadeler_Tutar28, po_Vadeler_OdemeTipi29, po_Vadeler_vade29, po_Vadeler_Tutar29, po_Vadeler_OdemeTipi30, po_Vadeler_vade30, po_Vadeler_Tutar30, po_Vadeler_OdemeTipi31, po_Vadeler_vade31, po_Vadeler_Tutar31, po_Vadeler_OdemeTipi32, po_Vadeler_vade32, po_Vadeler_Tutar32, po_Vadeler_OdemeTipi33, po_Vadeler_vade33, po_Vadeler_Tutar33, po_Vadeler_OdemeTipi34, po_Vadeler_vade34, po_Vadeler_Tutar34, po_Vadeler_OdemeTipi35, po_Vadeler_vade35, po_Vadeler_Tutar35, po_Vadeler_OdemeTipi36, po_Vadeler_vade36, po_Vadeler_Tutar36, po_Tks_Satis, 
@@ -561,7 +841,7 @@ function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
           , integrationCode)
           VALUES(NEWID(), 0, 0, 0, 1003, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), '', '', '', 0, 0, 
             @EvrakSeri /*po_KasaKodu*/, @EvrakSira /*po_BelgeNo*/, ${fisData.batchNo || 0} /*po_MyeZNo*/, '' /*po_KasiyerKodu*/, 
-            '${fisData.endDate}' /*po_BelgeTarihi*/, ${e.amount} /*po_BelgeToplam*/, @VergiMatrah0*@OdemeOran /*po_VerMtrh0*/, 
+            '${fisData.endDate}' /*po_BelgeTarihi*/, ${amount} /*po_BelgeToplam*/, @VergiMatrah0*@OdemeOran /*po_VerMtrh0*/, 
             @VergiMatrah1*@OdemeOran /*po_VerMtrh1*/, @VergiMatrah2*@OdemeOran /*po_VerMtrh2*/, @VergiMatrah3*@OdemeOran /*po_VerMtrh3*/,
             @VergiMatrah4*@OdemeOran /*po_VerMtrh4*/, @VergiMatrah5*@OdemeOran /*po_VerMtrh5*/, @VergiMatrah6*@OdemeOran /*po_VerMtrh6*/, 
             0 /*po_VerMtrh7*/, 0 /*po_VerMtrh8*/, 0 /*po_VerMtrh9*/, 0 /*po_VerMtrh10*/, 0 /*po_VerMtrh11*/, 0 /*po_VerMtrh12*/, 0 /*po_VerMtrh13*/, 
@@ -570,7 +850,7 @@ function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
             @Vergi5*@OdemeOran /*po_Vergi5*/, @Vergi6*@OdemeOran /*po_Vergi6*/, 0 /*po_Vergi7*/, 0 /*po_Vergi8*/, 0 /*po_Vergi9*/, 
             0 /*po_Vergi10*/, 0 /*po_Vergi11*/, 0 /*po_Vergi12*/, 0 /*po_Vergi13*/, 0 /*po_Vergi14*/, 0 /*po_Vergi15*/, 0 /*po_Vergi16*/, 
             0 /*po_Vergi17*/, 0 /*po_Vergi18*/, 0 /*po_Vergi19*/, 0 /*po_Vergi20*/, 0 /*po_Fisfatura*/, 1 /*po_Pozisyon*/, 
-            '' /*po_CariKodu*/, 0 /*po_Yuvarlama*/, ${e.amount} /*po_Odm_AnaDtut1*/, ${e.amount} /*po_Odm_OrjDtut1*/, 0 /*po_Odm_AnaDtut2*/, 0 /*po_Odm_OrjDtut2*/, 0 /*po_Odm_AnaDtut3*/, 0 /*po_Odm_OrjDtut3*/, 0 /*po_Odm_AnaDtut4*/, 
+            '' /*po_CariKodu*/, 0 /*po_Yuvarlama*/, ${amount} /*po_Odm_AnaDtut1*/, ${amount} /*po_Odm_OrjDtut1*/, 0 /*po_Odm_AnaDtut2*/, 0 /*po_Odm_OrjDtut2*/, 0 /*po_Odm_AnaDtut3*/, 0 /*po_Odm_OrjDtut3*/, 0 /*po_Odm_AnaDtut4*/, 
             0 /*po_Odm_OrjDtut4*/, 0 /*po_Odm_AnaDtut5*/, 0 /*po_Odm_OrjDtut5*/, 0 /*po_Odm_AnaDtut6*/, 0 /*po_Odm_OrjDtut6*/, 0 /*po_Odm_AnaDtut7*/, 0 /*po_Odm_OrjDtut7*/, 
             0 /*po_Odm_AnaDtut8*/, 0 /*po_Odm_OrjDtut8*/, 0 /*po_Odm_AnaDtut9*/, 0 /*po_Odm_OrjDtut9*/, 0 /*po_Odm_AnaDtut10*/, 0 /*po_Odm_OrjDtut10*/, 
             0 /*po_Odm_AnaDtut11*/, 0 /*po_Odm_OrjDtut11*/, 0 /*po_Odm_AnaDtut12*/, 0 /*po_Odm_OrjDtut12*/, 0 /*po_Odm_AnaDtut13*/, 0 /*po_Odm_OrjDtut13*/, 
@@ -637,19 +917,8 @@ function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
             '' /*po_OKCEvrakID*/, '' /*po_YolcuBeraberKod*/, '' /*po_YolcuBeraberIstisnaKodu*/, 
             '' /*po_YolcuBeraberAraciKurumKodu*/, 0 /*po_GibeGonderildiFl*/, '${fisData.id}' /*integrationCode*/);
           `
-      })
-      query += `END;`
-
-      // fs.writeFileSync(path.join(__dirname, 'workdataInsert_query.sql'), query, 'utf8')
-      executeSqlDb(orgDoc, storeDoc.db + '_WORKDATA', query)
-        .then(resolve)
-        .catch(reject)
-    } catch (error) {
-      reject(error)
-    }
-  })
+  return q
 }
-
 exports.syncPriceTrigger_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc) {
   return new Promise(async (resolve, reject) => {
     try {

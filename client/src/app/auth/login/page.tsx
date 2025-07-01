@@ -21,7 +21,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState(Cookies.get('login_last_username') || '')
   const [organization, setOrganization] = useState(Cookies.get('login_last_organization') || '')
   const { toast } = useToast()
-  const deviceId = Cookies.get('deviceId')
+  const deviceId = Cookies.get('deviceId') || ''
   const login = () => {
     if (username) {
       postItem(`/auth/login`, '', {
