@@ -16,6 +16,7 @@ import { SelectResponsibilityWithLabel } from "@/app/(authenticated)/(components
 import {  SelectProjectWithLabel } from "@/app/(authenticated)/(components)/select-project"
 import { PosIntegrationPos312 } from "./pos-integration-pos312"
 import { SelectWarehouseWithLabel } from "@/app/(authenticated)/(components)/select-warehouse"
+import { SelectFirmWithLabel } from "@/app/(authenticated)/(components)/select-firm"
 
 interface Props {
   params: { id: string }
@@ -91,7 +92,10 @@ export default function EditPage({ params }: Props) {
     loading={loading}
   >
     <div className="flex flex-col gap-4">
-      <TsnInput title={t('Name')} defaultValue={store?.name} onBlur={e => setStore({ ...store, name: e.target.value })} />
+      <div className="grid grid-cols-1 lg:grid-cols-3">
+        <TsnInput className="col-span-2" title={t('Name')} defaultValue={store?.name} onBlur={e => setStore({ ...store, name: e.target.value })} />
+        <SelectFirmWithLabel caption={store?.defaultFirm} t={t} onSelect={e => { setStore({ ...store, defaultFirmId: e._id, defaultFirm: e.name }) }} />
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-3">
         <SelectWarehouseWithLabel caption={store?.warehouse} t={t} onSelect={e => { setStore({ ...store, warehouseId: e._id, warehouse: e.name }) }} />
         <SelectProjectWithLabel caption={store?.project} t={t} onSelect={e => { setStore({ ...store, projectId: e._id, project: e.name }) }} />

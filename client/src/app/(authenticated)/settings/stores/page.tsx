@@ -39,16 +39,18 @@ export default function SettingsPage({ }: Props) {
 
       title={t('Stores')}
       icon=<StoreIcon />
-      onHeaderPaint={() => <div className='grid grid-cols-6 w-full'>
+      onHeaderPaint={() => <div className='grid grid-cols-7 w-full'>
         <div>{t('Name')}</div>
+        <div>{t('Default Firm')}</div>
         <div>{t('Warehouse')}</div>
         <div>{t('Responsibility')}</div>
         <div>{t('Project')}</div>
         <div>{t('Pos')}</div>
         <div className='text-center'>{t('Passive?')}</div>
       </div>}
-      onRowPaint={(e:Store,colIndex) => <div className='grid grid-cols-6 w-full'>
+      onRowPaint={(e:Store,colIndex) => <div className='grid grid-cols-7 w-full'>
         <div>{e.name}</div>
+        <div>{e.defaultFirm}</div>
         <div>{e.warehouse}</div>
         <div>{e.responsibility}</div>
         <div>{e.project}</div>

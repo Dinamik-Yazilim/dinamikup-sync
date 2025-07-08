@@ -23,6 +23,8 @@ import { TsnPanel } from "@/components/ui216/tsn-panel"
 import React from "react"
 import { TsnDialogSelectButton } from "@/components/ui216/tsn-dialog-selectbutton"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Label } from "@/components/ui/label"
+import { ButtonSelect } from "@/components/icon-buttons"
 
 interface Props {
   t: (text: string) => string
@@ -37,7 +39,7 @@ export function SelectFirm({ t, children, onSelect }: Props) {
   const [loading, setLoading] = useState(false)
   const [list, setList] = useState<Firm[]>([])
   const load = (s?: string) => {
-    let q = firmListQuery(50)
+    let q = firmListQuery(100)
     q = q.replaceAll('{search}', s || '')
 
     setLoading(true)
@@ -108,5 +110,21 @@ export function SelectFirm({ t, children, onSelect }: Props) {
 
       </AlertDialogContent>
     </AlertDialog>
+  )
+}
+
+interface WithLabelProps extends Props {
+  className?: string
+  caption?: React.ReactNode | any
+}
+export function SelectFirmWithLabel({ t, children, onSelect, className, caption }: WithLabelProps) {
+  return (
+    <div className={`w-full flex justify-between p-2 pe-4 items-start  border rounded-md border-dashed ${className}`}>
+      <div className="flex flex-col gap-1">
+        <Label className="text-muted-foreground">{t('Default Firm')}</Label>
+        <div className="capitalize">{caption}</div>
+      </div>
+      <SelectFirm t={t} onSelect={onSelect} ><ButtonSelect /></SelectFirm>
+    </div>
   )
 }

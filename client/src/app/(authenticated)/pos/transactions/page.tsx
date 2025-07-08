@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Cookies from 'js-cookie'
 import { ListGrid } from "@/components/ui216/list-grid"
-import { BanknoteIcon, BarcodeIcon, CircleArrowDown, ComputerIcon, Divide, Grid2x2PlusIcon, MoveRightIcon, Package2Icon, RefreshCcwDotIcon, StoreIcon } from "lucide-react"
+import { BanknoteIcon, BarcodeIcon, CircleArrowDown, ComputerIcon, Divide, Grid2x2PlusIcon, LucideUserSquare, MoveRightIcon, Package2Icon, RefreshCcwDotIcon, StoreIcon } from "lucide-react"
 import { ProgressBar } from "../../(components)/progressBar"
 import { ButtonConfirm } from "@/components/button-confirm"
 
@@ -23,15 +23,13 @@ export default function PosPage({ }: Props) {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [busyItems, setBusyItems] = useState(false)
-  const [busyBarcodes, setBusyBarcodes] = useState(false)
-  const [busyPrices, setBusyPrices] = useState(false)
+  const [busyFirms, setBusyFirms] = useState(false)
   const router = useRouter()
   const { t } = useLanguage()
   const posIntegrationTypeList = getPosIntegrationTypeList()
 
   const [sonucItems, setSonucItems] = useState<any>({})
-  const [sonucBarcodes, setSonucBarcodes] = useState<any>({})
-  const [sonucPrices, setSonucPrices] = useState<any>({})
+  const [sonucFirms, setSonucFirms] = useState<any>({})
 
   const load = () => {
     setLoading(true)
@@ -47,7 +45,7 @@ export default function PosPage({ }: Props) {
     return (<div className="border rounded-md border-dashed px-4 py-2 flex flex-col gap-4 w-full min-h-40">
       <div className="flex justify-between">
         <div className="flex gap-4"><StoreIcon /> {store.name}</div>
-        {!busyItems && !busyBarcodes && !busyPrices &&
+        {!busyItems && !busyFirms &&
           <ButtonConfirm
             title="Reset?"
             description={'Son Guncelleme tarihleri resetlenecek. Onayliyor musunuz?'}
@@ -77,34 +75,22 @@ export default function PosPage({ }: Props) {
         <ProgressBar className="col-span-3" title={'Stok Aktarimi'} eventName="syncItems_progress" onProgress={e => setBusyItems(true)} onFinished={() => setBusyItems(false)} />
         <div>{JSON.stringify(sonucItems)}</div>
       </div>
-      {/* <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 items-end">
-        <Button disabled={busyBarcodes} variant={'outline'}
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 items-end">
+        <Button disabled={busyFirms} variant={'outline'}
           onClick={() => {
-            setBusyBarcodes(true)
-            postItem(`/storeIntegration/${store._id}/syncBarcodes`, token, store)
-              .then(result => setSonucBarcodes(result))
+            setBusyFirms(true)
+            postItem(`/storeIntegration/${store._id}/syncFirms`, token, store)
+              .then(result => setSonucFirms(result))
               .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
           }}
           className="flex gap-2 justify-start"
-        ><BarcodeIcon /> Barkodlari Aktar</Button>
-        <ProgressBar className="col-span-3" title={'Barcode Aktarimi'} eventName="syncBarcodes_progress" onProgress={e => setBusyBarcodes(true)} onFinished={() => setBusyBarcodes(false)} />
-        <div>{JSON.stringify(sonucBarcodes)}</div>
-      </div> */}
-      {/* <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 items-end">
-        <Button disabled={busyPrices} variant={'outline'}
-          onClick={() => {
-            setBusyPrices(true)
-            postItem(`/storeIntegration/${store._id}/syncPrices`, token, store)
-              .then(result => setSonucBarcodes(result))
-              .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
-          }}
-          className="flex gap-2 justify-start"
-        ><BanknoteIcon /> Fiyatlari Aktar</Button>
-        <ProgressBar className="col-span-3" title={'Fiyat Aktarimi'} eventName="syncPrices_progress" onProgress={e => setBusyPrices(true)} onFinished={() => setBusyPrices(false)} />
-        <div>{JSON.stringify(sonucPrices)}</div>
-      </div> */}
+        ><LucideUserSquare />Cari Kartlari Aktar</Button>
+        <ProgressBar className="col-span-3" title={'Cari Aktarimi'} eventName="syncFirms_progress" onProgress={e => setBusyFirms(true)} onFinished={() => setBusyFirms(false)} />
+        <div>{JSON.stringify(sonucFirms)}</div>
+      </div>
       <div className="flex justify-start">
-        {!busyItems && !busyBarcodes && !busyPrices &&
+        {!busyItems && !busyFirms &&
           <ButtonConfirm
             title="Güncellemeleri Gönder?"
             description={'Yeni Stok/Barkod/Fiyat Bilgileri Mağaza Terminallerine gönderilecek. Onayliyor musunuz?'}

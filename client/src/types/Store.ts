@@ -9,6 +9,10 @@ export interface Store {
     responsibility?: string
     projectId?: string
     project?: string
+
+    defaultFirmId?: string
+    defaultFirm?: string
+
     posIntegration?: PosIntegration
     passive?:boolean
 }
