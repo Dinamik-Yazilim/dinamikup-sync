@@ -52,7 +52,7 @@ exports.mssql = function (clientId, clientPass, config, query) {
             reject(result.data.error)
           }
         })
-        .catch(err => reject(err.response.data.errors || err.response.data.error))
+        .catch(err => reject(err.response && err.response.data && (err.response.data.errors || err.response.data.error) || err))
 
     } catch (err) {
       reject(err)

@@ -1,0 +1,30 @@
+{
+  "id": "CE3B9156-AB48-42E0-B26F-9D208232F6AC",
+  "name": "AYKIM TEMIZLIK MADDELERI SANAYI VE TICARET ANONIM ŞIRKETI#320.10.02.0113",
+  "taxOffice": "KÜÇÜKKÖY VERGİ DAİRESİ MÜD.",
+  "taxNumber": "1220395099",
+  "eInvoice": true,
+  "eWaybill": true,
+  "fsd": false,
+  "status": 1,
+  "priceOrdr": 0,
+  "addresses": [
+    {
+      "address": "CUMHURİYET MAH. LÜTFİ AYKAÇ BLV. 7 A/      SULTANGAZİ İSTANBUL TÜRKİYE",
+      "ordr": 0
+    }
+  ],
+  "cards": [],
+  "groups": [
+    {
+      "id": 1,
+      "name": "Genel"
+    }
+  ],
+  "phones": [
+    {
+      "ordr": 0,
+      "phone": "+90 (212) 4750834 "
+    }
+  ]
+}

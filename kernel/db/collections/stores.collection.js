@@ -13,6 +13,11 @@ module.exports = function (dbModel) {
       project: { type: String, default: '', index: true },
       defaultFirmId: { type: String, default: '', index: true },
       defaultFirm: { type: String, default: '', index: true },
+      newFirm: {
+        codePattern: { type: String, default: '120.____' },
+        email: { type: String, default: '' },
+        accountingCode: { type: String, default: '120' },
+      },
       posIntegration: {
         integrationType: { type: String, enum: ['dinamikup', 'pos312', 'ingenico', 'genius3'], index: true },
         useMikroWorkData: { type: Boolean, default: true, index: true },

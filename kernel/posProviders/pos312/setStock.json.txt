@@ -1,0 +1,88 @@
+{
+  "Code": "13004371",
+  "Name": "2443 43 INCH FULL HD SMART TV",
+  "ShortName": "2443 43 FLL HD SMR T",
+  "Unit": 1,
+  "Status": true,
+  "Scale": false,
+  "CancelTimeout": 0,
+  "NoDiscount": false,
+  "NoPromotion": false,
+  "FreePrice": false,
+  "Tare": 0,
+  "MaxSale": 0,
+  "LastSaleTime": "00:00:00",
+  "TagUnit": 0,
+  "UnitWeight": 0,
+  "Returnable": true,
+  "Manufacturer": "TANIMSIZ",
+  "Contents": "",
+  "StorageConditions": null,
+  "ProductionPlace": "TR",
+  "LegalDocument": "",
+  "Warnings": "",
+  "ImprintNumber": "",
+  "ImprintName": "",
+  "ProductionMethod": "",
+  "ProductionDate": "2000-01-01T00:00:00",
+  "BusinessName": "",
+  "DomesticProduction": null,
+  "StockBarcodes": [
+    {
+      "barcode": "8680998018700",
+      "stockCode": "13004371",
+      "multiplier": 1
+    }
+  ],
+  "StockDepartments": [
+    {
+      "DepartmentId": 4,
+      "StockCode": "13004371",
+      "Type": 1
+    }
+  ],
+  "StockGroups": [
+    {
+      "GroupId": 1,
+      "StockCode": "13004371"
+    }
+  ],
+  "StockPrices": [
+    {
+      "master": "13004371",
+      "isBarcode": false,
+      "ordr": 1,
+      "storeId": 0,
+      "startDate": "2025-07-11T14:32:56.325Z",
+      "endDate": "2037-07-11T14:32:56.325Z",
+      "price": 5950,
+      "newPrice": 5950,
+      "deleted": false
+    },
+    {
+      "master": "13004371",
+      "isBarcode": false,
+      "ordr": 103,
+      "storeId": 0,
+      "startDate": "2025-07-11T14:32:56.325Z",
+      "endDate": "2037-07-11T14:32:56.325Z",
+      "price": 7500,
+      "newPrice": 7500,
+      "deleted": false
+    }
+  ],
+  "StockRayons": [
+    {
+      "RayonId": 1,
+      "StockCode": "13004371"
+    }
+  ],
+  "StockStores": null,
+  "StockOptionGroups": null,
+  "isNew": null,
+  "Barcode": null,
+  "Price": null,
+  "LastChange": null,
+  "CreateDate": null,
+  "UpdateDate": null
+}

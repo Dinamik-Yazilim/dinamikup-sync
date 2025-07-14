@@ -166,12 +166,13 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             WHEN B.bar_birimpntr=4 THEN S.sto_birim4_katsayi 
             ELSE 1 END as Multiplier, bar_lastup_date as updatedAt FROM BARKOD_TANIMLARI B INNER JOIN
           STOKLAR S ON S.sto_kod=B.bar_stokkodu
-        WHERE (S.sto_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}'  OR B.bar_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}'  ) `)
+        WHERE 1=1 `)
 
 
-      let priceDocs = await getList(sessionDoc, orgDoc, `SELECT sfiyat_stokkod as code, 0 as isBarcode, 0 as ordr, sfiyat_deposirano as storeId, GETDATE() as startDate, GETDATE() as endDate, sfiyat_fiyati as price, sfiyat_fiyati as newPrice, 0 as [deleted] FROM STOK_SATIS_FIYAT_LISTELERI F 
+      let priceDocs = await getList(sessionDoc, orgDoc, `SELECT sfiyat_stokkod as code, 0 as isBarcode, sfiyat_listesirano as ordr, sfiyat_deposirano as storeId, GETDATE() as startDate, GETDATE() as endDate, sfiyat_fiyati as price, sfiyat_fiyati as newPrice, 0 as [deleted] FROM STOK_SATIS_FIYAT_LISTELERI F 
         INNER JOIN STOKLAR S ON S.sto_kod=F.sfiyat_stokkod
-        WHERE sfiyat_listesirano=1 AND S.sto_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}'`)
+        WHERE (sfiyat_listesirano=1 OR sfiyat_listesirano>=100)  and sfiyat_deposirano in (0,${storeDoc.warehouseId}) 
+       `)
 
       console.log('priceDocs.length', priceDocs.length)
 
@@ -206,11 +207,11 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             if (tartiliUrunMu) {
               if (!Scale) Scale = true
             }
-            StockPrices = (priceDocs || []).filter(e => e.code == docs[i].code).map(e => {
+            StockPrices = ((priceDocs || []).filter(e => e.code == docs[i].code).map(e => {
               return {
                 master: e.code,
                 isBarcode: false,
-                ordr: 1,
+                ordr: e.ordr,
                 storeId: e.storeId,
                 startDate: new Date().toISOString(),
                 endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 12)).toISOString(),
@@ -218,7 +219,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
                 newPrice: e.newPrice,
                 deleted: false
               }
-            })
+            }) || []).sort((a, b) => a.ordr - b.ordr)
 
 
             let dataItem = {
@@ -264,7 +265,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
                   "StockCode": docs[i].code
                 }
               ],
-              "StockPrices": StockPrices.length > 0 ? [StockPrices[0]] : [],
+              "StockPrices": StockPrices,
               "StockRayons": [
                 {
                   "RayonId": !isNaN(Number(docs[i].rayon)) && Number(docs[i].rayon) != 0 ? Number(docs[i].rayon) : 1,
@@ -280,6 +281,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
               "CreateDate": null,
               "UpdateDate": null
             }
+            fs.writeFileSync(path.join(__dirname, 'setStock.json.txt'), JSON.stringify(dataItem, null, 2), 'utf8')
             SetStock2(storeDoc.posIntegration.pos312.webServiceUrl, token312, [dataItem])
               .then(async sonuc => {
                 if (sonuc) {
@@ -353,27 +355,26 @@ function AddCustomer(webServiceUrl, token, data) {
 }
 
 
-function GetCustomer(webServiceUrl, token, data) {
+function GetCustomerById(webServiceUrl, token, data) {
   return new Promise((resolve, reject) => {
+    //return resolve([ddd])
     axios({
       method: 'post',
-      url: `${webServiceUrl}/integration/addcustomer`,
+      url: `${webServiceUrl}/integration/getcustomerbyid`,
       timeout: 120 * 60 * 1000, // 120 dakika
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       data: data
     })
       .then(resp => {
-        eventLog('resp:', resp.data)
         resolve(resp.data)
       })
       .catch(err => {
-        // errorLog('[pos312 GetCustomer] Error:', err)
-        reject(err.response.data.errors || err.response.data.error)
+        // errorLog('[pos312 SetStock] Error:', err.response.data.errors || err.response.data.error)
+        reject((err.response && err.response.data.errors || err.response.data.error) || 'error')
       })
 
   })
 }
-
 
 exports.syncFirms_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc) {
   return new Promise(async (resolve, reject) => {
@@ -507,7 +508,7 @@ function GetDocuments(webServiceUrl, token, data) {
       })
       .catch(err => {
         // errorLog('[pos312 SetStock] Error:', err.response.data.errors || err.response.data.error)
-        reject(err.response.data.errors || err.response.data.error)
+        reject((err.response && err.response.data.errors || err.response.data.error) || 'error')
       })
 
   })
@@ -535,14 +536,24 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
       GetDocuments(storeDoc.posIntegration.pos312.webServiceUrl, token312, { startDate: startDate, endDate: endDate })
         .then(fisler => {
           eventLog('[syncGetSales_pos312] fisler adet:'.green, fisler.length)
-          fs.writeFileSync(path.join(__dirname, 'syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
+
           resolve('Mikroya Aktarim Basliyor. Evrak Sayisi:' + fisler.length)
           socketSend(sessionDoc, { event: 'syncSales_progress', caption: `Aktariliyor`, max: fisler.length, position: 0, percent: 0 })
           let i = 0
           function calistir() {
-            return new Promise((resolve, reject) => {
+            return new Promise(async (resolve, reject) => {
               if (i >= fisler.length) return resolve()
+              if ((fisler[i].customers || []).length > 0) {
+                if (fisler[i].customers[0].customerId) {
+                  try {
+                    const customer = await GetCustomerById(storeDoc.posIntegration.pos312.webServiceUrl, token312, fisler[i].customers[0].customerId)
+                    fisler[i].musteri = customer
+                  } catch (err) {
+                    errorLog('[syncGetSales_pos312] customer error:', err)
+                  }
 
+                }
+              }
               fs.writeFileSync(path.join(__dirname, 'fisData.json.txt'), JSON.stringify(fisler[i], null, 2), 'utf8')
               mikroWorkDataAktar(orgDoc, storeDoc, fisler[i])
                 .then(sonuc => {
@@ -558,9 +569,11 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             .then(() => {
               eventLog('[syncGetSales_pos312]'.green, 'Bitti')
               socketSend(sessionDoc, { event: 'syncSales_progress_end' })
+              fs.writeFileSync(path.join(__dirname, 'syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
             })
             .catch(err => {
               errorLog('[syncGetSales_pos312]'.green, 'Error:', err)
+              fs.writeFileSync(path.join(__dirname, 'syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
             })
             .finally(() => socketSend(sessionDoc, { event: 'syncSales_progress_end' }))
 
@@ -577,6 +590,8 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
     }
   })
 }
+
+
 
 function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
   return new Promise((resolve, reject) => {

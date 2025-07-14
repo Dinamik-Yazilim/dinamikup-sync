@@ -75,8 +75,7 @@ exports.executeSql = function (sessionDoc, orgDoc, execQuery, dbSuffix = '') {
         COMMIT TRAN;
       END TRY
       BEGIN CATCH
-        IF @@TRANCOUNT > 0 
-          ROLLBACK TRAN
+        
         DECLARE @ErrorMessage NVARCHAR(4000);
         DECLARE @ErrorSeverity INT;
         DECLARE @ErrorState INT;
@@ -86,6 +85,7 @@ exports.executeSql = function (sessionDoc, orgDoc, execQuery, dbSuffix = '') {
           @ErrorSeverity = ERROR_SEVERITY(),
           @ErrorState = ERROR_STATE();
         
+        IF @@TRANCOUNT > 0 ROLLBACK TRAN;
         RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
       END CATCH
       `
@@ -103,30 +103,31 @@ exports.executeSql = function (sessionDoc, orgDoc, execQuery, dbSuffix = '') {
 exports.executeSqlDb = function (orgDoc, db, execQuery) {
   return new Promise(async (resolve, reject) => {
     try {
-      let query = `use ${db};
-        ${execQuery || ''}
-      `
       // let query = `use ${db};
-      // BEGIN TRY
-      //   BEGIN TRAN;
-      //     ${execQuery || ''}
-      //   COMMIT TRAN;
-      // END TRY
-      // BEGIN CATCH
-      //   IF @@TRANCOUNT > 0 
-      //     ROLLBACK TRAN
-      //   DECLARE @ErrorMessage NVARCHAR(4000);
-      //   DECLARE @ErrorSeverity INT;
-      //   DECLARE @ErrorState INT;
-
-      //   SELECT 
-      //     @ErrorMessage = ERROR_MESSAGE(),
-      //     @ErrorSeverity = ERROR_SEVERITY(),
-      //     @ErrorState = ERROR_STATE();
-
-      //   RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
-      // END CATCH
+      //   ${execQuery || ''}
       // `
+      let query = `use ${db};
+      BEGIN TRY
+        BEGIN TRAN;
+          ${execQuery || ''}
+        COMMIT TRAN;
+      END TRY
+      BEGIN CATCH
+        
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT 
+          @ErrorMessage = ERROR_MESSAGE(),
+          @ErrorSeverity = ERROR_SEVERITY(),
+          @ErrorState = ERROR_STATE();
+
+        IF @@TRANCOUNT > 0 ROLLBACK TRAN;
+        
+        RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
+      END CATCH
+      `
       fs.writeFileSync(path.join(__dirname, 'executeSqlDb.txt'), query, 'utf8')
       mssql(orgDoc.connector.clientId, orgDoc.connector.clientPass, orgDoc.connector.mssql, query)
         .then(result => {
