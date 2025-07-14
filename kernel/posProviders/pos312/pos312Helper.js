@@ -169,9 +169,9 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
         WHERE 1=1 `)
 
 
-      let priceDocs = await getList(sessionDoc, orgDoc, `SELECT sfiyat_stokkod as code, 0 as isBarcode, sfiyat_listesirano as ordr, sfiyat_deposirano as storeId, GETDATE() as startDate, GETDATE() as endDate, sfiyat_fiyati as price, sfiyat_fiyati as newPrice, 0 as [deleted] FROM STOK_SATIS_FIYAT_LISTELERI F 
+      let priceDocs = await getList(sessionDoc, orgDoc, `SELECT sfiyat_stokkod as code, 0 as isBarcode, sfiyat_listesirano as ordr, 0 as storeId, GETDATE() as startDate, GETDATE() as endDate, sfiyat_fiyati as price, sfiyat_fiyati as newPrice, 0 as [deleted] FROM STOK_SATIS_FIYAT_LISTELERI F 
         INNER JOIN STOKLAR S ON S.sto_kod=F.sfiyat_stokkod
-        WHERE (sfiyat_listesirano=1 OR sfiyat_listesirano>=100)  and sfiyat_deposirano in (0,${storeDoc.warehouseId}) 
+        WHERE (sfiyat_listesirano=1 OR sfiyat_listesirano>=100)  and sfiyat_deposirano in (0) 
        `)
 
       console.log('priceDocs.length', priceDocs.length)
@@ -212,7 +212,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
                 master: e.code,
                 isBarcode: false,
                 ordr: e.ordr,
-                storeId: e.storeId,
+                storeId: 0,
                 startDate: new Date().toISOString(),
                 endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 12)).toISOString(),
                 price: e.price,
