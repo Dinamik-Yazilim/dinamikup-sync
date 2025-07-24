@@ -525,7 +525,10 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
       if (!storeDoc.defaultFirmId) return reject(`${storeDoc.name} magaza varsayilan cari tanimlanmamis`)
       if (endDate < startDate) return reject(`baslangic tarihi bitisten buyuk olamaz`)
       socketSend(sessionDoc, { event: 'syncSales_progress', caption: `Mikro WorkData olusturuluyor` })
-      await mikroWorkDataOlustur(orgDoc, storeDoc, startDate.substring(0, 10), endDate.substring(0, 10))
+      if (orgDoc.mainApp == 'mikro16_workdata' || orgDoc.mainApp == 'mikro17_workdata') {
+        await mikroWorkDataOlustur(orgDoc, storeDoc, startDate.substring(0, 10), endDate.substring(0, 10))
+      }
+
       socketSend(sessionDoc, { event: 'syncSales_progress', caption: `312 Pos login in` })
       token312 = await exports.login(storeDoc.posIntegration.pos312.webServiceUrl,
         storeDoc.posIntegration.pos312.webServiceUsername,
@@ -555,7 +558,7 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
                 }
               }
               fs.writeFileSync(path.join(__dirname, 'fisData.json.txt'), JSON.stringify(fisler[i], null, 2), 'utf8')
-              mikroWorkDataAktar(orgDoc, storeDoc, fisler[i])
+              mikroAktar(orgDoc, storeDoc, fisler[i])
                 .then(sonuc => {
                   // eventLog('[syncGetSales_pos312]'.green, 'sonuc:', sonuc)
                   socketSend(sessionDoc, { event: 'syncSales_progress', caption: `${fisler[i].date} Kalem:${fisler[i].sales.length} Station:${fisler[i].stationId} Batch:${fisler[i].batchNo}/${fisler[i].stanNo}`, max: fisler.length, position: (i + 1), percent: 100 * (i + 1) / fisler.length })
@@ -593,13 +596,13 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
 
 
-function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
+function mikroAktar(orgDoc, storeDoc, fisData) {
   return new Promise((resolve, reject) => {
     switch (orgDoc.mainApp) {
-      case 'mikro16':
+      case 'mikro16_workdata':
         mikroV16WorkDataAktar(orgDoc, storeDoc, fisData).then(resolve).catch(reject)
         break
-      case 'mikro17':
+      case 'mikro17_workdata':
         mikroV17WorkDataAktar(orgDoc, storeDoc, fisData).then(resolve).catch(reject)
         break
       default:
@@ -608,6 +611,7 @@ function mikroWorkDataAktar(orgDoc, storeDoc, fisData) {
     }
   })
 }
+
 function mikroWorkDataOlustur(orgDoc, storeDoc, startDate, endDate) {
   return new Promise((resolve, reject) => {
     let i = 0;
@@ -618,12 +622,12 @@ function mikroWorkDataOlustur(orgDoc, storeDoc, startDate, endDate) {
     while (tarih <= d2) {
       let query = ``
       switch (orgDoc.mainApp) {
-        case 'mikro16':
+        case 'mikro16_workdata':
           query += workData.workDataV16CreatePOQuery(tarih, storeDoc.warehouseId) + '\n'
           query += workData.workDataV16CreatePRHQuery(tarih, storeDoc.warehouseId) + '\n'
           query += workData.workDataV16CreateSTHQuery(tarih, storeDoc.warehouseId) + '\n'
           break
-        case 'mikro17':
+        case 'mikro17_workdata':
           query += workData.workDataV17CreatePOQuery(tarih, storeDoc.warehouseId) + '\n'
           query += workData.workDataV17CreatePRHQuery(tarih, storeDoc.warehouseId) + '\n'
           query += workData.workDataV17CreateSTHQuery(tarih, storeDoc.warehouseId) + '\n'

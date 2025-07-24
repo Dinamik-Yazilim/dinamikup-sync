@@ -3,7 +3,7 @@ module.exports = function (dbModel) {
   const schema = mongoose.Schema(
     {
       name: { type: String, unique: true },
-      mainApp: { type: String, default: 'mikro16', enum: ['mikro16', 'mikro17'] },
+      mainApp: { type: String, default: 'mikro16', enum: ['mikro16', 'mikro17', 'mikro16_workdata', 'mikro17_workdata'] },
       connector: {
         clientId: { type: String, default: '', index: true },
         clientPass: { type: String, default: '', index: true },
