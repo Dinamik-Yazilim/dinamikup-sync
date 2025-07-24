@@ -4,8 +4,9 @@ const path = require('path')
 const { socketSend } = require('../../lib/socketHelper')
 const { getList, executeSql, getListDb, executeSqlDb } = require('../../lib/mikro/mikroHelper')
 const workData = require('../../lib/mikro/workdata')
-const { mikroV16WorkDataAktar } = require('./workDataV16Aktar')
-const { mikroV17WorkDataAktar } = require('./workDataV17Aktar')
+const { mikroV16WorkDataAktar } = require('./mikro16_workDataAktar')
+const { mikroV17WorkDataAktar } = require('./mikro17_workDataAktar')
+const { mikroV16SatisAktar } = require('./mikro16_satisAktar')
 
 exports.test = function (webServiceUrl, webServiceUsername, webServicePassword) {
   return new Promise((resolve, reject) => {
@@ -281,7 +282,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
               "CreateDate": null,
               "UpdateDate": null
             }
-            fs.writeFileSync(path.join(__dirname, 'setStock.json.txt'), JSON.stringify(dataItem, null, 2), 'utf8')
+            fs.writeFileSync(path.join(__dirname, 'logs', '!!__setStock.json.txt'), JSON.stringify(dataItem, null, 2), 'utf8')
             SetStock2(storeDoc.posIntegration.pos312.webServiceUrl, token312, [dataItem])
               .then(async sonuc => {
                 if (sonuc) {
@@ -444,7 +445,7 @@ exports.syncFirms_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             "groups": [{ "id": 1, "name": "Genel" }],
             "phones": [{ "ordr": 0, "phone": docs[i].phone }]
           }
-          fs.writeFileSync(path.join(__dirname, '__customerDataItem.json.txt'), JSON.stringify(dataItem, null, 2), 'utf8')
+          fs.writeFileSync(path.join(__dirname, 'logs', '!!__customerDataItem.json.txt'), JSON.stringify(dataItem, null, 2), 'utf8')
           AddCustomer(storeDoc.posIntegration.pos312.webServiceUrl, token312, dataItem)
             .then(async sonuc => {
               eventLog('[syncFirms_pos312] AddCustomer sonuc:', sonuc)
@@ -524,8 +525,9 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
       if (!storeDoc.warehouseId) return reject(`${storeDoc.name} magaza depo no tanimlanmamis`)
       if (!storeDoc.defaultFirmId) return reject(`${storeDoc.name} magaza varsayilan cari tanimlanmamis`)
       if (endDate < startDate) return reject(`baslangic tarihi bitisten buyuk olamaz`)
-      socketSend(sessionDoc, { event: 'syncSales_progress', caption: `Mikro WorkData olusturuluyor` })
+
       if (orgDoc.mainApp == 'mikro16_workdata' || orgDoc.mainApp == 'mikro17_workdata') {
+        socketSend(sessionDoc, { event: 'syncSales_progress', caption: `Mikro WorkData olusturuluyor` })
         await mikroWorkDataOlustur(orgDoc, storeDoc, startDate.substring(0, 10), endDate.substring(0, 10))
       }
 
@@ -557,8 +559,8 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
                 }
               }
-              fs.writeFileSync(path.join(__dirname, 'fisData.json.txt'), JSON.stringify(fisler[i], null, 2), 'utf8')
-              mikroAktar(orgDoc, storeDoc, fisler[i])
+              fs.writeFileSync(path.join(__dirname, 'logs', '!!__fisData.json.txt'), JSON.stringify(fisler[i], null, 2), 'utf8')
+              satislariAktar(orgDoc, storeDoc, fisler[i])
                 .then(sonuc => {
                   // eventLog('[syncGetSales_pos312]'.green, 'sonuc:', sonuc)
                   socketSend(sessionDoc, { event: 'syncSales_progress', caption: `${fisler[i].date} Kalem:${fisler[i].sales.length} Station:${fisler[i].stationId} Batch:${fisler[i].batchNo}/${fisler[i].stanNo}`, max: fisler.length, position: (i + 1), percent: 100 * (i + 1) / fisler.length })
@@ -572,11 +574,11 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             .then(() => {
               eventLog('[syncGetSales_pos312]'.green, 'Bitti')
               socketSend(sessionDoc, { event: 'syncSales_progress_end' })
-              fs.writeFileSync(path.join(__dirname, 'syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
+              fs.writeFileSync(path.join(__dirname, 'logs', '!!__syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
             })
             .catch(err => {
               errorLog('[syncGetSales_pos312]'.green, 'Error:', err)
-              fs.writeFileSync(path.join(__dirname, 'syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
+              fs.writeFileSync(path.join(__dirname, 'logs', '!!__syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
             })
             .finally(() => socketSend(sessionDoc, { event: 'syncSales_progress_end' }))
 
@@ -595,10 +597,12 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 }
 
 
-
-function mikroAktar(orgDoc, storeDoc, fisData) {
+function satislariAktar(orgDoc, storeDoc, fisData) {
   return new Promise((resolve, reject) => {
     switch (orgDoc.mainApp) {
+      case 'mikro16':
+        mikroV16SatisAktar(orgDoc, storeDoc, fisData).then(resolve).catch(reject)
+        break
       case 'mikro16_workdata':
         mikroV16WorkDataAktar(orgDoc, storeDoc, fisData).then(resolve).catch(reject)
         break
