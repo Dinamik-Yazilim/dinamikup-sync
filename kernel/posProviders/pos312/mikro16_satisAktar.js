@@ -30,11 +30,18 @@ exports.mikroV16SatisAktar = function (orgDoc, storeDoc, fisData) {
         DECLARE @GirisDepoNo INT = ${iade ? storeDoc.warehouseId : 0};
         DECLARE @CikisDepoNo INT = ${iade ? 0 : storeDoc.warehouseId};
         DECLARE @CariKod VARCHAR(25) = '${storeDoc.defaultFirmId}';
+        DECLARE @ProjeKodu VARCHAR(25) = '${posComputerDoc.responsibilityId || storeDoc.responsibilityId}';
+        DECLARE @SorumlulukMerkezi VARCHAR(25) = '${posComputerDoc.projectId || storeDoc.projectId}';
+        DECLARE @KasaKod VARCHAR(25) = '${posComputerDoc.cashAccountId}';
+        DECLARE @BankaKod VARCHAR(25) = '${posComputerDoc.bankAccountId}';
 
         DECLARE @CHA_TIP INT = ${iade ? 0 : 1};
         DECLARE @CHA_CINS INT = 4;
         DECLARE @CHA_IADE INT = ${iade ? 1 : 0};
         DECLARE @CHA_EVRAKTIP INT = ${iade ? 0 : 63};
+        DECLARE @CHA_TPOZ INT = 1;
+        DECLARE @CHA_TICARET_TURU INT = ${iade ? 0 : 1};
+        DECLARE @CHA_CARI_CINS INT = 4;
 
         DECLARE @STH_TIP INT = ${iade ? 0 : 1};
         DECLARE @STH_CINS INT = ${iade ? 0 : 1};
@@ -48,21 +55,13 @@ exports.mikroV16SatisAktar = function (orgDoc, storeDoc, fisData) {
         DECLARE @SatirNo INT = -1;
         DECLARE @VergiPntr INT = 0;
         DECLARE @VergiYuzde FLOAT = 0;
-        DECLARE @VergiMatrah0 FLOAT=0;
-        DECLARE @VergiMatrah1 FLOAT=0;
-        DECLARE @VergiMatrah2 FLOAT=0;
-        DECLARE @VergiMatrah3 FLOAT=0;
-        DECLARE @VergiMatrah4 FLOAT=0;
-        DECLARE @VergiMatrah5 FLOAT=0;
-        DECLARE @VergiMatrah6 FLOAT=0;
+        DECLARE @VergiMatrah0 FLOAT=0,@VergiMatrah1 FLOAT=0, @VergiMatrah2 FLOAT=0, @VergiMatrah3 FLOAT=0, @VergiMatrah4 FLOAT=0;
+        DECLARE @VergiMatrah5 FLOAT=0, @VergiMatrah6 FLOAT=0, @VergiMatrah7 FLOAT=0, @VergiMatrah8 FLOAT=0, @VergiMatrah9 FLOAT=0;
+        DECLARE @VergiMatrah10 FLOAT=0, @VergiMatrah11 FLOAT=0, @VergiMatrah12 FLOAT=0;
 
-        DECLARE @Vergi0 FLOAT=0;
-        DECLARE @Vergi1 FLOAT=0;
-        DECLARE @Vergi2 FLOAT=0;
-        DECLARE @Vergi3 FLOAT=0;
-        DECLARE @Vergi4 FLOAT=0;
-        DECLARE @Vergi5 FLOAT=0;
-        DECLARE @Vergi6 FLOAT=0; 
+        DECLARE @Vergi0 FLOAT=0, @Vergi1 FLOAT=0, @Vergi2 FLOAT=0, @Vergi3 FLOAT=0, @Vergi4 FLOAT=0, @Vergi5 FLOAT=0, @Vergi6 FLOAT=0; 
+        DECLARE @Vergi7 FLOAT=0, @Vergi8 FLOAT=0, @Vergi9 FLOAT=0, @Vergi10 FLOAT=0, @Vergi11 FLOAT=0, @Vergi12 FLOAT=0; 
+        
         DECLARE @OdemeOran FLOAT=0;
         IF EXISTS(SELECT TOP 1 * FROM DEPOLAR) BEGIN
           SELECT TOP 1 @MikroVersionNo=dep_VersionNo FROM DEPOLAR ORDER BY dep_no DESC
@@ -112,8 +111,6 @@ exports.mikroV16SatisAktar = function (orgDoc, storeDoc, fisData) {
             SET @NextCariKodInt=CAST(@MaxCariKod as bigint)+1
 
             SET @YeniCariKod=REPLACE(@CariHesapPattern,'_','') + REPLACE(STR(@NextCariKodInt,LEN(@MaxCariKod)),' ', '0')
-            
-
 
             INSERT INTO CARI_HESAPLAR(cari_Guid, cari_DBCno, cari_SpecRECno, cari_iptal, cari_fileid, cari_hidden, cari_kilitli, cari_degisti, cari_checksum, cari_create_user,
               cari_create_date, cari_lastup_user, cari_lastup_date, cari_special1, cari_special2, cari_special3, cari_MainProgramNo, cari_VersionNo, cari_MenuNo, cari_MikroSpecial1, 
@@ -201,15 +198,117 @@ exports.mikroV16SatisAktar = function (orgDoc, storeDoc, fisData) {
         `
       }
       query += `
-        IF NOT EXISTS(SELECT * FROM S_${tarih}_${depoNo} WHERE sth_yetkili_uid='${fisData.id}' ) BEGIN
-      `
+        IF NOT EXISTS(SELECT * FROM CARI_HESAP_HAREKETLERI WHERE cha_Guid='${fisData.id}' ) BEGIN
+        `
       let satisToplam = 0
+      let vergiToplam = 0
       fisData.sales.forEach((e, rowIndex) => {
         if (e.status) {
           let netTutar = e.returnUnitPrice * e.quantity
           let tutar = netTutar / (1 + e.departmentValue / 100)
           let vergi = netTutar - tutar
           satisToplam += netTutar
+          vergiToplam += vergi
+          query += `
+          
+          SET @VergiYuzde=${e.departmentValue};
+          SELECT @VergiPntr=CASE WHEN fn_VergiYuzde(0)=@VergiYuzde THEN 0
+          WHEN fn_VergiYuzde(1)=@VergiYuzde THEN 1
+          WHEN fn_VergiYuzde(2)=@VergiYuzde THEN 2
+          WHEN fn_VergiYuzde(3)=@VergiYuzde THEN 3
+          WHEN fn_VergiYuzde(4)=@VergiYuzde THEN 4
+          WHEN fn_VergiYuzde(5)=@VergiYuzde THEN 5
+          WHEN fn_VergiYuzde(6)=@VergiYuzde THEN 6
+          WHEN fn_VergiYuzde(7)=@VergiYuzde THEN 7
+          WHEN fn_VergiYuzde(8)=@VergiYuzde THEN 8
+          WHEN fn_VergiYuzde(9)=@VergiYuzde THEN 9
+          WHEN fn_VergiYuzde(10)=@VergiYuzde THEN 10
+          WHEN fn_VergiYuzde(11)=@VergiYuzde THEN 11
+          WHEN fn_VergiYuzde(12)=@VergiYuzde THEN 12
+          ELSE 0 END;
+
+          SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah1=@VergiMatrah1 + CASE WHEN @VergiPntr=1 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah2=@VergiMatrah2 + CASE WHEN @VergiPntr=2 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah3=@VergiMatrah3 + CASE WHEN @VergiPntr=3 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah4=@VergiMatrah4 + CASE WHEN @VergiPntr=4 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah5=@VergiMatrah5 + CASE WHEN @VergiPntr=5 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah6=@VergiMatrah6 + CASE WHEN @VergiPntr=6 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah7=@VergiMatrah7 + CASE WHEN @VergiPntr=7 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah8=@VergiMatrah8 + CASE WHEN @VergiPntr=8 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah9=@VergiMatrah9 + CASE WHEN @VergiPntr=9 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah10=@VergiMatrah10 + CASE WHEN @VergiPntr=10 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah11=@VergiMatrah11 + CASE WHEN @VergiPntr=11 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah12=@VergiMatrah12 + CASE WHEN @VergiPntr=12 THEN ${tutar} ELSE 0 END;
+
+          SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi2=@Vergi2 + CASE WHEN @VergiPntr=2 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi3=@Vergi3 + CASE WHEN @VergiPntr=3 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi4=@Vergi4 + CASE WHEN @VergiPntr=4 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi7=@Vergi7 + CASE WHEN @VergiPntr=7 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi8=@Vergi8 + CASE WHEN @VergiPntr=8 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi9=@Vergi9 + CASE WHEN @VergiPntr=9 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi10=@Vergi10 + CASE WHEN @VergiPntr=10 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi11=@Vergi11 + CASE WHEN @VergiPntr=11 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi12=@Vergi12 + CASE WHEN @VergiPntr=12 THEN ${vergi} ELSE 0 END;
+          `
+        }
+      })
+      query += `  INSERT INTO CARI_HESAP_HAREKETLERI (cha_Guid, cha_DBCno, cha_SpecRecNo, cha_iptal, cha_fileid, cha_hidden, cha_kilitli, cha_degisti, cha_CheckSum, cha_create_user, 
+            cha_create_date, cha_lastup_user, cha_lastup_date, cha_special1, cha_special2, cha_special3, cha_firmano, cha_subeno, cha_evrak_tip, cha_evrakno_seri, cha_evrakno_sira, 
+            cha_satir_no, cha_tarihi, cha_tip, cha_cinsi, cha_normal_Iade, cha_tpoz, cha_ticaret_turu, cha_belge_no, cha_belge_tarih, cha_aciklama, cha_satici_kodu, cha_EXIMkodu, 
+            cha_projekodu, cha_yat_tes_kodu, cha_cari_cins, cha_kod, cha_ciro_cari_kodu, cha_d_cins, cha_d_kur, cha_altd_kur, cha_grupno, cha_srmrkkodu, cha_kasa_hizmet, cha_kasa_hizkod, 
+            cha_karsidcinsi, cha_karsid_kur, cha_karsidgrupno, cha_karsisrmrkkodu, cha_miktari, cha_meblag, cha_aratoplam, cha_vade, cha_Vade_Farki_Yuz, cha_ft_iskonto1, cha_ft_iskonto2, 
+            cha_ft_iskonto3, cha_ft_iskonto4, cha_ft_iskonto5, cha_ft_iskonto6, cha_ft_masraf1, cha_ft_masraf2, cha_ft_masraf3, cha_ft_masraf4, cha_isk_mas1, cha_isk_mas2, cha_isk_mas3, 
+            cha_isk_mas4, cha_isk_mas5, cha_isk_mas6, cha_isk_mas7, cha_isk_mas8, cha_isk_mas9, cha_isk_mas10, cha_sat_iskmas1, cha_sat_iskmas2, cha_sat_iskmas3, cha_sat_iskmas4, 
+            cha_sat_iskmas5, cha_sat_iskmas6, cha_sat_iskmas7, cha_sat_iskmas8, cha_sat_iskmas9, cha_sat_iskmas10, cha_yuvarlama, cha_StFonPntr, cha_stopaj, cha_savsandesfonu, 
+            cha_avansmak_damgapul, cha_vergipntr, cha_vergisiz_fl, cha_otvtutari, cha_otvvergisiz_fl, cha_oiv_pntr, cha_oivtutari, cha_oiv_vergi, cha_oivergisiz_fl, cha_fis_tarih, 
+            cha_fis_sirano, cha_trefno, cha_sntck_poz, cha_reftarihi, cha_istisnakodu, cha_pos_hareketi, cha_meblag_ana_doviz_icin_gecersiz_fl, cha_meblag_alt_doviz_icin_gecersiz_fl, 
+            cha_meblag_orj_doviz_icin_gecersiz_fl, cha_sip_uid, cha_kirahar_uid, cha_vardiya_tarihi, cha_vardiya_no, cha_vardiya_evrak_ti, cha_ebelge_turu, cha_tevkifat_toplam, 
+            cha_e_islem_turu, cha_fatura_belge_turu, cha_diger_belge_adi, cha_uuid, cha_adres_no, cha_vergifon_toplam, cha_ilk_belge_tarihi, cha_ilk_belge_doviz_kuru, cha_HareketGrupKodu1, 
+            cha_HareketGrupKodu2, cha_HareketGrupKodu3, cha_ebelgeno_seri, cha_ebelgeno_sira, cha_hubid, cha_hubglbid, cha_disyazilimid, cha_disyazilim_tip, cha_bsba_e_belge_mi, 
+            cha_eticaret_kanal_kodu, cha_hizli_satis_kasa_no, cha_ebelge_Islemturu, cha_tevkifat_sifirlandi_fl, cha_vergi1, cha_vergi2, cha_vergi3, cha_vergi4, cha_vergi5, cha_vergi6, 
+            cha_vergi7, cha_vergi8, cha_vergi9, cha_vergi10, cha_vergi11, cha_vergi12, cha_vergi13, cha_vergi14, cha_vergi15, cha_vergi16, cha_vergi17, cha_vergi18, cha_vergi19, cha_vergi20, 
+            cha_ilave_edilecek_kdv1, cha_ilave_edilecek_kdv2, cha_ilave_edilecek_kdv3, cha_ilave_edilecek_kdv4, cha_ilave_edilecek_kdv5, cha_ilave_edilecek_kdv6, cha_ilave_edilecek_kdv7, 
+            cha_ilave_edilecek_kdv8, cha_ilave_edilecek_kdv9, cha_ilave_edilecek_kdv10, cha_ilave_edilecek_kdv11, cha_ilave_edilecek_kdv12, cha_ilave_edilecek_kdv13, cha_ilave_edilecek_kdv14, 
+            cha_ilave_edilecek_kdv15, cha_ilave_edilecek_kdv16, cha_ilave_edilecek_kdv17, cha_ilave_edilecek_kdv18, cha_ilave_edilecek_kdv19, cha_ilave_edilecek_kdv20, cha_efatura_belge_tipi)
+            VALUES('${fisData.id}' /*cha_Guid*/, 0 /*cha_DBCno*/, 0 /*cha_SpecRecNo*/, 0 /*cha_iptal*/, 51 /*cha_fileid*/, 0 /*cha_hidden*/, 0 /*cha_kilitli*/, 0 /*cha_degisti*/,
+            0 /*cha_CheckSum*/, @MikroUserNo /*cha_create_user*/, GETDATE() /*cha_create_date*/, @MikroUserNo /*cha_lastup_user*/, GETDATE() /*cha_lastup_date*/, 
+            '' /*cha_special1*/, '' /*cha_special2*/, '' /*cha_special3*/, 0 /*cha_firmano*/, 0 /*cha_subeno*/, @CHA_EVRAKTIP /*cha_evrak_tip*/, @EvrakSeri /*cha_evrakno_seri*/,
+            @EvrakSira /*cha_evrakno_sira*/, 0 /*cha_satir_no*/, @Tarih /*cha_tarihi*/, @CHA_TIP /*cha_tip*/, @CHA_CINS /*cha_cinsi*/, @CHA_IADE /*cha_normal_Iade*/,
+            @CHA_TPOZ /*cha_tpoz*/, @CHA_TICARET_TURU /*cha_ticaret_turu*/, @BelgeNo /*cha_belge_no*/, @Tarih /*cha_belge_tarih*/, '' /*cha_aciklama*/, '' /*cha_satici_kodu*/, '' /*cha_EXIMkodu*/, 
+            @ProjeKodu /*cha_projekodu*/, '' /*cha_yat_tes_kodu*/,@CHA_CARI_CINS /*cha_cari_cins*/, @KasaKod /*cha_kod*/, @CariKod /*cha_ciro_cari_kodu*/, 
+        0 /*cha_d_cins*/, 1 /*cha_d_kur*/, 1 /*cha_altd_kur*/, 0 /*cha_grupno*/, @SorumlulukMerkezi /*cha_srmrkkodu*/, 0 /*cha_kasa_hizmet*/, '' /*cha_kasa_hizkod*/, 
+            0 /*cha_karsidcinsi*/, 1 /*cha_karsid_kur*/, 0 /*cha_karsidgrupno*/, '' /*cha_karsisrmrkkodu*/, 0 /*cha_miktari*/, ${satisToplam} /*cha_meblag*/,
+            ${satisToplam - vergiToplam} /*cha_aratoplam*/, 0 /*cha_vade*/, 0 /*cha_Vade_Farki_Yuz*/, 0 /*cha_ft_iskonto1*/, 0 /*cha_ft_iskonto2*/, 0 /*cha_ft_iskonto3*/, 0 /*cha_ft_iskonto4*/,
+            0 /*cha_ft_iskonto5*/, 0 /*cha_ft_iskonto6*/, 0 /*cha_ft_masraf1*/, 0 /*cha_ft_masraf2*/, 0 /*cha_ft_masraf3*/, 0 /*cha_ft_masraf4*/, 0 /*cha_isk_mas1*/, 1 /*cha_isk_mas2*/,
+            1 /*cha_isk_mas3*/, 1 /*cha_isk_mas4*/, 1 /*cha_isk_mas5*/, 1 /*cha_isk_mas6*/, 1 /*cha_isk_mas7*/, 1 /*cha_isk_mas8*/, 1 /*cha_isk_mas9*/, 1 /*cha_isk_mas10*/, 0 /*cha_sat_iskmas1*/,
+            0 /*cha_sat_iskmas2*/, 0 /*cha_sat_iskmas3*/, 0 /*cha_sat_iskmas4*/, 0 /*cha_sat_iskmas5*/, 0 /*cha_sat_iskmas6*/, 0 /*cha_sat_iskmas7*/, 0 /*cha_sat_iskmas8*/, 0 /*cha_sat_iskmas9*/,
+            0 /*cha_sat_iskmas10*/, 0 /*cha_yuvarlama*/, 0 /*cha_StFonPntr*/, 0 /*cha_stopaj*/, 0 /*cha_savsandesfonu*/, 0 /*cha_avansmak_damgapul*/, 0 /*cha_vergipntr*/, 0 /*cha_vergisiz_fl*/,
+            0 /*cha_otvtutari*/, 0 /*cha_otvvergisiz_fl*/, 0 /*cha_oiv_pntr*/, 0 /*cha_oivtutari*/, 0 /*cha_oiv_vergi*/, 0 /*cha_oivergisiz_fl*/, '1899-12-30 00:00:00.000' /*cha_fis_tarih*/, 
+            0 /*cha_fis_sirano*/, '' /*cha_trefno*/, 0 /*cha_sntck_poz*/, '1899-12-30 00:00:00.000' /*cha_reftarihi*/, 0 /*cha_istisnakodu*/, 0 /*cha_pos_hareketi*/, 
+            0 /*cha_meblag_ana_doviz_icin_gecersiz_fl*/, 0 /*cha_meblag_alt_doviz_icin_gecersiz_fl*/, 0 /*cha_meblag_orj_doviz_icin_gecersiz_fl*/, '00000000-0000-0000-0000-000000000000' /*cha_sip_uid*/,
+            '00000000-0000-0000-0000-000000000000' /*cha_kirahar_uid*/, '1899-12-30 00:00:00.000' /*cha_vardiya_tarihi*/, 0 /*cha_vardiya_no*/, 0 /*cha_vardiya_evrak_ti*/, ${iade ? 1 : 0} /*cha_ebelge_turu*/,
+            0 /*cha_tevkifat_toplam*/, 0 /*cha_e_islem_turu*/, 0 /*cha_fatura_belge_turu*/, '' /*cha_diger_belge_adi*/, NEWID() /*cha_uuid*/, 1 /*cha_adres_no*/, 0 /*cha_vergifon_toplam*/,
+            '1899-12-30 00:00:00.000' /*cha_ilk_belge_tarihi*/, 0 /*cha_ilk_belge_doviz_kuru*/, '' /*cha_HareketGrupKodu1*/, '' /*cha_HareketGrupKodu2*/, '' /*cha_HareketGrupKodu3*/, 
+            '' /*cha_ebelgeno_seri*/, 0 /*cha_ebelgeno_sira*/, '' /*cha_hubid*/, '' /*cha_hubglbid*/, '${fisData.id}' /*cha_disyazilimid*/, 0 /*cha_disyazilim_tip*/, 0 /*cha_bsba_e_belge_mi*/, 
+            '' /*cha_eticaret_kanal_kodu*/, 0 /*cha_hizli_satis_kasa_no*/, 0 /*cha_ebelge_Islemturu*/, 0 /*cha_tevkifat_sifirlandi_fl*/, @Vergi1 /*cha_vergi1*/, @Vergi2 /*cha_vergi2*/, 
+            @Vergi3 /*cha_vergi3*/, @Vergi4 /*cha_vergi4*/, @Vergi5 /*cha_vergi5*/, @Vergi6 /*cha_vergi6*/, @Vergi7 /*cha_vergi7*/, @Vergi8 /*cha_vergi8*/, @Vergi9 /*cha_vergi9*/, 
+            @Vergi10 /*cha_vergi10*/, @Vergi11 /*cha_vergi11*/, @Vergi12 /*cha_vergi12*/, 0 /*cha_vergi13*/, 0 /*cha_vergi14*/, 0 /*cha_vergi15*/, 0 /*cha_vergi16*/, 0 /*cha_vergi17*/, 
+            0 /*cha_vergi18*/, 0 /*cha_vergi19*/, 0 /*cha_vergi20*/, 0 /*cha_ilave_edilecek_kdv1*/, 0 /*cha_ilave_edilecek_kdv2*/,0 /*cha_ilave_edilecek_kdv3*/, 0 /*cha_ilave_edilecek_kdv4*/, 
+            0 /*cha_ilave_edilecek_kdv5*/, 0 /*cha_ilave_edilecek_kdv6*/, 0 /*cha_ilave_edilecek_kdv7*/, 0 /*cha_ilave_edilecek_kdv8*/, 0 /*cha_ilave_edilecek_kdv9*/, 0 /*cha_ilave_edilecek_kdv10*/, 
+            0 /*cha_ilave_edilecek_kdv11*/, 0 /*cha_ilave_edilecek_kdv12*/, 0 /*cha_ilave_edilecek_kdv13*/, 0 /*cha_ilave_edilecek_kdv14*/, 0 /*cha_ilave_edilecek_kdv15*/, 0 /*cha_ilave_edilecek_kdv16*/, 
+            0 /*cha_ilave_edilecek_kdv17*/, 0 /*cha_ilave_edilecek_kdv18*/, 0 /*cha_ilave_edilecek_kdv19*/, 0 /*cha_ilave_edilecek_kdv20*/, 0 /*cha_efatura_belge_tipi*/);
+
+      `
+      fisData.sales.forEach((e, rowIndex) => {
+        if (e.status) {
+          let netTutar = e.returnUnitPrice * e.quantity
+          let tutar = netTutar / (1 + e.departmentValue / 100)
+          let vergi = netTutar - tutar
           query += `
           SET @SatirNo=@SatirNo+1;
           SET @VergiYuzde=${e.departmentValue};
@@ -238,6 +337,8 @@ exports.mikroV16SatisAktar = function (orgDoc, storeDoc, fisData) {
           SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN ${vergi} ELSE 0 END;
           SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN ${vergi} ELSE 0 END;
         
+          
+       
           INSERT INTO S_${tarih}_${depoNo} (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, 
           sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, 
           sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
@@ -311,7 +412,6 @@ exports.mikroV16SatisAktar = function (orgDoc, storeDoc, fisData) {
       // }
 
       query += `SET @SatirNo=@SatirNo+1;\n`
-      query += odemeV16Insert(fisData, tarih, depoNo, odemeToplam, odemeToplam)
 
       query += `END`
 
