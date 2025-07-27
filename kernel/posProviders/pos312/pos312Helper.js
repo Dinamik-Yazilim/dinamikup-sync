@@ -6,7 +6,7 @@ const { getList, executeSql, getListDb, executeSqlDb } = require('../../lib/mikr
 const workData = require('../../lib/mikro/workdata')
 const { mikroV16WorkDataAktar } = require('./mikro16_workDataAktar')
 const { mikroV17WorkDataAktar } = require('./mikro17_workDataAktar')
-const { mikroV16SatisAktar } = require('./mikro16_satisAktar')
+const { mikroV16SatisAktar, mikroV17SatisAktar } = require('./mikro_satisAktar')
 
 exports.test = function (webServiceUrl, webServiceUsername, webServicePassword) {
   return new Promise((resolve, reject) => {
@@ -149,12 +149,15 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
           sto_lastup_date as updatedAt , sto_reyon_kodu as rayon
            FROM STOKLAR WITH (NOLOCK)
             WHERE sto_kod in (SELECT sfiyat_stokkod FROM STOK_SATIS_FIYAT_LISTELERI WITH (NOLOCK) WHERE sfiyat_listesirano=1)
+            --AND sto_kod IN (SELECT bar_stokkodu FROM BARKOD_TANIMLARI WITH (NOLOCK) WHERE bar_kodu like '27%' OR bar_kodu like '28%' OR bar_kodu like '29%')
+            --AND sto_kod IN ('TB209')
             AND (sto_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}' 
               OR sto_kod IN (SELECT bar_stokkodu FROM BARKOD_TANIMLARI WITH (NOLOCK) WHERE bar_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}') 
               OR sto_kod IN (SELECT sfiyat_stokkod FROM STOK_SATIS_FIYAT_LISTELERI WITH (NOLOCK) WHERE sfiyat_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}') 
             )
             ORDER BY sto_lastup_date`)
 
+      console.log('docs.length', docs.length)
       if (docs.length == 0) {
         socketSend(sessionDoc, { event: 'syncItems_progress_end' })
         return resolve('stok kartlari zaten guncel')
@@ -165,14 +168,15 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             WHEN B.bar_birimpntr=2 THEN S.sto_birim2_katsayi 
             WHEN B.bar_birimpntr=3 THEN S.sto_birim3_katsayi 
             WHEN B.bar_birimpntr=4 THEN S.sto_birim4_katsayi 
-            ELSE 1 END as Multiplier, bar_lastup_date as updatedAt FROM BARKOD_TANIMLARI B INNER JOIN
-          STOKLAR S ON S.sto_kod=B.bar_stokkodu
-        WHERE 1=1 `)
-
+            ELSE 1 END as Multiplier, bar_lastup_date as updatedAt FROM BARKOD_TANIMLARI B  INNER JOIN
+         STOKLAR S ON S.sto_kod=B.bar_stokkodu
+        WHERE B.bar_stokkodu IN ('${docs.map(e => e.code).join("','")}') `)
+      console.log('barcodeDocs.length', barcodeDocs.length)
 
       let priceDocs = await getList(sessionDoc, orgDoc, `SELECT sfiyat_stokkod as code, 0 as isBarcode, sfiyat_listesirano as ordr, 0 as storeId, GETDATE() as startDate, GETDATE() as endDate, sfiyat_fiyati as price, sfiyat_fiyati as newPrice, 0 as [deleted] FROM STOK_SATIS_FIYAT_LISTELERI F 
         INNER JOIN STOKLAR S ON S.sto_kod=F.sfiyat_stokkod
-        WHERE (sfiyat_listesirano=1 OR sfiyat_listesirano>=100)  and sfiyat_deposirano in (0) 
+        WHERE (sfiyat_listesirano=1 OR sfiyat_listesirano>=100)  and sfiyat_deposirano in (0)
+        AND S.sto_kod IN ('${docs.map(e => e.code).join("','")}')
        `)
 
       console.log('priceDocs.length', priceDocs.length)
@@ -186,7 +190,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
           let t1 = new Date().getTime() / 1000
           let Scale = false
           let unit = 1
-          if (['KİLOGRAM', 'KILOGRAM', 'KG', 'kg', 'kilogram', 'KİLO', 'kilo', 'Kilogram'].includes(docs[i].unit)) {
+          if (['KİLOGRAM', 'KILOGRAM', 'KG', 'kg', 'Kg', 'kilogram', 'KİLO', 'kilo', 'Kilogram'].includes(docs[i].unit)) {
             unit = 2
             Scale = true
           }
@@ -204,9 +208,10 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
                 "multiplier": e.Multiplier
               }
             })
-            let tartiliUrunMu = StockBarcodes.find(e => (e.barcode.startsWith('28') || e.barcode.startsWith('29')) && e.barcode.length == 7)
+            let tartiliUrunMu = StockBarcodes.find(e => (e.barcode.startsWith('27') || e.barcode.startsWith('28') || e.barcode.startsWith('29')) && e.barcode.length == 7)
             if (tartiliUrunMu) {
-              if (!Scale) Scale = true
+              unit = 2
+              Scale = true
             }
             StockPrices = ((priceDocs || []).filter(e => e.code == docs[i].code).map(e => {
               return {
@@ -282,7 +287,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
               "CreateDate": null,
               "UpdateDate": null
             }
-            fs.writeFileSync(path.join(__dirname, 'logs', '!!__setStock.json.txt'), JSON.stringify(dataItem, null, 2), 'utf8')
+            process.env.NODE_ENV == 'development' && fs.writeFileSync(path.join(__dirname, 'logs', '!!__setStock.json.txt'), JSON.stringify(dataItem, null, 2), 'utf8')
             SetStock2(storeDoc.posIntegration.pos312.webServiceUrl, token312, [dataItem])
               .then(async sonuc => {
                 if (sonuc) {
@@ -445,7 +450,7 @@ exports.syncFirms_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             "groups": [{ "id": 1, "name": "Genel" }],
             "phones": [{ "ordr": 0, "phone": docs[i].phone }]
           }
-          fs.writeFileSync(path.join(__dirname, 'logs', '!!__customerDataItem.json.txt'), JSON.stringify(dataItem, null, 2), 'utf8')
+          process.env.NODE_ENV == 'development' && fs.writeFileSync(path.join(__dirname, 'logs', '!!__customerDataItem.json.txt'), JSON.stringify(dataItem, null, 2), 'utf8')
           AddCustomer(storeDoc.posIntegration.pos312.webServiceUrl, token312, dataItem)
             .then(async sonuc => {
               eventLog('[syncFirms_pos312] AddCustomer sonuc:', sonuc)
@@ -559,7 +564,7 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
                 }
               }
-              fs.writeFileSync(path.join(__dirname, 'logs', '!!__fisData.json.txt'), JSON.stringify(fisler[i], null, 2), 'utf8')
+              process.env.NODE_ENV == 'development' && fs.writeFileSync(path.join(__dirname, 'logs', '!!__fisData.json.txt'), JSON.stringify(fisler[i], null, 2), 'utf8')
               satislariAktar(orgDoc, storeDoc, fisler[i])
                 .then(sonuc => {
                   // eventLog('[syncGetSales_pos312]'.green, 'sonuc:', sonuc)
@@ -574,11 +579,11 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             .then(() => {
               eventLog('[syncGetSales_pos312]'.green, 'Bitti')
               socketSend(sessionDoc, { event: 'syncSales_progress_end' })
-              fs.writeFileSync(path.join(__dirname, 'logs', '!!__syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
+              process.env.NODE_ENV == 'development' && fs.writeFileSync(path.join(__dirname, 'logs', '!!__syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
             })
             .catch(err => {
               errorLog('[syncGetSales_pos312]'.green, 'Error:', err)
-              fs.writeFileSync(path.join(__dirname, 'logs', '!!__syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
+              process.env.NODE_ENV == 'development' && fs.writeFileSync(path.join(__dirname, 'logs', '!!__syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
             })
             .finally(() => socketSend(sessionDoc, { event: 'syncSales_progress_end' }))
 
@@ -602,6 +607,9 @@ function satislariAktar(orgDoc, storeDoc, fisData) {
     switch (orgDoc.mainApp) {
       case 'mikro16':
         mikroV16SatisAktar(orgDoc, storeDoc, fisData).then(resolve).catch(reject)
+        break
+      case 'mikro17':
+        mikroV17SatisAktar(orgDoc, storeDoc, fisData).then(resolve).catch(reject)
         break
       case 'mikro16_workdata':
         mikroV16WorkDataAktar(orgDoc, storeDoc, fisData).then(resolve).catch(reject)

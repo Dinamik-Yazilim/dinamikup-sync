@@ -310,7 +310,7 @@ exports.mikroV17WorkDataAktar = function (orgDoc, storeDoc, fisData) {
 
       query += `END`
 
-      // fs.writeFileSync(path.join(__dirname,'logs', 'workdataInsert_query.sql'), query, 'utf8')
+      // process.env.NODE_ENV=='development' && fs.writeFileSync(path.join(__dirname,'logs', 'workdataInsert_query.sql'), query, 'utf8')
       executeSqlDb(orgDoc, storeDoc.db + '_WORKDATA', query)
         .then(resolve)
         .catch(reject)

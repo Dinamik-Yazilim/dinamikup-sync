@@ -128,7 +128,7 @@ exports.executeSqlDb = function (orgDoc, db, execQuery) {
         RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
       END CATCH
       `
-      fs.writeFileSync(path.join(__dirname, 'executeSqlDb.txt'), query, 'utf8')
+      process.env.NODE_ENV == 'development' && fs.writeFileSync(path.join(__dirname, 'executeSqlDb.txt'), query, 'utf8')
       mssql(orgDoc.connector.clientId, orgDoc.connector.clientPass, orgDoc.connector.mssql, query)
         .then(result => {
           resolve({ rowsAffected: (result.rowsAffected || []).reduce((a, b) => a + b, 0) })

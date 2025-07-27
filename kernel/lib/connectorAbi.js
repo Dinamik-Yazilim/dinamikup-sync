@@ -19,7 +19,7 @@ exports.dateTime = function (clientId, clientPass) {
             reject(result.data.error)
           }
         })
-        .catch(err => reject(err.response.data && (err.response.data.errors || err.response.data.error) || 'error'))
+        .catch(err => reject(err.response && err.response.data && (err.response.data.errors || err.response.data.error) || err || 'error'))
 
     } catch (err) {
       reject(err)
