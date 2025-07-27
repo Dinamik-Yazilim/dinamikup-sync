@@ -4,8 +4,7 @@ const path = require('path')
 const { socketSend } = require('../../lib/socketHelper')
 const { getList, executeSql, getListDb, executeSqlDb } = require('../../lib/mikro/mikroHelper')
 const workData = require('../../lib/mikro/workdata')
-const { mikroV16WorkDataAktar } = require('./mikro16_workDataAktar')
-const { mikroV17WorkDataAktar } = require('./mikro17_workDataAktar')
+const { mikroV16WorkDataAktar, mikroV17WorkDataAktar } = require('./mikro_workDataAktar')
 const { mikroV16SatisAktar, mikroV17SatisAktar } = require('./mikro_satisAktar')
 
 exports.test = function (webServiceUrl, webServiceUsername, webServicePassword) {
@@ -149,8 +148,6 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
           sto_lastup_date as updatedAt , sto_reyon_kodu as rayon
            FROM STOKLAR WITH (NOLOCK)
             WHERE sto_kod in (SELECT sfiyat_stokkod FROM STOK_SATIS_FIYAT_LISTELERI WITH (NOLOCK) WHERE sfiyat_listesirano=1)
-            --AND sto_kod IN (SELECT bar_stokkodu FROM BARKOD_TANIMLARI WITH (NOLOCK) WHERE bar_kodu like '27%' OR bar_kodu like '28%' OR bar_kodu like '29%')
-            --AND sto_kod IN ('TB209')
             AND (sto_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}' 
               OR sto_kod IN (SELECT bar_stokkodu FROM BARKOD_TANIMLARI WITH (NOLOCK) WHERE bar_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}') 
               OR sto_kod IN (SELECT sfiyat_stokkod FROM STOK_SATIS_FIYAT_LISTELERI WITH (NOLOCK) WHERE sfiyat_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}') 

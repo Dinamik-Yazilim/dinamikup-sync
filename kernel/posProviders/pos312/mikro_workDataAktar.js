@@ -2,6 +2,18 @@ const { getList, executeSql, getListDb, executeSqlDb } = require('../../lib/mikr
 
 exports.mikroV16WorkDataAktar = function (orgDoc, storeDoc, fisData) {
   return new Promise(async (resolve, reject) => {
+    mikroWorkDataAktar('mikro16', orgDoc, storeDoc, fisData).then(resolve).catch(reject)
+  })
+}
+
+exports.mikroV17WorkDataAktar = function (orgDoc, storeDoc, fisData) {
+  return new Promise(async (resolve, reject) => {
+    mikroWorkDataAktar('mikro17', orgDoc, storeDoc, fisData).then(resolve).catch(reject)
+  })
+}
+
+function mikroWorkDataAktar(mainApp, orgDoc, storeDoc, fisData) {
+  return new Promise(async (resolve, reject) => {
     try {
       if (fisData.status != 1) return resolve()
       // if (!fisData.batchNo) return resolve()
@@ -20,7 +32,32 @@ exports.mikroV16WorkDataAktar = function (orgDoc, storeDoc, fisData) {
       const depoNo = util.pad(storeDoc.warehouseId, 3)
 
       let seriNo = posComputerDoc.salesDocNoSerial || ''
-      if (fisData.type == 3) {
+      const iade = fisData.type == 3 ? true : false
+
+
+      let sth_m17fields = ''
+      let sth_m17values = ''
+      let cari_m17fields = ''
+      let cari_m17values = ''
+      let adr_m17fields = ''
+      let adr_m17values = ''
+      if (mainApp == 'mikro17') {
+        sth_m17fields = `, sth_MainProgramNo, sth_VersionNo, sth_MenuNo, sth_MikroSpecial1, sth_MikroSpecial2, sth_MikroSpecial3, sth_ExternalProgramType, sth_ExternalProgramId, sth_Hash`
+        sth_m17values = `, 1 /*sth_MainProgramNo*/, @MikroVersionNo /*sth_VersionNo*/, '100056' /*sth_MenuNo*/, '' /*sth_MikroSpecial1*/, '' /*sth_MikroSpecial2*/, '' /*sth_MikroSpecial3*/, 
+          0 /*sth_ExternalProgramType*/, '${fisData.id}' /*sth_ExternalProgramId*/, 0 /*sth_Hash*/`
+        cari_m17fields = `,cari_MainProgramNo, cari_VersionNo, cari_MenuNo, cari_MikroSpecial1, cari_MikroSpecial2, cari_MikroSpecial3, cari_ExternalProgramType, cari_ExternalProgramId, cari_Hash
+              , cari_siparis_avans_muh_kod, cari_siparis_avans_muh_kod1, cari_siparis_avans_muh_kod2`
+        cari_m17values = `, 46 /*cari_MainProgramNo*/, @MikroVersionNo /*cari_VersionNo*/, '41110' /*cari_MenuNo*/, '' /*cari_MikroSpecial1*/, '' /*cari_MikroSpecial2*/, '' /*cari_MikroSpecial3*/, 
+            0 /*cari_ExternalProgramType*/, @CariId /*cari_ExternalProgramId*/, 0 /*cari_Hash*/
+            , '' /*cari_siparis_avans_muh_kod*/, '' /*cari_siparis_avans_muh_kod1*/, '' /*cari_siparis_avans_muh_kod2*/  `
+        adr_m17fields = `,adr_MainProgramNo, adr_VersionNo, adr_MenuNo, adr_MikroSpecial1, adr_MikroSpecial2, adr_MikroSpecial3
+            ,adr_ExternalProgramType, adr_ExternalProgramId, adr_Hash `
+        adr_m17values = `,46 /*adr_MainProgramNo*/, @MikroVersionNo /*adr_VersionNo*/, 0 /*adr_MenuNo*/, '' /*adr_MikroSpecial1*/, '' /*adr_MikroSpecial2*/, '' /*adr_MikroSpecial3*/
+            , 0 /*adr_ExternalProgramType*/,  @CariId /*adr_ExternalProgramId*/, 0 /*adr_Hash*/ `
+      } else if (mainApp == 'mikro16') {
+
+      }
+      if (iade) {
         seriNo = 'I' + seriNo.substring(1)
       }
       let query = `
@@ -34,7 +71,7 @@ exports.mikroV16WorkDataAktar = function (orgDoc, storeDoc, fisData) {
         DECLARE @STH_IADE INT = ${fisData.type == 3 ? 1 : 0};
         DECLARE @STH_EVRAKTIP INT = ${fisData.type == 3 ? 13 : 1};
         DECLARE @CariVergiNo VARCHAR(15)='';
-        DECLARE @STH_CARI_KODU VARCHAR(25) = '';
+        DECLARE @CariKod VARCHAR(25) = '';
         DECLARE @MikroVersionNo nVARCHAR(10)='17.03d'
         DECLARE @MikroUserNo INT = 99;
         DECLARE @SatirNo INT = -1;
@@ -56,12 +93,14 @@ exports.mikroV16WorkDataAktar = function (orgDoc, storeDoc, fisData) {
         DECLARE @Vergi5 FLOAT=0;
         DECLARE @Vergi6 FLOAT=0; 
         DECLARE @OdemeOran FLOAT=0;
-        IF EXISTS(SELECT TOP 1 * FROM ${storeDoc.db}.dbo.STOKLAR) BEGIN
-          SELECT TOP 1 @MikroVersionNo=sto_VersionNo FROM  ${storeDoc.db}.dbo.STOKLAR
-        END
       `
-      // let cariKod = storeDoc.defaultFirmId
-      let cariKod = ''
+      if (mainApp == 'mikro17') {
+        query += `
+        IF EXISTS(SELECT TOP 1 * FROM ${storeDoc.db}.dbo.DEPOLAR) BEGIN
+          SELECT TOP 1 @MikroVersionNo=dep_VersionNo FROM ${storeDoc.db}.dbo.DEPOLAR ORDER BY dep_no DESC
+        END
+        `
+      }
       if (fisData.musteri) {
         query += `
           DECLARE @CariHesapPattern VARCHAR(25)='${storeDoc.newFirm && storeDoc.newFirm.codePattern || '120.____'}';
@@ -88,15 +127,21 @@ exports.mikroV16WorkDataAktar = function (orgDoc, storeDoc, fisData) {
           DECLARE @NextCariKodInt BIGINT=1;
 
           SET @CariVergiNo = '${fisData.musteri.taxNumber || '11111111111'}';
+        `
+        if (mainApp == 'mikro16') {
+          query += `SELECT @YeniCariKod = cari_kod FROM ${storeDoc.db}.dbo.CARI_HESAPLAR WHERE (cari_Guid=@CariId);`
+        } else if (mainApp == 'mikro17') {
+          query += `SELECT @YeniCariKod = cari_kod FROM ${storeDoc.db}.dbo.CARI_HESAPLAR WHERE (cari_Guid=@CariId or cari_ExternalProgramId=@CariId );`
+        }
 
-          SELECT @YeniCariKod = cari_kod FROM CARI_HESAPLAR WHERE (cari_Guid=@CariId or cari_ExternalProgramId=@CariId );
+        query += `
           IF @YeniCariKod IS NULL BEGIN
 
-            SELECT @MaxCariKod= REPLACE(RTRIM(MAX(cari_kod)),' ','.') FROM CARI_HESAPLAR WHERE  cari_kod like @CariHesapPattern 
+            SELECT @MaxCariKod= REPLACE(RTRIM(MAX(cari_kod)),' ','.') FROM ${storeDoc.db}.dbo.CARI_HESAPLAR WITH(NOLOCK) WHERE  cari_kod like @CariHesapPattern 
             and ISNUMERIC(REPLACE(REPLACE(cari_kod,' ',''),'.',''))=1;
 
             IF NOT @MaxCariKod IS NULL BEGIN
-              SELECT TOP 1 @MaxCariKod=Item FROM SplitToItems(@MaxCariKod,'.') ORDER BY ItemNumber DESC
+              SELECT TOP 1 @MaxCariKod=Item FROM ${storeDoc.db}.dbo.SplitToItems(@MaxCariKod,'.') ORDER BY ItemNumber DESC
             END ELSE BEGIN
               SET @MaxCariKod=REPLACE(STR('',LEN(@CariHesapPattern)-LEN(REPLACE(@CariHesapPattern,'_',''))),' ','0');
               PRINT @MaxCariKod;
@@ -105,10 +150,8 @@ exports.mikroV16WorkDataAktar = function (orgDoc, storeDoc, fisData) {
 
             SET @YeniCariKod=REPLACE(@CariHesapPattern,'_','') + REPLACE(STR(@NextCariKodInt,LEN(@MaxCariKod)),' ', '0')
 
-            INSERT INTO CARI_HESAPLAR(cari_Guid, cari_DBCno, cari_SpecRECno, cari_iptal, cari_fileid, cari_hidden, cari_kilitli, cari_degisti, cari_checksum, cari_create_user,
+            INSERT INTO ${storeDoc.db}.dbo.CARI_HESAPLAR(cari_Guid, cari_DBCno, cari_SpecRECno, cari_iptal, cari_fileid, cari_hidden, cari_kilitli, cari_degisti, cari_checksum, cari_create_user,
               cari_create_date, cari_lastup_user, cari_lastup_date, cari_special1, cari_special2, cari_special3, 
-              --cari_MainProgramNo, cari_VersionNo, cari_MenuNo, cari_MikroSpecial1, 
-              --cari_MikroSpecial2, cari_MikroSpecial3, cari_ExternalProgramType, cari_ExternalProgramId, cari_Hash, 
               cari_kod, cari_unvan1, cari_unvan2, cari_hareket_tipi, cari_baglanti_tipi, 
               cari_stok_alim_cinsi, cari_stok_satim_cinsi, cari_muh_kod, cari_muh_kod1, cari_muh_kod2, cari_doviz_cinsi, cari_doviz_cinsi1, cari_doviz_cinsi2, cari_vade_fark_yuz, cari_vade_fark_yuz1,
               cari_vade_fark_yuz2, cari_KurHesapSekli, cari_vdaire_adi, cari_vdaire_no, cari_sicil_no, cari_VergiKimlikNo, cari_satis_fk, cari_odeme_cinsi, cari_odeme_gunu, cari_odemeplan_no, 
@@ -131,12 +174,11 @@ exports.mikroV16WorkDataAktar = function (orgDoc, storeDoc, fisData) {
               cari_eirsaliye_baslangic_tarihi, cari_vergidairekodu, cari_CRM_sistemine_aktar_fl, cari_efatura_xslt_dosya, cari_pasaport_no, cari_kisi_kimlik_bilgisi_aciklama_turu, 
               cari_kisi_kimlik_bilgisi_diger_aciklama, cari_uts_kurum_no, cari_kamu_kurumu_fl, cari_earsiv_xslt_dosya, cari_Perakende_fl, cari_yeni_dogan_mi, cari_eirsaliye_xslt_dosya, 
               cari_def_eirsaliye_cinsi, cari_ozel_butceli_kurum_carisi, cari_nakakincelenmesi, cari_vergimukellefidegil_mi, cari_tasiyicifirma_cari_kodu, cari_nacekodu_1, cari_nacekodu_2, 
-              cari_nacekodu_3, cari_sirket_turu, cari_baba_adi, cari_faal_terk, cari_siparis_avans_muh_kod, cari_siparis_avans_muh_kod1, cari_siparis_avans_muh_kod2)
+              cari_nacekodu_3, cari_sirket_turu, cari_baba_adi, cari_faal_terk
+              ${cari_m17fields})
             VALUES(NEWID()	/*cari_Guid*/, 
             0 /*cari_DBCno*/, 0 /*cari_SpecRECno*/, 0 /*cari_iptal*/, 31 /*cari_fileid*/, 0 /*cari_hidden*/, 0 /*cari_kilitli*/, 0 /*cari_degisti*/, 0 /*cari_checksum*/, 
             @MikroUserNo /*cari_create_user*/, GETDATE(), @MikroUserNo /*cari_lastup_user*/, @MikroUserNo, '' /*cari_special1*/, '' /*cari_special2*/, '' /*cari_special3*/, 
-            --46 /*cari_MainProgramNo*/, @MikroVersionNo /*cari_VersionNo*/, '41110' /*cari_MenuNo*/, '' /*cari_MikroSpecial1*/, '' /*cari_MikroSpecial2*/, '' /*cari_MikroSpecial3*/, 
-            --0 /*cari_ExternalProgramType*/, @CariId /*cari_ExternalProgramId*/, 0 /*cari_Hash*/, 
             @YeniCariKod /*cari_kod*/, @CariUnvan1 /*cari_unvan1*/, @CariUnvan2 /*cari_unvan2*/,
             0 /*cari_hareket_tipi*/, 0 /*cari_baglanti_tipi*/, 0 /*cari_stok_alim_cinsi*/, 0 /*cari_stok_satim_cinsi*/,@CariMuhKodu /*cari_muh_kod*/, '' /*cari_muh_kod1*/, '' /*cari_muh_kod2*/,
             0 /*cari_doviz_cinsi*/, 255 /*cari_doviz_cinsi1*/, 255 /*cari_doviz_cinsi2*/, 25 /*cari_vade_fark_yuz*/, 0 /*cari_vade_fark_yuz1*/, 0 /*cari_vade_fark_yuz2*/, 1 /*cari_KurHesapSekli*/,
@@ -170,28 +212,26 @@ exports.mikroV16WorkDataAktar = function (orgDoc, storeDoc, fisData) {
             '' /*cari_efatura_xslt_dosya*/, '' /*cari_pasaport_no*/, 0 /*cari_kisi_kimlik_bilgisi_aciklama_turu*/, '' /*cari_kisi_kimlik_bilgisi_diger_aciklama*/,
             '' /*cari_uts_kurum_no*/, 0 /*cari_kamu_kurumu_fl*/, '' /*cari_earsiv_xslt_dosya*/, 0 /*cari_Perakende_fl*/, 0 /*cari_yeni_dogan_mi*/, '' /*cari_eirsaliye_xslt_dosya*/, 
             0 /*cari_def_eirsaliye_cinsi*/, '' /*cari_ozel_butceli_kurum_carisi*/, 0 /*cari_nakakincelenmesi*/, 0 /*cari_vergimukellefidegil_mi*/, '' /*cari_tasiyicifirma_cari_kodu*/, 
-            '' /*cari_nacekodu_1*/, '' /*cari_nacekodu_2*/, '' /*cari_nacekodu_3*/, 0 /*cari_sirket_turu*/, '' /*cari_baba_adi*/, 0 /*cari_faal_terk*/, 
-            '' /*cari_siparis_avans_muh_kod*/, '' /*cari_siparis_avans_muh_kod1*/, '' /*cari_siparis_avans_muh_kod2*/);
+            '' /*cari_nacekodu_1*/, '' /*cari_nacekodu_2*/, '' /*cari_nacekodu_3*/, 0 /*cari_sirket_turu*/, '' /*cari_baba_adi*/, 0 /*cari_faal_terk*/
+            ${cari_m17values});
 
-            INSERT INTO CARI_HESAP_ADRESLERI(adr_Guid, adr_DBCno, adr_SpecRECno, adr_iptal, adr_fileid, adr_hidden, adr_kilitli, adr_degisti, adr_checksum, adr_create_user, adr_create_date, 
+            INSERT INTO ${storeDoc.db}.dbo.CARI_HESAP_ADRESLERI(adr_Guid, adr_DBCno, adr_SpecRECno, adr_iptal, adr_fileid, adr_hidden, adr_kilitli, adr_degisti, adr_checksum, adr_create_user, adr_create_date, 
             adr_lastup_user, adr_lastup_date, adr_special1, adr_special2, adr_special3, 
-            --adr_MainProgramNo, adr_VersionNo, adr_MenuNo, adr_MikroSpecial1, adr_MikroSpecial2, adr_MikroSpecial3, 
-            --adr_ExternalProgramType, adr_ExternalProgramId, adr_Hash, 
             adr_cari_kod, adr_adres_no, adr_aprint_fl, adr_cadde, adr_mahalle, adr_sokak, adr_Semt, adr_Apt_No, adr_Daire_No, adr_posta_kodu, 
             adr_ilce, adr_il, adr_ulke, adr_Adres_kodu, adr_tel_ulke_kodu, adr_tel_bolge_kodu, adr_tel_no1, adr_tel_no2, adr_tel_faxno, adr_tel_modem, adr_yon_kodu, adr_uzaklik_kodu, adr_temsilci_kodu, 
             adr_ozel_not, adr_ziyaretperyodu, adr_ziyaretgunu, adr_gps_enlem, adr_gps_boylam, adr_ziyarethaftasi, adr_ziygunu2_1, adr_ziygunu2_2, adr_ziygunu2_3, adr_ziygunu2_4, adr_ziygunu2_5, 
-            adr_ziygunu2_6, adr_ziygunu2_7, adr_efatura_alias, adr_eirsaliye_alias)
+            adr_ziygunu2_6, adr_ziygunu2_7, adr_efatura_alias, adr_eirsaliye_alias ${adr_m17fields})
             VALUES(NEWID() /*adr_Guid*/, 0, 0, 0, 0, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), '', '', '',
-            --46 /*adr_MainProgramNo*/, @MikroVersionNo /*adr_VersionNo*/, 0 /*adr_MenuNo*/, '' /*adr_MikroSpecial1*/, '' /*adr_MikroSpecial2*/, '' /*adr_MikroSpecial3*/,
-            --0 /*adr_ExternalProgramType*/,  @CariId /*adr_ExternalProgramId*/, 0 /*adr_Hash*/, 
             @YeniCariKod /*adr_cari_kod*/, 1 /*adr_adres_no*/, 0 /*adr_aprint_fl*/, 
             @AdresCadde /*adr_cadde*/, @AdresMahalle /*adr_mahalle*/, @AdresSokak /*adr_sokak*/, @AdresSemt /*adr_Semt*/, '' /*adr_Apt_No*/, '' /*adr_Daire_No*/, 
             0 /*adr_posta_kodu*/, '' /*adr_ilce*/, '' /*adr_il*/, 'TÜRKİYE' /*adr_ulke*/, '' /*adr_Adres_kodu*/, '' /*adr_tel_ulke_kodu*/, '' /*adr_tel_bolge_kodu*/, 
             '' /*adr_tel_no1*/, '' /*adr_tel_no2*/, '' /*adr_tel_faxno*/, '' /*adr_tel_modem*/, '' /*adr_yon_kodu*/, 0 /*adr_uzaklik_kodu*/, '' /*adr_temsilci_kodu*/,
             '' /*adr_ozel_not*/, 0 /*adr_ziyaretperyodu*/, 0 /*adr_ziyaretgunu*/, 0 /*adr_gps_enlem*/, 0 /*adr_gps_boylam*/, 0 /*adr_ziyarethaftasi*/, 0 /*adr_ziygunu2_1*/, 
             0 /*adr_ziygunu2_2*/, 0 /*adr_ziygunu2_3*/, 0 /*adr_ziygunu2_4*/, 0 /*adr_ziygunu2_5*/, 0 /*adr_ziygunu2_6*/, 0 /*adr_ziygunu2_7*/,
-            @CariEInvoiceAlias /*adr_efatura_alias*/, @CariEWayBillAlias /*adr_eirsaliye_alias*/);
-
+            @CariEInvoiceAlias /*adr_efatura_alias*/, @CariEWayBillAlias /*adr_eirsaliye_alias*/
+            ${adr_m17values});
+            
+            
           END
           SET @CariKod=@YeniCariKod;  
         `
@@ -237,14 +277,14 @@ exports.mikroV16WorkDataAktar = function (orgDoc, storeDoc, fisData) {
           INSERT INTO S_${tarih}_${depoNo} (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, 
           sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, 
           sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
-          sth_tevkifat_sifirlandi_fl)
+          sth_tevkifat_sifirlandi_fl ${sth_m17fields})
           VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), '', '', '', 
           0, 0, @Tarih, @STH_TIP /*sth_tip*/, @STH_CINS /*sth_cins*/, @STH_IADE /*sth_normal_iade*/,@STH_EVRAKTIP /*sth_evraktip*/, 
           @EvrakSeri, @EvrakSira, @SatirNo, '${fisData.batchNo || 0}' /*sth_belge_no*/, @Tarih /*sth_belge_tarih*/,
           '${e.stockCode}' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
           0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
           0 /*sth_sat_iskmas4*/, 0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/,
-          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, @STH_CARI_KODU /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
+          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, @CariKod /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
           '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 0 /*sth_har_doviz_cinsi*/, 0 /*sth_har_doviz_kuru*/, 0 /*sth_alt_doviz_kuru*/, 
           0 /*sth_stok_doviz_cinsi*/, 0 /*sth_stok_doviz_kuru*/, ${e.quantity} /*sth_miktar*/, 0 /*sth_miktar2*/, 1 /*sth_birim_pntr*/, 
           ${tutar} /*sth_tutar*/, 0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 
@@ -262,7 +302,8 @@ exports.mikroV16WorkDataAktar = function (orgDoc, storeDoc, fisData) {
           0 /*sth_ilave_edilecek_kdv*/, '' /*sth_ismerkezi_kodu*/, '' /*sth_HareketGrupKodu1*/, '' /*sth_HareketGrupKodu2*/, '' /*sth_HareketGrupKodu3*/, 
           0 /*sth_Olcu1*/, 0 /*sth_Olcu2*/, 0 /*sth_Olcu3*/, 0 /*sth_Olcu4*/, 0 /*sth_Olcu5*/, 0 /*sth_FormulMiktarNo*/, 0 /*sth_FormulMiktar*/, 
           0 /*sth_eirs_senaryo*/, 0 /*sth_eirs_tipi*/, '1899-12-30 00:00:00.000' /*sth_teslim_tarihi*/, 0 /*sth_matbu_fl*/, 0 /*sth_satis_fiyat_doviz_cinsi*/, 
-          0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/);
+          0 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/
+          ${sth_m17values});
         `
         }
       })
@@ -293,21 +334,8 @@ exports.mikroV16WorkDataAktar = function (orgDoc, storeDoc, fisData) {
       })
 
 
-      // if (nakitToplam > 0) {
-      //   query += `SET @SatirNo=@SatirNo+1;\n`
-      //   query += odemeInsert(fisData, tarih, depoNo, nakitToplam, odemeToplam)
-      // }
-      // if (krediToplam > 0) {
-      //   query += `SET @SatirNo=@SatirNo+1;\n`
-      //   query += odemeInsert(fisData, tarih, depoNo, krediToplam, odemeToplam)
-      // }
-      // if (digerToplam > 0) {
-      //   query += `SET @SatirNo=@SatirNo+1;\n`
-      //   query += odemeInsert(fisData, tarih, depoNo, digerToplam, odemeToplam)
-      // }
-
       query += `SET @SatirNo=@SatirNo+1;\n`
-      query += odemeV16Insert(fisData, tarih, depoNo, odemeToplam, odemeToplam)
+      query += odemeInsert(mainApp, fisData, tarih, depoNo, odemeToplam, odemeToplam)
 
       query += `END`
 
@@ -321,14 +349,25 @@ exports.mikroV16WorkDataAktar = function (orgDoc, storeDoc, fisData) {
   })
 }
 
-function odemeV16Insert(fisData, tarih, depoNo, amount, odemeToplam) {
-  let q = `SET @OdemeOran=${amount}/${odemeToplam};
-          INSERT INTO O_${tarih}_${depoNo} (po_Guid, po_DBCno, po_SpecRECno, po_iptal, po_fileid, po_hidden, po_kilitli, po_degisti, po_checksum, po_create_user, po_create_date, po_lastup_user, po_lastup_date, po_special1, po_special2, po_special3, po_firmano, po_subeno, po_KasaKodu, po_BelgeNo, po_MyeZNo, po_KasiyerKodu, po_BelgeTarihi, po_BelgeToplam, po_VerMtrh0, po_VerMtrh1, po_VerMtrh2, po_VerMtrh3, po_VerMtrh4, po_VerMtrh5, po_VerMtrh6, po_VerMtrh7, po_VerMtrh8, po_VerMtrh9, po_VerMtrh10, po_VerMtrh11, po_VerMtrh12, po_VerMtrh13, po_VerMtrh14, po_VerMtrh15, po_VerMtrh16, po_VerMtrh17, po_VerMtrh18, po_VerMtrh19, po_VerMtrh20, po_Vergi1, po_Vergi2, po_Vergi3, po_Vergi4, po_Vergi5, po_Vergi6, po_Vergi7, po_Vergi8, po_Vergi9, po_Vergi10, po_Vergi11, po_Vergi12, po_Vergi13, po_Vergi14, po_Vergi15, po_Vergi16, po_Vergi17, po_Vergi18, po_Vergi19, po_Vergi20, po_Fisfatura, po_Pozisyon, po_CariKodu, po_Yuvarlama, po_Odm_AnaDtut1, po_Odm_OrjDtut1, po_Odm_AnaDtut2, po_Odm_OrjDtut2, po_Odm_AnaDtut3, po_Odm_OrjDtut3, po_Odm_AnaDtut4, po_Odm_OrjDtut4, po_Odm_AnaDtut5, po_Odm_OrjDtut5, po_Odm_AnaDtut6, po_Odm_OrjDtut6, po_Odm_AnaDtut7, po_Odm_OrjDtut7, po_Odm_AnaDtut8, po_Odm_OrjDtut8, po_Odm_AnaDtut9, po_Odm_OrjDtut9, po_Odm_AnaDtut10, po_Odm_OrjDtut10, po_Odm_AnaDtut11, po_Odm_OrjDtut11, po_Odm_AnaDtut12, po_Odm_OrjDtut12, po_Odm_AnaDtut13, po_Odm_OrjDtut13, po_Odm_AnaDtut14, po_Odm_OrjDtut14, po_Odm_AnaDtut15, po_Odm_OrjDtut15, po_Odm_AnaDtut16, po_Odm_OrjDtut16, po_Odm_AnaDtut17, po_Odm_OrjDtut17, po_Odm_AnaDtut18, po_Odm_OrjDtut18, po_Odm_AnaDtut19, po_Odm_OrjDtut19, po_Odm_AnaDtut20, po_Odm_OrjDtut20, po_Odm_AnaDtut21, po_Odm_OrjDtut21, po_Odm_AnaDtut22, po_Odm_OrjDtut22, po_Odm_AnaDtut23, po_Odm_OrjDtut23, po_Odm_AnaDtut24, po_Odm_OrjDtut24, po_Odm_AnaDtut25, po_Odm_OrjDtut25, po_Odm_AnaDtut26, po_Odm_OrjDtut26, po_Odm_AnaDtut27, po_Odm_OrjDtut27, po_Odm_AnaDtut28, po_Odm_OrjDtut28, po_Odm_AnaDtut29, po_Odm_OrjDtut29, po_Odm_AnaDtut30, po_Odm_OrjDtut30, po_Odm_AnaDtut31, po_Odm_OrjDtut31, po_Odm_AnaDtut32, po_Odm_OrjDtut32, po_Odm_AnaDtut33, po_Odm_OrjDtut33, po_Odm_AnaDtut34, po_Odm_OrjDtut34, po_Odm_AnaDtut35, po_Odm_OrjDtut35, po_Odm_AnaDtut36, po_Odm_OrjDtut36, po_Odm_AnaDtut37, po_Odm_OrjDtut37, 
+function odemeInsert(mainApp, fisData, tarih, depoNo, amount, odemeToplam) {
+  let poV17Fields = ``
+  let poV17values = ``
+  if (mainApp == 'mikro17') {
+    poV17Fields = `,po_MainProgramNo, po_VersionNo, po_MenuNo, po_MikroSpecial1, po_MikroSpecial2, po_MikroSpecial3, po_ExternalProgramType, po_ExternalProgramId, po_Hash`
+    poV17values = `,1 /*po_MainProgramNo*/, @MikroVersionNo /*po_VersionNo*/, '100056' /*po_MenuNo*/, '' /*po_MikroSpecial1*/, '' /*po_MikroSpecial2*/, '' /*po_MikroSpecial3*/,
+            0 /*po_ExternalProgramType*/, '' /*po_ExternalProgramId*/, 0 /*po_Hash*/`
+  } else if (mainApp == 'mikro16') {
+
+  }
+  return `SET @OdemeOran=${amount}/${odemeToplam};
+          INSERT INTO O_${tarih}_${depoNo} (po_Guid, po_DBCno, po_SpecRECno, po_iptal, po_fileid, po_hidden, po_kilitli, po_degisti, po_checksum, po_create_user, po_create_date, po_lastup_user, po_lastup_date, po_special1, po_special2, po_special3,
+            po_firmano, po_subeno, po_KasaKodu, po_BelgeNo, po_MyeZNo, po_KasiyerKodu, po_BelgeTarihi, po_BelgeToplam, po_VerMtrh0, po_VerMtrh1, po_VerMtrh2, po_VerMtrh3, po_VerMtrh4, po_VerMtrh5, po_VerMtrh6, po_VerMtrh7, po_VerMtrh8, po_VerMtrh9, po_VerMtrh10, po_VerMtrh11, po_VerMtrh12, po_VerMtrh13, po_VerMtrh14, po_VerMtrh15, po_VerMtrh16, po_VerMtrh17, po_VerMtrh18, po_VerMtrh19, po_VerMtrh20, po_Vergi1, po_Vergi2, po_Vergi3, po_Vergi4, po_Vergi5, po_Vergi6, po_Vergi7, po_Vergi8, po_Vergi9, po_Vergi10, po_Vergi11, po_Vergi12, po_Vergi13, po_Vergi14, po_Vergi15, po_Vergi16, po_Vergi17, po_Vergi18, po_Vergi19, po_Vergi20, po_Fisfatura, po_Pozisyon, po_CariKodu, po_Yuvarlama, po_Odm_AnaDtut1, po_Odm_OrjDtut1, po_Odm_AnaDtut2, po_Odm_OrjDtut2, po_Odm_AnaDtut3, po_Odm_OrjDtut3, po_Odm_AnaDtut4, po_Odm_OrjDtut4, po_Odm_AnaDtut5, po_Odm_OrjDtut5, po_Odm_AnaDtut6, po_Odm_OrjDtut6, po_Odm_AnaDtut7, po_Odm_OrjDtut7, po_Odm_AnaDtut8, po_Odm_OrjDtut8, po_Odm_AnaDtut9, po_Odm_OrjDtut9, po_Odm_AnaDtut10, po_Odm_OrjDtut10, po_Odm_AnaDtut11, po_Odm_OrjDtut11, po_Odm_AnaDtut12, po_Odm_OrjDtut12, po_Odm_AnaDtut13, po_Odm_OrjDtut13, po_Odm_AnaDtut14, po_Odm_OrjDtut14, po_Odm_AnaDtut15, po_Odm_OrjDtut15, po_Odm_AnaDtut16, po_Odm_OrjDtut16, po_Odm_AnaDtut17, po_Odm_OrjDtut17, po_Odm_AnaDtut18, po_Odm_OrjDtut18, po_Odm_AnaDtut19, po_Odm_OrjDtut19, po_Odm_AnaDtut20, po_Odm_OrjDtut20, po_Odm_AnaDtut21, po_Odm_OrjDtut21, po_Odm_AnaDtut22, po_Odm_OrjDtut22, po_Odm_AnaDtut23, po_Odm_OrjDtut23, po_Odm_AnaDtut24, po_Odm_OrjDtut24, po_Odm_AnaDtut25, po_Odm_OrjDtut25, po_Odm_AnaDtut26, po_Odm_OrjDtut26, po_Odm_AnaDtut27, po_Odm_OrjDtut27, po_Odm_AnaDtut28, po_Odm_OrjDtut28, po_Odm_AnaDtut29, po_Odm_OrjDtut29, po_Odm_AnaDtut30, po_Odm_OrjDtut30, po_Odm_AnaDtut31, po_Odm_OrjDtut31, po_Odm_AnaDtut32, po_Odm_OrjDtut32, po_Odm_AnaDtut33, po_Odm_OrjDtut33, po_Odm_AnaDtut34, po_Odm_OrjDtut34, po_Odm_AnaDtut35, po_Odm_OrjDtut35, po_Odm_AnaDtut36, po_Odm_OrjDtut36, po_Odm_AnaDtut37, po_Odm_OrjDtut37, 
             po_Odm_AnaDtut38, po_Odm_OrjDtut38, po_Odm_AnaDtut39, po_Odm_OrjDtut39, po_Odm_AnaDtut40, po_Odm_OrjDtut40, po_Odm_AnaDtut41, po_Odm_OrjDtut41, po_Odm_AnaDtut42, po_Odm_OrjDtut42, po_Odm_AnaDtut43, po_Odm_OrjDtut43, po_Odm_AnaDtut44, po_Odm_OrjDtut44, po_Odm_AnaDtut45, po_Odm_OrjDtut45, po_Odm_AnaDtut46, po_Odm_OrjDtut46, po_Odm_AnaDtut47, po_Odm_OrjDtut47, po_Odm_AnaDtut48, po_Odm_OrjDtut48, po_Odm_AnaDtut49, po_Odm_OrjDtut49, po_Odm_AnaDtut50, po_Odm_OrjDtut50, po_Vadeler_OdemeTipi1, po_Vadeler_vade1, 
             po_Vadeler_Tutar1, po_Vadeler_OdemeTipi2, po_Vadeler_vade2, po_Vadeler_Tutar2, po_Vadeler_OdemeTipi3, po_Vadeler_vade3, po_Vadeler_Tutar3, po_Vadeler_OdemeTipi4, po_Vadeler_vade4, po_Vadeler_Tutar4, po_Vadeler_OdemeTipi5, po_Vadeler_vade5, po_Vadeler_Tutar5, po_Vadeler_OdemeTipi6, po_Vadeler_vade6, po_Vadeler_Tutar6, po_Vadeler_OdemeTipi7, po_Vadeler_vade7, po_Vadeler_Tutar7, po_Vadeler_OdemeTipi8, po_Vadeler_vade8, po_Vadeler_Tutar8, po_Vadeler_OdemeTipi9, po_Vadeler_vade9, po_Vadeler_Tutar9, po_Vadeler_OdemeTipi10, po_Vadeler_vade10, po_Vadeler_Tutar10, po_Vadeler_OdemeTipi11, po_Vadeler_vade11, po_Vadeler_Tutar11, po_Vadeler_OdemeTipi12, po_Vadeler_vade12, po_Vadeler_Tutar12, po_Vadeler_OdemeTipi13, po_Vadeler_vade13, po_Vadeler_Tutar13, po_Vadeler_OdemeTipi14, po_Vadeler_vade14, po_Vadeler_Tutar14, po_Vadeler_OdemeTipi15, po_Vadeler_vade15, po_Vadeler_Tutar15, po_Vadeler_OdemeTipi16, po_Vadeler_vade16, po_Vadeler_Tutar16, po_Vadeler_OdemeTipi17, po_Vadeler_vade17, po_Vadeler_Tutar17, po_Vadeler_OdemeTipi18, po_Vadeler_vade18, po_Vadeler_Tutar18, po_Vadeler_OdemeTipi19, po_Vadeler_vade19, po_Vadeler_Tutar19, po_Vadeler_OdemeTipi20, po_Vadeler_vade20, po_Vadeler_Tutar20, po_Vadeler_OdemeTipi21, po_Vadeler_vade21, po_Vadeler_Tutar21, po_Vadeler_OdemeTipi22, po_Vadeler_vade22, po_Vadeler_Tutar22, po_Vadeler_OdemeTipi23, po_Vadeler_vade23, po_Vadeler_Tutar23, po_Vadeler_OdemeTipi24, po_Vadeler_vade24, po_Vadeler_Tutar24, po_Vadeler_OdemeTipi25, po_Vadeler_vade25, po_Vadeler_Tutar25, po_Vadeler_OdemeTipi26, po_Vadeler_vade26, po_Vadeler_Tutar26, po_Vadeler_OdemeTipi27, po_Vadeler_vade27, po_Vadeler_Tutar27, po_Vadeler_OdemeTipi28, po_Vadeler_vade28, po_Vadeler_Tutar28, po_Vadeler_OdemeTipi29, po_Vadeler_vade29, po_Vadeler_Tutar29, po_Vadeler_OdemeTipi30, po_Vadeler_vade30, po_Vadeler_Tutar30, po_Vadeler_OdemeTipi31, po_Vadeler_vade31, po_Vadeler_Tutar31, po_Vadeler_OdemeTipi32, po_Vadeler_vade32, po_Vadeler_Tutar32, po_Vadeler_OdemeTipi33, po_Vadeler_vade33, po_Vadeler_Tutar33, po_Vadeler_OdemeTipi34, po_Vadeler_vade34, po_Vadeler_Tutar34, po_Vadeler_OdemeTipi35, po_Vadeler_vade35, po_Vadeler_Tutar35, po_Vadeler_OdemeTipi36, po_Vadeler_vade36, po_Vadeler_Tutar36, po_Tks_Satis, 
             po_Tks_Satis_Tutar, po_Odm_TaksitTipi1, po_Odm_TaksitTipi2, po_Odm_TaksitTipi3, po_Odm_TaksitTipi4, po_Odm_TaksitTipi5, po_Odm_TaksitTipi6, po_Odm_TaksitTipi7, po_Odm_TaksitTipi8, po_Odm_TaksitTipi9, po_Odm_TaksitTipi10, po_Odm_TaksitTipi11, po_Odm_TaksitTipi12, po_Odm_TaksitTipi13, po_Odm_TaksitTipi14, po_Odm_TaksitTipi15, po_Odm_TaksitTipi16, po_Odm_TaksitTipi17, po_Odm_TaksitTipi18, po_Odm_TaksitTipi19, po_Odm_TaksitTipi20, po_Odm_TaksitTipi21, po_Odm_TaksitTipi22, po_Odm_TaksitTipi23, po_Odm_TaksitTipi24, po_Odm_TaksitTipi25, po_Odm_TaksitTipi26, po_Odm_TaksitTipi27, po_Odm_TaksitTipi28, po_Odm_TaksitTipi29, po_Odm_TaksitTipi30, po_Odm_TaksitTipi31, po_Odm_TaksitTipi32, po_Odm_TaksitTipi33, po_Odm_TaksitTipi34, po_Odm_TaksitTipi35, po_Odm_TaksitTipi36, po_Odm_TaksitTipi37, po_Odm_TaksitTipi38, po_Odm_TaksitTipi39, po_Odm_TaksitTipi40, po_Odm_TaksitTipi41, po_Odm_TaksitTipi42, po_Odm_TaksitTipi43, po_Odm_TaksitTipi44, po_Odm_TaksitTipi45, po_Odm_TaksitTipi46, po_Odm_TaksitTipi47, po_Odm_TaksitTipi48, po_Odm_TaksitTipi49, po_Odm_TaksitTipi50, po_OdemeNo1, po_ProvizyonKodu1, po_ProvizyonTutari1, po_OdemeNo2, po_ProvizyonKodu2, po_ProvizyonTutari2, po_OdemeNo3, po_ProvizyonKodu3, po_ProvizyonTutari3, po_OdemeNo4, po_ProvizyonKodu4, po_ProvizyonTutari4, po_OdemeNo5, po_ProvizyonKodu5, po_ProvizyonTutari5, po_OdemeNo6, po_ProvizyonKodu6, po_ProvizyonTutari6, po_Tahsilat_evrakno_seri, po_Tahsilat_evrakno_sira, po_Tahsilat_Tutari, po_ParaUstuOdemeTipi, po_ParaUstuAnaDtut, po_ParaUstuOrjDtut, po_EvrakID, po_AdresNo, po_EArsivSeri, po_EArsivSira, po_ZNo, po_FNo, po_EJNo, po_OKCEvrakID, po_YolcuBeraberKod, po_YolcuBeraberIstisnaKodu
-            , po_YolcuBeraberAraciKurumKodu, po_GibeGonderildiFl)
-          VALUES(NEWID(), 0, 0, 0, 1003, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), '', '', '', 0, 0, 
+            , po_YolcuBeraberAraciKurumKodu, po_GibeGonderildiFl ${poV17Fields})
+          VALUES(NEWID(), 0, 0, 0, 1003, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), '', '', '', 
+            0, 0, 
             @EvrakSeri /*po_KasaKodu*/, @EvrakSira /*po_BelgeNo*/, ${fisData.batchNo || 0} /*po_MyeZNo*/, '' /*po_KasiyerKodu*/, 
             '${fisData.endDate}' /*po_BelgeTarihi*/, ${amount} /*po_BelgeToplam*/, @VergiMatrah0*@OdemeOran /*po_VerMtrh0*/, 
             @VergiMatrah1*@OdemeOran /*po_VerMtrh1*/, @VergiMatrah2*@OdemeOran /*po_VerMtrh2*/, @VergiMatrah3*@OdemeOran /*po_VerMtrh3*/,
@@ -404,7 +443,7 @@ function odemeV16Insert(fisData, tarih, depoNo, amount, odemeToplam) {
             0 /*po_ParaUstuAnaDtut*/, 0 /*po_ParaUstuOrjDtut*/, 
             '' /*po_EvrakID*/, 0 /*po_AdresNo*/, '' /*po_EArsivSeri*/, '' /*po_EArsivSira*/, 0 /*po_ZNo*/, 0 /*po_FNo*/, 0 /*po_EJNo*/, 
             '' /*po_OKCEvrakID*/, '' /*po_YolcuBeraberKod*/, '' /*po_YolcuBeraberIstisnaKodu*/, 
-            '' /*po_YolcuBeraberAraciKurumKodu*/, 0 /*po_GibeGonderildiFl*/);
+            '' /*po_YolcuBeraberAraciKurumKodu*/, 0 /*po_GibeGonderildiFl*/ ${poV17values});
           `
-  return q
+
 }
