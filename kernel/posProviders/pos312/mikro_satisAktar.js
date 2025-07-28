@@ -46,26 +46,43 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
       let adr_m17values = ''
       if (mainApp == 'mikro17') {
         cha_m17fields = `, cha_MainProgramNo, cha_VersionNo, cha_MenuNo, cha_MikroSpecial1, cha_MikroSpecial2, cha_MikroSpecial3, cha_ExternalProgramType, cha_ExternalProgramId, cha_Hash
-        , cha_efatura_belge_tipi`
+        , cha_efatura_belge_tipi
+        , cha_vergi11, cha_vergi12, cha_vergi13, cha_vergi14, cha_vergi15, cha_vergi16, cha_vergi17, cha_vergi18, cha_vergi19, cha_vergi20
+        , cha_ilave_edilecek_kdv11, cha_ilave_edilecek_kdv12, cha_ilave_edilecek_kdv13, cha_ilave_edilecek_kdv14, 
+            cha_ilave_edilecek_kdv15, cha_ilave_edilecek_kdv16, cha_ilave_edilecek_kdv17, cha_ilave_edilecek_kdv18, cha_ilave_edilecek_kdv19, cha_ilave_edilecek_kdv20
+        , cha_tevkifat_sifirlandi_fl, cha_bsba_e_belge_mi, 
+              cha_eticaret_kanal_kodu, cha_hizli_satis_kasa_no, cha_ebelge_Islemturu`
         cha_m17values = `, 21 /*cha_MainProgramNo*/, @MikroVersionNo /*cha_VersionNo*/, 61270 /*cha_MenuNo*/, '' /*cha_MikroSpecial1*/, '' /*cha_MikroSpecial2*/, '' /*cha_MikroSpecial3*/, 
           0 /*cha_ExternalProgramType*/, '${fisData.id}' /*cha_ExternalProgramId*/, 0 /*cha_Hash*/
-        , 0 /*cha_efatura_belge_tipi*/`
+        , 0 /*cha_efatura_belge_tipi*/
+        , @Vergi11 /*cha_vergi11*/, @Vergi12 /*cha_vergi12*/, 0 /*cha_vergi13*/, 0 /*cha_vergi14*/, 0 /*cha_vergi15*/, 0 /*cha_vergi16*/, 0 /*cha_vergi17*/, 
+        0 /*cha_vergi18*/, 0 /*cha_vergi19*/, 0 /*cha_vergi20*/
+        , 0 /*cha_ilave_edilecek_kdv11*/, 0 /*cha_ilave_edilecek_kdv12*/, 0 /*cha_ilave_edilecek_kdv13*/, 0 /*cha_ilave_edilecek_kdv14*/, 0 /*cha_ilave_edilecek_kdv15*/, 0 /*cha_ilave_edilecek_kdv16*/, 
+            0 /*cha_ilave_edilecek_kdv17*/, 0 /*cha_ilave_edilecek_kdv18*/, 0 /*cha_ilave_edilecek_kdv19*/, 0 /*cha_ilave_edilecek_kdv20*/
+        , 0 /*cha_tevkifat_sifirlandi_fl*/, 0 /*cha_bsba_e_belge_mi*/, 
+            '' /*cha_eticaret_kanal_kodu*/, 0 /*cha_hizli_satis_kasa_no*/, 0 /*cha_ebelge_Islemturu*/`
 
-        sth_m17fields = `, sth_MainProgramNo, sth_VersionNo, sth_MenuNo, sth_MikroSpecial1, sth_MikroSpecial2, sth_MikroSpecial3, sth_ExternalProgramType, sth_ExternalProgramId, sth_Hash`
+        sth_m17fields = `, sth_MainProgramNo, sth_VersionNo, sth_MenuNo, sth_MikroSpecial1, sth_MikroSpecial2, sth_MikroSpecial3, sth_ExternalProgramType, sth_ExternalProgramId, sth_Hash
+        , sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu, sth_tevkifat_sifirlandi_fl`
         sth_m17values = `, 21 /*sth_MainProgramNo*/, @MikroVersionNo /*sth_VersionNo*/, 61270 /*sth_MenuNo*/, '' /*sth_MikroSpecial1*/, '' /*sth_MikroSpecial2*/, '' /*sth_MikroSpecial3*/, 
-          0 /*sth_ExternalProgramType*/, '${fisData.id}' /*sth_ExternalProgramId*/, 0 /*sth_Hash*/`
+          0 /*sth_ExternalProgramType*/, '${fisData.id}' /*sth_ExternalProgramId*/, 0 /*sth_Hash*/
+          , '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/`
         cari_m17fields = `,cari_MainProgramNo, cari_VersionNo, cari_MenuNo, cari_MikroSpecial1, cari_MikroSpecial2, cari_MikroSpecial3, cari_ExternalProgramType, cari_ExternalProgramId, cari_Hash, 
-              , cari_siparis_avans_muh_kod, cari_siparis_avans_muh_kod1, cari_siparis_avans_muh_kod2`
+              , cari_siparis_avans_muh_kod, cari_siparis_avans_muh_kod1, cari_siparis_avans_muh_kod2
+              , cari_ozel_butceli_kurum_carisi, cari_nakakincelenmesi, cari_vergimukellefidegil_mi, cari_tasiyicifirma_cari_kodu, cari_nacekodu_1, cari_nacekodu_2, 
+              cari_nacekodu_3, cari_sirket_turu, cari_baba_adi, cari_faal_terk`
         cari_m17values = `, 46 /*cari_MainProgramNo*/, @MikroVersionNo /*cari_VersionNo*/, '41110' /*cari_MenuNo*/, '' /*cari_MikroSpecial1*/, '' /*cari_MikroSpecial2*/, '' /*cari_MikroSpecial3*/, 
             0 /*cari_ExternalProgramType*/, @CariId /*cari_ExternalProgramId*/, 0 /*cari_Hash*/
-            , '' /*cari_siparis_avans_muh_kod*/, '' /*cari_siparis_avans_muh_kod1*/, '' /*cari_siparis_avans_muh_kod2*/  `
+            , '' /*cari_siparis_avans_muh_kod*/, '' /*cari_siparis_avans_muh_kod1*/, '' /*cari_siparis_avans_muh_kod2*/  
+            , '' /*cari_ozel_butceli_kurum_carisi*/, 0 /*cari_nakakincelenmesi*/, 0 /*cari_vergimukellefidegil_mi*/, '' /*cari_tasiyicifirma_cari_kodu*/, 
+            '' /*cari_nacekodu_1*/, '' /*cari_nacekodu_2*/, '' /*cari_nacekodu_3*/, 0 /*cari_sirket_turu*/, '' /*cari_baba_adi*/, 0 /*cari_faal_terk*/`
         adr_m17fields = `,adr_MainProgramNo, adr_VersionNo, adr_MenuNo, adr_MikroSpecial1, adr_MikroSpecial2, adr_MikroSpecial3, 
             ,adr_ExternalProgramType, adr_ExternalProgramId, adr_Hash `
         adr_m17values = `,46 /*adr_MainProgramNo*/, @MikroVersionNo /*adr_VersionNo*/, 0 /*adr_MenuNo*/, '' /*adr_MikroSpecial1*/, '' /*adr_MikroSpecial2*/, '' /*adr_MikroSpecial3*/,
             0 /*adr_ExternalProgramType*/,  @CariId /*adr_ExternalProgramId*/, 0 /*adr_Hash*/ `
       } else if (mainApp == 'mikro16') {
-        cha_m16fields = `, cha_disyazilimid, cha_disyazilim_tip`
-        cha_m16values = `, '${fisData.id}' /*cha_disyazilimid*/, 0 /*cha_disyazilim_tip*/`
+        cha_m16fields = `, cha_disyazilimid ` //, cha_disyazilim_tip`
+        cha_m16values = `, '${fisData.id}' /*cha_disyazilimid*/` //, 0 /*cha_disyazilim_tip*/`
       }
 
       let query = `
@@ -190,8 +207,7 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
               cari_efatura_baslangic_tarihi, cari_mutabakat_mail_adresi, cari_mersis_no, cari_istasyon_cari_kodu, cari_gonderionayi_sms, cari_gonderionayi_email, cari_eirsaliye_fl, 
               cari_eirsaliye_baslangic_tarihi, cari_vergidairekodu, cari_CRM_sistemine_aktar_fl, cari_efatura_xslt_dosya, cari_pasaport_no, cari_kisi_kimlik_bilgisi_aciklama_turu, 
               cari_kisi_kimlik_bilgisi_diger_aciklama, cari_uts_kurum_no, cari_kamu_kurumu_fl, cari_earsiv_xslt_dosya, cari_Perakende_fl, cari_yeni_dogan_mi, cari_eirsaliye_xslt_dosya, 
-              cari_def_eirsaliye_cinsi, cari_ozel_butceli_kurum_carisi, cari_nakakincelenmesi, cari_vergimukellefidegil_mi, cari_tasiyicifirma_cari_kodu, cari_nacekodu_1, cari_nacekodu_2, 
-              cari_nacekodu_3, cari_sirket_turu, cari_baba_adi, cari_faal_terk
+              cari_def_eirsaliye_cinsi
               ${cari_m17fields})
             VALUES(NEWID()	/*cari_Guid*/, 
             0 /*cari_DBCno*/, 0 /*cari_SpecRECno*/, 0 /*cari_iptal*/, 31 /*cari_fileid*/, 0 /*cari_hidden*/, 0 /*cari_kilitli*/, 0 /*cari_degisti*/, 0 /*cari_checksum*/, 
@@ -228,8 +244,7 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
             @CariEWayBill /*cari_eirsaliye_fl*/, '1899-12-31 00:00:00.000' /*cari_eirsaliye_baslangic_tarihi*/, '' /*cari_vergidairekodu*/, 0 /*cari_CRM_sistemine_aktar_fl*/, 
             '' /*cari_efatura_xslt_dosya*/, '' /*cari_pasaport_no*/, 0 /*cari_kisi_kimlik_bilgisi_aciklama_turu*/, '' /*cari_kisi_kimlik_bilgisi_diger_aciklama*/,
             '' /*cari_uts_kurum_no*/, 0 /*cari_kamu_kurumu_fl*/, '' /*cari_earsiv_xslt_dosya*/, 0 /*cari_Perakende_fl*/, 0 /*cari_yeni_dogan_mi*/, '' /*cari_eirsaliye_xslt_dosya*/, 
-            0 /*cari_def_eirsaliye_cinsi*/, '' /*cari_ozel_butceli_kurum_carisi*/, 0 /*cari_nakakincelenmesi*/, 0 /*cari_vergimukellefidegil_mi*/, '' /*cari_tasiyicifirma_cari_kodu*/, 
-            '' /*cari_nacekodu_1*/, '' /*cari_nacekodu_2*/, '' /*cari_nacekodu_3*/, 0 /*cari_sirket_turu*/, '' /*cari_baba_adi*/, 0 /*cari_faal_terk*/
+            0 /*cari_def_eirsaliye_cinsi*/
             ${cari_m17values});
 
             INSERT INTO CARI_HESAP_ADRESLERI(adr_Guid, adr_DBCno, adr_SpecRECno, adr_iptal, adr_fileid, adr_hidden, adr_kilitli, adr_degisti, adr_checksum, adr_create_user, adr_create_date, 
@@ -327,12 +342,10 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
             cha_fis_sirano, cha_trefno, cha_sntck_poz, cha_reftarihi, cha_istisnakodu, cha_pos_hareketi, cha_meblag_ana_doviz_icin_gecersiz_fl, cha_meblag_alt_doviz_icin_gecersiz_fl, 
             cha_meblag_orj_doviz_icin_gecersiz_fl, cha_sip_uid, cha_kirahar_uid, cha_vardiya_tarihi, cha_vardiya_no, cha_vardiya_evrak_ti, cha_ebelge_turu, cha_tevkifat_toplam, 
             cha_e_islem_turu, cha_fatura_belge_turu, cha_diger_belge_adi, cha_uuid, cha_adres_no, cha_vergifon_toplam, cha_ilk_belge_tarihi, cha_ilk_belge_doviz_kuru, cha_HareketGrupKodu1, 
-            cha_HareketGrupKodu2, cha_HareketGrupKodu3, cha_ebelgeno_seri, cha_ebelgeno_sira, cha_hubid, cha_hubglbid, cha_bsba_e_belge_mi, 
-            cha_eticaret_kanal_kodu, cha_hizli_satis_kasa_no, cha_ebelge_Islemturu, cha_tevkifat_sifirlandi_fl, cha_vergi1, cha_vergi2, cha_vergi3, cha_vergi4, cha_vergi5, cha_vergi6, 
-            cha_vergi7, cha_vergi8, cha_vergi9, cha_vergi10, cha_vergi11, cha_vergi12, cha_vergi13, cha_vergi14, cha_vergi15, cha_vergi16, cha_vergi17, cha_vergi18, cha_vergi19, cha_vergi20, 
+            cha_HareketGrupKodu2, cha_HareketGrupKodu3, cha_ebelgeno_seri, cha_ebelgeno_sira, cha_hubid, cha_hubglbid, cha_vergi1, cha_vergi2, cha_vergi3, cha_vergi4, cha_vergi5, cha_vergi6, 
+            cha_vergi7, cha_vergi8, cha_vergi9, cha_vergi10, 
             cha_ilave_edilecek_kdv1, cha_ilave_edilecek_kdv2, cha_ilave_edilecek_kdv3, cha_ilave_edilecek_kdv4, cha_ilave_edilecek_kdv5, cha_ilave_edilecek_kdv6, cha_ilave_edilecek_kdv7, 
-            cha_ilave_edilecek_kdv8, cha_ilave_edilecek_kdv9, cha_ilave_edilecek_kdv10, cha_ilave_edilecek_kdv11, cha_ilave_edilecek_kdv12, cha_ilave_edilecek_kdv13, cha_ilave_edilecek_kdv14, 
-            cha_ilave_edilecek_kdv15, cha_ilave_edilecek_kdv16, cha_ilave_edilecek_kdv17, cha_ilave_edilecek_kdv18, cha_ilave_edilecek_kdv19, cha_ilave_edilecek_kdv20
+            cha_ilave_edilecek_kdv8, cha_ilave_edilecek_kdv9, cha_ilave_edilecek_kdv10
             ${cha_m17fields}${cha_m16fields})
             VALUES('${fisData.id}' /*cha_Guid*/, 0 /*cha_DBCno*/, 0 /*cha_SpecRecNo*/, 0 /*cha_iptal*/, 51 /*cha_fileid*/, 0 /*cha_hidden*/, 0 /*cha_kilitli*/, 0 /*cha_degisti*/,
             0 /*cha_CheckSum*/, @MikroUserNo /*cha_create_user*/, GETDATE() /*cha_create_date*/, @MikroUserNo /*cha_lastup_user*/, GETDATE() /*cha_lastup_date*/, 
@@ -353,14 +366,11 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
             '00000000-0000-0000-0000-000000000000' /*cha_kirahar_uid*/, '1899-12-30 00:00:00.000' /*cha_vardiya_tarihi*/, 0 /*cha_vardiya_no*/, 0 /*cha_vardiya_evrak_ti*/, ${iade ? 1 : 0} /*cha_ebelge_turu*/,
             0 /*cha_tevkifat_toplam*/, 0 /*cha_e_islem_turu*/, 0 /*cha_fatura_belge_turu*/, '' /*cha_diger_belge_adi*/, NEWID() /*cha_uuid*/, 1 /*cha_adres_no*/, 0 /*cha_vergifon_toplam*/,
             '1899-12-30 00:00:00.000' /*cha_ilk_belge_tarihi*/, 0 /*cha_ilk_belge_doviz_kuru*/, '' /*cha_HareketGrupKodu1*/, '' /*cha_HareketGrupKodu2*/, '' /*cha_HareketGrupKodu3*/, 
-            '' /*cha_ebelgeno_seri*/, 0 /*cha_ebelgeno_sira*/, '' /*cha_hubid*/, '' /*cha_hubglbid*/, 0 /*cha_bsba_e_belge_mi*/, 
-            '' /*cha_eticaret_kanal_kodu*/, 0 /*cha_hizli_satis_kasa_no*/, 0 /*cha_ebelge_Islemturu*/, 0 /*cha_tevkifat_sifirlandi_fl*/, @Vergi1 /*cha_vergi1*/, @Vergi2 /*cha_vergi2*/, 
+            '' /*cha_ebelgeno_seri*/, 0 /*cha_ebelgeno_sira*/, '' /*cha_hubid*/, '' /*cha_hubglbid*/, @Vergi1 /*cha_vergi1*/, @Vergi2 /*cha_vergi2*/, 
             @Vergi3 /*cha_vergi3*/, @Vergi4 /*cha_vergi4*/, @Vergi5 /*cha_vergi5*/, @Vergi6 /*cha_vergi6*/, @Vergi7 /*cha_vergi7*/, @Vergi8 /*cha_vergi8*/, @Vergi9 /*cha_vergi9*/, 
-            @Vergi10 /*cha_vergi10*/, @Vergi11 /*cha_vergi11*/, @Vergi12 /*cha_vergi12*/, 0 /*cha_vergi13*/, 0 /*cha_vergi14*/, 0 /*cha_vergi15*/, 0 /*cha_vergi16*/, 0 /*cha_vergi17*/, 
-            0 /*cha_vergi18*/, 0 /*cha_vergi19*/, 0 /*cha_vergi20*/, 0 /*cha_ilave_edilecek_kdv1*/, 0 /*cha_ilave_edilecek_kdv2*/,0 /*cha_ilave_edilecek_kdv3*/, 0 /*cha_ilave_edilecek_kdv4*/, 
-            0 /*cha_ilave_edilecek_kdv5*/, 0 /*cha_ilave_edilecek_kdv6*/, 0 /*cha_ilave_edilecek_kdv7*/, 0 /*cha_ilave_edilecek_kdv8*/, 0 /*cha_ilave_edilecek_kdv9*/, 0 /*cha_ilave_edilecek_kdv10*/, 
-            0 /*cha_ilave_edilecek_kdv11*/, 0 /*cha_ilave_edilecek_kdv12*/, 0 /*cha_ilave_edilecek_kdv13*/, 0 /*cha_ilave_edilecek_kdv14*/, 0 /*cha_ilave_edilecek_kdv15*/, 0 /*cha_ilave_edilecek_kdv16*/, 
-            0 /*cha_ilave_edilecek_kdv17*/, 0 /*cha_ilave_edilecek_kdv18*/, 0 /*cha_ilave_edilecek_kdv19*/, 0 /*cha_ilave_edilecek_kdv20*/
+            @Vergi10 /*cha_vergi10*/, 0 /*cha_ilave_edilecek_kdv1*/, 0 /*cha_ilave_edilecek_kdv2*/,0 /*cha_ilave_edilecek_kdv3*/, 0 /*cha_ilave_edilecek_kdv4*/, 
+            0 /*cha_ilave_edilecek_kdv5*/, 0 /*cha_ilave_edilecek_kdv6*/, 0 /*cha_ilave_edilecek_kdv7*/, 0 /*cha_ilave_edilecek_kdv8*/, 0 /*cha_ilave_edilecek_kdv9*/, 0 /*cha_ilave_edilecek_kdv10*/
+            
             ${cha_m17values}${cha_m16values});
 
       `
@@ -399,8 +409,8 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
           sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, 
           sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, 
           sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, 
-          sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, 
-          sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu, sth_tevkifat_sifirlandi_fl ${sth_m17fields})
+          sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru
+           ${sth_m17fields})
           VALUES (NEWID() /*sth_Guid*/, 0 /*sth_DBCno*/, 0 /*sth_SpecRECno*/, 0 /*sth_iptal*/, 16 /*sth_fileid*/, 0 /*sth_hidden*/, 0 /*sth_kilitli*/, 0 /*sth_degisti*/, 0 /*sth_checksum*/, 
           @MikroUserNo /*sth_create_user*/, GETDATE() /*sth_create_date*/, @MikroUserNo /*sth_lastup_user*/, GETDATE() /*sth_lastup_date*/, '' /*sth_special1*/, '' /*sth_special2*/, 
           '' /*sth_special3*/, 0 /*sth_firmano*/, 0 /*sth_subeno*/, @Tarih /*sth_tarih*/, @STH_TIP /*sth_tip*/, @STH_CINS /*sth_cins*/, @STH_IADE /*sth_normal_iade*/, @STH_EVRAKTIP /*sth_evraktip*/, 
@@ -423,7 +433,7 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
           '00000000-0000-0000-0000-000000000000' /*sth_yetkili_uid*/, 0 /*sth_taxfree_fl*/, 0 /*sth_ilave_edilecek_kdv*/, '' /*sth_ismerkezi_kodu*/, '' /*sth_HareketGrupKodu1*/, 
           '' /*sth_HareketGrupKodu2*/, '' /*sth_HareketGrupKodu3*/, 0 /*sth_Olcu1*/, 0 /*sth_Olcu2*/, 0 /*sth_Olcu3*/, 0 /*sth_Olcu4*/, 0 /*sth_Olcu5*/, 
           0 /*sth_FormulMiktarNo*/, 0 /*sth_FormulMiktar*/, 0 /*sth_eirs_senaryo*/, 0 /*sth_eirs_tipi*/, @Tarih /*sth_teslim_tarihi*/, 0 /*sth_matbu_fl*/, 0 /*sth_satis_fiyat_doviz_cinsi*/, 
-          1 /*sth_satis_fiyat_doviz_kuru*/, '' /*sth_eticaret_kanal_kodu*/, '' /*sth_bagli_ithalat_kodu*/, 0 /*sth_tevkifat_sifirlandi_fl*/
+          1 /*sth_satis_fiyat_doviz_kuru*/
           ${sth_m17values});
 
           SET @SatirNo=@SatirNo+1;
@@ -476,12 +486,25 @@ function posHasilatDagilimDekontu(mainApp, tutar, fisData) {
   let cha_m17fields = ''
   let cha_m17values = ''
   if (mainApp == 'mikro17') {
-    cha_m17fields = `, cha_MainProgramNo, cha_VersionNo, cha_MenuNo, cha_MikroSpecial1, cha_MikroSpecial2, cha_MikroSpecial3, cha_ExternalProgramType, cha_ExternalProgramId, cha_Hash`
-    cha_m17values = `, 21 /*cha_MainProgramNo*/, @MikroVersionNo /*cha_VersionNo*/, 43340 /*cha_MenuNo*/, '' /*cha_MikroSpecial1*/, '' /*cha_MikroSpecial2*/, '' /*cha_MikroSpecial3*/, 
-    0 /*cha_ExternalProgramType*/, '${fisData.id}' /*cha_ExternalProgramId*/, 0 /*cha_Hash*/`
+    cha_m17fields = `, cha_MainProgramNo, cha_VersionNo, cha_MenuNo, cha_MikroSpecial1, cha_MikroSpecial2, cha_MikroSpecial3, cha_ExternalProgramType, cha_ExternalProgramId, cha_Hash
+        , cha_efatura_belge_tipi
+        , cha_vergi11, cha_vergi12, cha_vergi13, cha_vergi14, cha_vergi15, cha_vergi16, cha_vergi17, cha_vergi18, cha_vergi19, cha_vergi20
+        , cha_ilave_edilecek_kdv11, cha_ilave_edilecek_kdv12, cha_ilave_edilecek_kdv13, cha_ilave_edilecek_kdv14, 
+            cha_ilave_edilecek_kdv15, cha_ilave_edilecek_kdv16, cha_ilave_edilecek_kdv17, cha_ilave_edilecek_kdv18, cha_ilave_edilecek_kdv19, cha_ilave_edilecek_kdv20
+        , cha_tevkifat_sifirlandi_fl, cha_bsba_e_belge_mi, 
+              cha_eticaret_kanal_kodu, cha_hizli_satis_kasa_no, cha_ebelge_Islemturu`
+    cha_m17values = `, 21 /*cha_MainProgramNo*/, @MikroVersionNo /*cha_VersionNo*/, 61270 /*cha_MenuNo*/, '' /*cha_MikroSpecial1*/, '' /*cha_MikroSpecial2*/, '' /*cha_MikroSpecial3*/, 
+          0 /*cha_ExternalProgramType*/, '${fisData.id}' /*cha_ExternalProgramId*/, 0 /*cha_Hash*/
+        , 0 /*cha_efatura_belge_tipi*/
+        , @Vergi11 /*cha_vergi11*/, @Vergi12 /*cha_vergi12*/, 0 /*cha_vergi13*/, 0 /*cha_vergi14*/, 0 /*cha_vergi15*/, 0 /*cha_vergi16*/, 0 /*cha_vergi17*/, 
+        0 /*cha_vergi18*/, 0 /*cha_vergi19*/, 0 /*cha_vergi20*/
+        , 0 /*cha_ilave_edilecek_kdv11*/, 0 /*cha_ilave_edilecek_kdv12*/, 0 /*cha_ilave_edilecek_kdv13*/, 0 /*cha_ilave_edilecek_kdv14*/, 0 /*cha_ilave_edilecek_kdv15*/, 0 /*cha_ilave_edilecek_kdv16*/, 
+            0 /*cha_ilave_edilecek_kdv17*/, 0 /*cha_ilave_edilecek_kdv18*/, 0 /*cha_ilave_edilecek_kdv19*/, 0 /*cha_ilave_edilecek_kdv20*/
+        , 0 /*cha_tevkifat_sifirlandi_fl*/, 0 /*cha_bsba_e_belge_mi*/, 
+            '' /*cha_eticaret_kanal_kodu*/, 0 /*cha_hizli_satis_kasa_no*/, 0 /*cha_ebelge_Islemturu*/`
   } else if (mainApp == 'mikro16') {
-    cha_m16fields = `, cha_disyazilimid, cha_disyazilim_tip`
-    cha_m16values = `, '${fisData.id}' /*cha_disyazilimid*/, 0 /*cha_disyazilim_tip*/`
+    cha_m16fields = `, cha_disyazilimid ` //, cha_disyazilim_tip`
+    cha_m16values = `, '${fisData.id}' /*cha_disyazilimid*/` //, 0 /*cha_disyazilim_tip*/`
   }
   let q = `-- POS HASILAT DAGILIM DEKONTU ---
           IF NOT EXISTS(SELECT * FROM CARI_HESAP_HAREKETLERI WHERE cha_evrak_tip=60 AND cha_evrakno_seri=@EvrakSeri and cha_evrakno_sira=@EvrakSira ) BEGIN
@@ -497,12 +520,10 @@ function posHasilatDagilimDekontu(mainApp, tutar, fisData) {
               cha_fis_sirano, cha_trefno, cha_sntck_poz, cha_reftarihi, cha_istisnakodu, cha_pos_hareketi, cha_meblag_ana_doviz_icin_gecersiz_fl, cha_meblag_alt_doviz_icin_gecersiz_fl, 
               cha_meblag_orj_doviz_icin_gecersiz_fl, cha_sip_uid, cha_kirahar_uid, cha_vardiya_tarihi, cha_vardiya_no, cha_vardiya_evrak_ti, cha_ebelge_turu, cha_tevkifat_toplam, 
               cha_e_islem_turu, cha_fatura_belge_turu, cha_diger_belge_adi, cha_uuid, cha_adres_no, cha_vergifon_toplam, cha_ilk_belge_tarihi, cha_ilk_belge_doviz_kuru, cha_HareketGrupKodu1, 
-              cha_HareketGrupKodu2, cha_HareketGrupKodu3, cha_ebelgeno_seri, cha_ebelgeno_sira, cha_hubid, cha_hubglbid, cha_bsba_e_belge_mi, 
-              cha_eticaret_kanal_kodu, cha_hizli_satis_kasa_no, cha_ebelge_Islemturu, cha_tevkifat_sifirlandi_fl, cha_vergi1, cha_vergi2, cha_vergi3, cha_vergi4, cha_vergi5, cha_vergi6, 
-              cha_vergi7, cha_vergi8, cha_vergi9, cha_vergi10, cha_vergi11, cha_vergi12, cha_vergi13, cha_vergi14, cha_vergi15, cha_vergi16, cha_vergi17, cha_vergi18, cha_vergi19, cha_vergi20, 
+              cha_HareketGrupKodu2, cha_HareketGrupKodu3, cha_ebelgeno_seri, cha_ebelgeno_sira, cha_hubid, cha_hubglbid, cha_vergi1, cha_vergi2, cha_vergi3, cha_vergi4, cha_vergi5, cha_vergi6, 
+              cha_vergi7, cha_vergi8, cha_vergi9, cha_vergi10, 
               cha_ilave_edilecek_kdv1, cha_ilave_edilecek_kdv2, cha_ilave_edilecek_kdv3, cha_ilave_edilecek_kdv4, cha_ilave_edilecek_kdv5, cha_ilave_edilecek_kdv6, cha_ilave_edilecek_kdv7, 
-              cha_ilave_edilecek_kdv8, cha_ilave_edilecek_kdv9, cha_ilave_edilecek_kdv10, cha_ilave_edilecek_kdv11, cha_ilave_edilecek_kdv12, cha_ilave_edilecek_kdv13, cha_ilave_edilecek_kdv14, 
-              cha_ilave_edilecek_kdv15, cha_ilave_edilecek_kdv16, cha_ilave_edilecek_kdv17, cha_ilave_edilecek_kdv18, cha_ilave_edilecek_kdv19, cha_ilave_edilecek_kdv20, cha_efatura_belge_tipi
+              cha_ilave_edilecek_kdv8, cha_ilave_edilecek_kdv9, cha_ilave_edilecek_kdv10
               ${cha_m17fields}${cha_m16fields})
               VALUES(NEWID() /*cha_Guid*/, 0 /*cha_DBCno*/, 0 /*cha_SpecRecNo*/, 0 /*cha_iptal*/, 51 /*cha_fileid*/, 0 /*cha_hidden*/, 0 /*cha_kilitli*/, 0 /*cha_degisti*/,
               0 /*cha_CheckSum*/, @MikroUserNo /*cha_create_user*/, GETDATE() /*cha_create_date*/, @MikroUserNo /*cha_lastup_user*/, GETDATE() /*cha_lastup_date*/, 
@@ -523,14 +544,10 @@ function posHasilatDagilimDekontu(mainApp, tutar, fisData) {
               '00000000-0000-0000-0000-000000000000' /*cha_kirahar_uid*/, '1899-12-30 00:00:00.000' /*cha_vardiya_tarihi*/, 0 /*cha_vardiya_no*/, 0 /*cha_vardiya_evrak_ti*/, 0 /*cha_ebelge_turu*/,
               0 /*cha_tevkifat_toplam*/, 0 /*cha_e_islem_turu*/, 3 /*cha_fatura_belge_turu*/, 'Z Raporu' /*cha_diger_belge_adi*/, '' /*cha_uuid*/, 0 /*cha_adres_no*/, 0 /*cha_vergifon_toplam*/,
               '1899-12-30 00:00:00.000' /*cha_ilk_belge_tarihi*/, 0 /*cha_ilk_belge_doviz_kuru*/, '' /*cha_HareketGrupKodu1*/, '' /*cha_HareketGrupKodu2*/, '' /*cha_HareketGrupKodu3*/, 
-              '' /*cha_ebelgeno_seri*/, 0 /*cha_ebelgeno_sira*/, '' /*cha_hubid*/, '' /*cha_hubglbid*/, 0 /*cha_bsba_e_belge_mi*/, 
-              '' /*cha_eticaret_kanal_kodu*/, 0 /*cha_hizli_satis_kasa_no*/, 0 /*cha_ebelge_Islemturu*/, 0 /*cha_tevkifat_sifirlandi_fl*/, 0 /*cha_vergi1*/, 0 /*cha_vergi2*/, 
+              '' /*cha_ebelgeno_seri*/, 0 /*cha_ebelgeno_sira*/, '' /*cha_hubid*/, '' /*cha_hubglbid*/, 0 /*cha_vergi1*/, 0 /*cha_vergi2*/, 
               0 /*cha_vergi3*/, 0 /*cha_vergi4*/, 0 /*cha_vergi5*/, 0 /*cha_vergi6*/, 0 /*cha_vergi7*/, 0 /*cha_vergi8*/, 0 /*cha_vergi9*/, 
-              0 /*cha_vergi10*/, 0 /*cha_vergi11*/, 0 /*cha_vergi12*/, 0 /*cha_vergi13*/, 0 /*cha_vergi14*/, 0 /*cha_vergi15*/, 0 /*cha_vergi16*/, 0 /*cha_vergi17*/, 
-              0 /*cha_vergi18*/, 0 /*cha_vergi19*/, 0 /*cha_vergi20*/, 0 /*cha_ilave_edilecek_kdv1*/, 0 /*cha_ilave_edilecek_kdv2*/,0 /*cha_ilave_edilecek_kdv3*/, 0 /*cha_ilave_edilecek_kdv4*/, 
-              0 /*cha_ilave_edilecek_kdv5*/, 0 /*cha_ilave_edilecek_kdv6*/, 0 /*cha_ilave_edilecek_kdv7*/, 0 /*cha_ilave_edilecek_kdv8*/, 0 /*cha_ilave_edilecek_kdv9*/, 0 /*cha_ilave_edilecek_kdv10*/, 
-              0 /*cha_ilave_edilecek_kdv11*/, 0 /*cha_ilave_edilecek_kdv12*/, 0 /*cha_ilave_edilecek_kdv13*/, 0 /*cha_ilave_edilecek_kdv14*/, 0 /*cha_ilave_edilecek_kdv15*/, 0 /*cha_ilave_edilecek_kdv16*/, 
-              0 /*cha_ilave_edilecek_kdv17*/, 0 /*cha_ilave_edilecek_kdv18*/, 0 /*cha_ilave_edilecek_kdv19*/, 0 /*cha_ilave_edilecek_kdv20*/, 0 /*cha_efatura_belge_tipi*/
+              0 /*cha_vergi10*/, 0 /*cha_ilave_edilecek_kdv1*/, 0 /*cha_ilave_edilecek_kdv2*/,0 /*cha_ilave_edilecek_kdv3*/, 0 /*cha_ilave_edilecek_kdv4*/, 
+              0 /*cha_ilave_edilecek_kdv5*/, 0 /*cha_ilave_edilecek_kdv6*/, 0 /*cha_ilave_edilecek_kdv7*/, 0 /*cha_ilave_edilecek_kdv8*/, 0 /*cha_ilave_edilecek_kdv9*/, 0 /*cha_ilave_edilecek_kdv10*/
               ${cha_m17values}${cha_m16values});
 
             INSERT INTO CARI_HESAP_HAREKETLERI (cha_Guid, cha_DBCno, cha_SpecRecNo, cha_iptal, cha_fileid, cha_hidden, cha_kilitli, cha_degisti, cha_CheckSum, cha_create_user, 
@@ -545,12 +562,10 @@ function posHasilatDagilimDekontu(mainApp, tutar, fisData) {
               cha_fis_sirano, cha_trefno, cha_sntck_poz, cha_reftarihi, cha_istisnakodu, cha_pos_hareketi, cha_meblag_ana_doviz_icin_gecersiz_fl, cha_meblag_alt_doviz_icin_gecersiz_fl, 
               cha_meblag_orj_doviz_icin_gecersiz_fl, cha_sip_uid, cha_kirahar_uid, cha_vardiya_tarihi, cha_vardiya_no, cha_vardiya_evrak_ti, cha_ebelge_turu, cha_tevkifat_toplam, 
               cha_e_islem_turu, cha_fatura_belge_turu, cha_diger_belge_adi, cha_uuid, cha_adres_no, cha_vergifon_toplam, cha_ilk_belge_tarihi, cha_ilk_belge_doviz_kuru, cha_HareketGrupKodu1, 
-              cha_HareketGrupKodu2, cha_HareketGrupKodu3, cha_ebelgeno_seri, cha_ebelgeno_sira, cha_hubid, cha_hubglbid, cha_bsba_e_belge_mi, 
-              cha_eticaret_kanal_kodu, cha_hizli_satis_kasa_no, cha_ebelge_Islemturu, cha_tevkifat_sifirlandi_fl, cha_vergi1, cha_vergi2, cha_vergi3, cha_vergi4, cha_vergi5, cha_vergi6, 
-              cha_vergi7, cha_vergi8, cha_vergi9, cha_vergi10, cha_vergi11, cha_vergi12, cha_vergi13, cha_vergi14, cha_vergi15, cha_vergi16, cha_vergi17, cha_vergi18, cha_vergi19, cha_vergi20, 
+              cha_HareketGrupKodu2, cha_HareketGrupKodu3, cha_ebelgeno_seri, cha_ebelgeno_sira, cha_hubid, cha_hubglbid, cha_vergi1, cha_vergi2, cha_vergi3, cha_vergi4, cha_vergi5, cha_vergi6, 
+              cha_vergi7, cha_vergi8, cha_vergi9, cha_vergi10, 
               cha_ilave_edilecek_kdv1, cha_ilave_edilecek_kdv2, cha_ilave_edilecek_kdv3, cha_ilave_edilecek_kdv4, cha_ilave_edilecek_kdv5, cha_ilave_edilecek_kdv6, cha_ilave_edilecek_kdv7, 
-              cha_ilave_edilecek_kdv8, cha_ilave_edilecek_kdv9, cha_ilave_edilecek_kdv10, cha_ilave_edilecek_kdv11, cha_ilave_edilecek_kdv12, cha_ilave_edilecek_kdv13, cha_ilave_edilecek_kdv14, 
-              cha_ilave_edilecek_kdv15, cha_ilave_edilecek_kdv16, cha_ilave_edilecek_kdv17, cha_ilave_edilecek_kdv18, cha_ilave_edilecek_kdv19, cha_ilave_edilecek_kdv20, cha_efatura_belge_tipi
+              cha_ilave_edilecek_kdv8, cha_ilave_edilecek_kdv9, cha_ilave_edilecek_kdv10
               ${cha_m17fields}${cha_m16fields})
               VALUES(NEWID() /*cha_Guid*/, 0 /*cha_DBCno*/, 0 /*cha_SpecRecNo*/, 0 /*cha_iptal*/, 51 /*cha_fileid*/, 0 /*cha_hidden*/, 0 /*cha_kilitli*/, 0 /*cha_degisti*/,
               0 /*cha_CheckSum*/, @MikroUserNo /*cha_create_user*/, GETDATE() /*cha_create_date*/, @MikroUserNo /*cha_lastup_user*/, GETDATE() /*cha_lastup_date*/, 
@@ -571,14 +586,10 @@ function posHasilatDagilimDekontu(mainApp, tutar, fisData) {
               '00000000-0000-0000-0000-000000000000' /*cha_kirahar_uid*/, '1899-12-30 00:00:00.000' /*cha_vardiya_tarihi*/, 0 /*cha_vardiya_no*/, 0 /*cha_vardiya_evrak_ti*/,0 /*cha_ebelge_turu*/,
               0 /*cha_tevkifat_toplam*/, 0 /*cha_e_islem_turu*/, 3 /*cha_fatura_belge_turu*/, 'Z Raporu' /*cha_diger_belge_adi*/, '' /*cha_uuid*/, 0 /*cha_adres_no*/, 0 /*cha_vergifon_toplam*/,
               '1899-12-30 00:00:00.000' /*cha_ilk_belge_tarihi*/, 0 /*cha_ilk_belge_doviz_kuru*/, '' /*cha_HareketGrupKodu1*/, '' /*cha_HareketGrupKodu2*/, '' /*cha_HareketGrupKodu3*/, 
-              '' /*cha_ebelgeno_seri*/, 0 /*cha_ebelgeno_sira*/, '' /*cha_hubid*/, '' /*cha_hubglbid*/, 0 /*cha_bsba_e_belge_mi*/, 
-              '' /*cha_eticaret_kanal_kodu*/, 0 /*cha_hizli_satis_kasa_no*/, 0 /*cha_ebelge_Islemturu*/, 0 /*cha_tevkifat_sifirlandi_fl*/, 0 /*cha_vergi1*/, 0 /*cha_vergi2*/, 
+              '' /*cha_ebelgeno_seri*/, 0 /*cha_ebelgeno_sira*/, '' /*cha_hubid*/, '' /*cha_hubglbid*/, 0 /*cha_vergi1*/, 0 /*cha_vergi2*/, 
               0 /*cha_vergi3*/, 0 /*cha_vergi4*/, 0 /*cha_vergi5*/, 0 /*cha_vergi6*/, 0 /*cha_vergi7*/, 0 /*cha_vergi8*/, 0 /*cha_vergi9*/, 
-              0 /*cha_vergi10*/, 0 /*cha_vergi11*/, 0 /*cha_vergi12*/, 0 /*cha_vergi13*/, 0 /*cha_vergi14*/, 0 /*cha_vergi15*/, 0 /*cha_vergi16*/, 0 /*cha_vergi17*/, 
-              0 /*cha_vergi18*/, 0 /*cha_vergi19*/, 0 /*cha_vergi20*/, 0 /*cha_ilave_edilecek_kdv1*/, 0 /*cha_ilave_edilecek_kdv2*/,0 /*cha_ilave_edilecek_kdv3*/, 0 /*cha_ilave_edilecek_kdv4*/, 
-              0 /*cha_ilave_edilecek_kdv5*/, 0 /*cha_ilave_edilecek_kdv6*/, 0 /*cha_ilave_edilecek_kdv7*/, 0 /*cha_ilave_edilecek_kdv8*/, 0 /*cha_ilave_edilecek_kdv9*/, 0 /*cha_ilave_edilecek_kdv10*/, 
-              0 /*cha_ilave_edilecek_kdv11*/, 0 /*cha_ilave_edilecek_kdv12*/, 0 /*cha_ilave_edilecek_kdv13*/, 0 /*cha_ilave_edilecek_kdv14*/, 0 /*cha_ilave_edilecek_kdv15*/, 0 /*cha_ilave_edilecek_kdv16*/, 
-              0 /*cha_ilave_edilecek_kdv17*/, 0 /*cha_ilave_edilecek_kdv18*/, 0 /*cha_ilave_edilecek_kdv19*/, 0 /*cha_ilave_edilecek_kdv20*/, 0 /*cha_efatura_belge_tipi*/
+              0 /*cha_vergi10*/, 0 /*cha_ilave_edilecek_kdv1*/, 0 /*cha_ilave_edilecek_kdv2*/,0 /*cha_ilave_edilecek_kdv3*/, 0 /*cha_ilave_edilecek_kdv4*/, 
+              0 /*cha_ilave_edilecek_kdv5*/, 0 /*cha_ilave_edilecek_kdv6*/, 0 /*cha_ilave_edilecek_kdv7*/, 0 /*cha_ilave_edilecek_kdv8*/, 0 /*cha_ilave_edilecek_kdv9*/, 0 /*cha_ilave_edilecek_kdv10*/
               ${cha_m17values}${cha_m16values});
           END
         `

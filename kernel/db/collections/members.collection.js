@@ -2,10 +2,10 @@ const collectionName = path.basename(__filename, '.collection.js')
 module.exports = function (dbModel) {
   const schema = mongoose.Schema(
     {
-      organization: { type: ObjectId, ref: 'organizations', index: true },
+      organization: { type: ObjectId, ref: 'organizations', default: null, index: true },
       username: { type: String, required: true, index: true },
       password: { type: String, default: null, index: true, select: false },
-      role: { type: String, default: 'user' },
+      role: { type: String, default: 'user', enum: ['user', 'owner', 'purchase', 'sales', 'admin', 'sysadmin'] },
       name: { type: String, default: '', index: true },
       passive: { type: Boolean, default: false, index: true },
 
