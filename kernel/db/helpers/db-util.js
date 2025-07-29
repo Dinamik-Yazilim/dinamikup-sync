@@ -13,55 +13,51 @@ exports.sendToTrash = (dbModel, collectionName, session, filter) =>
       .findOne(filter)
       .then((doc) => {
         if (doc) {
-          if (dbModel.relations) {
-            let relations = dbModel.relations
+          if (dbModel[collectionName].relations) {
+            let relations = dbModel[collectionName].relations
             let keys = Object.keys(relations)
             let index = 0
             let errorList = []
-
+            console.log('relations:', relations)
             let kontrolEt = () => new Promise((resolve, reject) => {
               if (index >= keys.length) return resolve()
-              getRepoDbModel(session.member, dbModel._id, dbModel.dbName)
-                .then((mdl) => {
-                  let k = keys[index]
-                  let relationFilter
-                  let errMessage = `Bu kayit <b>${k}</b> tablosuna baglidir.`
-                  if (Array.isArray(relations[k])) {
-                    if (relations[k].length > 0)
-                      if (typeof relations[k][0] == 'string') {
-                        relationFilter = {}
-                        relationFilter[relations[k][0]] = doc._id
-                        if (relations[k].length > 1)
-                          if (typeof relations[k][1] == 'string')
-                            errMessage = relations[k][1]
-                      }
-                  } else if (typeof relations[k] == 'object') {
-                    if (relations[k].field) {
-                      relationFilter = {}
-                      relationFilter[relations[k].field] = doc._id
-                      if (relations[k].filter)
-                        Object.assign(relationFilter, relations[k].filter)
-                      if (relations[k].message)
-                        errMessage = relations[k].message
-                    }
-                  }
-
-                  if (!relationFilter) {
+              let k = keys[index]
+              let relationFilter
+              let errMessage = `Bu kayit ${k} tablosuna baglidir.`
+              if (Array.isArray(relations[k])) {
+                if (relations[k].length > 0)
+                  if (typeof relations[k][0] == 'string') {
                     relationFilter = {}
-                    relationFilter[relations[k]] = doc._id
+                    relationFilter[relations[k][0]] = doc._id
+                    if (relations[k].length > 1)
+                      if (typeof relations[k][1] == 'string')
+                        errMessage = relations[k][1]
                   }
+              } else if (typeof relations[k] == 'object') {
+                if (relations[k].field) {
+                  relationFilter = {}
+                  relationFilter[relations[k].field] = doc._id
+                  if (relations[k].filter)
+                    Object.assign(relationFilter, relations[k].filter)
+                  if (relations[k].message)
+                    errMessage = relations[k].message
+                }
+              }
 
-                  mdl[k]
-                    .countDocuments(relationFilter)
-                    .then((c) => {
-                      if (c > 0) errorList.push(`${errMessage} ${c} Kayıt`)
-                      index++
-                      setTimeout(
-                        () => kontrolEt().then(resolve).catch(reject),
-                        0
-                      )
-                    })
-                    .catch(reject)
+              if (!relationFilter) {
+                relationFilter = {}
+                relationFilter[relations[k]] = doc._id
+              }
+
+              dbModel[k]
+                .countDocuments(relationFilter)
+                .then((c) => {
+                  if (c > 0) errorList.push(`${errMessage} ${c} Kayıt`)
+                  index++
+                  setTimeout(
+                    () => kontrolEt().then(resolve).catch(reject),
+                    0
+                  )
                 })
                 .catch(reject)
             })
@@ -71,7 +67,7 @@ exports.sendToTrash = (dbModel, collectionName, session, filter) =>
                 if (errorList.length == 0) {
                   resolve()
                 } else {
-                  errorList.unshift('<b>Bağlı kayıt(lar) var. Silemezsiniz!</b>')
+                  errorList.unshift('Bağlı kayıt(lar) var. Silemezsiniz!')
                   reject({
                     name: 'RELATION_ERROR',
                     message: errorList.join('\n'),
@@ -79,7 +75,7 @@ exports.sendToTrash = (dbModel, collectionName, session, filter) =>
                 }
               })
               .catch((err) => {
-                errorList.unshift('<b>Bağlı kayıt(lar) var. Silemezsiniz!</b>')
+                errorList.unshift('Bağlı kayıt(lar) var. Silemezsiniz!')
                 if (err) errorList.push(err.message)
                 reject({ name: 'RELATION_ERROR', message: errorList.join('\n') })
               })

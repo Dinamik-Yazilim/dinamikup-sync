@@ -54,5 +54,6 @@ module.exports = function (dbModel) {
   let model = dbModel.conn.model(collectionName, schema, collectionName)
 
   model.removeOne = (member, filter) => sendToTrash(dbModel, collectionName, member, filter)
+  model.relations = { storePosComputers: 'store' }
   return model
 }

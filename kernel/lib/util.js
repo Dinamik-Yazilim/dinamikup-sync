@@ -339,3 +339,22 @@ exports.yyyyMMdd = function (tarih) {
 	// console.log('yyyyMMdd:', s, 'tarih:', tarih)
 
 }
+
+exports.assign = (doc, data) => {
+	Object.keys(data).forEach(key => {
+		if (typeof data[key] == 'object') {
+			doc[key] = Object.assign(doc[key], data[key])
+			Object.keys(data[key]).forEach(jey => {
+				if (typeof data[key] == 'object') {
+					doc[key] = exports.assign(doc[key], data[key])
+				} else {
+					doc[key] = data[key]
+				}
+			})
+		} else {
+			doc[key] = data[key]
+		}
+
+	})
+	return doc
+}

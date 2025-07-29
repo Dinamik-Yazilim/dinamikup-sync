@@ -1,9 +1,15 @@
 const collectionName = path.basename(__filename, '.collection.js')
 module.exports = function (dbModel) {
+  let t1 = new Date()
+  let t2 = new Date()
+  t2.setFullYear(t2.getFullYear() + 2)
   const schema = mongoose.Schema(
     {
       name: { type: String, unique: true },
       mainApp: { type: String, default: 'mikro16', enum: ['mikro16', 'mikro17', 'mikro16_workdata', 'mikro17_workdata'] },
+      location: { type: String, default: '', index: true },
+      startDate: { type: String, default: t1.toISOString().substring(0, 10), index: true },
+      endDate: { type: String, default: t2.toISOString().substring(0, 10), index: true },
       connector: {
         clientId: { type: String, default: '', index: true },
         clientPass: { type: String, default: '', index: true },
@@ -63,5 +69,6 @@ module.exports = function (dbModel) {
   let model = dbModel.conn.model(collectionName, schema, collectionName)
 
   model.removeOne = (member, filter) => sendToTrash(dbModel, collectionName, member, filter)
+  model.relations = { stores: 'organization', members: 'organization', storePosComputers: 'organization' }
   return model
 }

@@ -21,11 +21,21 @@ module.exports = (req) =>
 			if (authCodeDoc.authCodeExpire.getTime() < new Date().getTime()) return reject('authCode expired')
 			if (authCodeDoc.verified) return reject('authCode has already been verified')
 
-			const orgDoc = await db.organizations.findOne({ _id: authCodeDoc.organization })
-			if (!orgDoc) return reject(`organization not found`)
+			let orgDoc = null
+			let memberDoc = null
+			if (authCodeDoc.organization) {
+				orgDoc = await db.organizations.findOne({ _id: authCodeDoc.organization })
+				if (!orgDoc) return reject(`organization not found`)
+				memberDoc = await db.members.findOne({ username: username, organization: orgDoc._id })
+				if (!memberDoc) return reject('member not found')
+			} else {
+				memberDoc = await db.members.findOne({ username: username, organization: null })
+				if (!memberDoc) return reject('member not found')
+				if (!['sysadmin', 'sysuser'].includes(memberDoc.role)) return reject(`permission denied`)
+			}
 
-			const memberDoc = await db.members.findOne({ username: username, organization: orgDoc._id })
-			if (!memberDoc) return reject('member not found')
+
+
 
 			saveSession(orgDoc, memberDoc, req, 'dinamikup', null)
 				.then(async result => {
