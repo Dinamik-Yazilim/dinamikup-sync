@@ -13,6 +13,7 @@ import { HeaderLogo2 } from "@/components/logo"
 import { useLanguage } from "@/i18n"
 import Cookies from 'js-cookie'
 import { Member } from "@/types/Member"
+import { SignOutButton } from "./signout-button"
 
 // Define menu item types
 interface MenuItem {
@@ -184,7 +185,7 @@ export function Sidebar({ className }: Props) {
   }, [])
   useEffect(() => {
     if (user) {
-      const m: MenuItem[] = user.role?.startsWith('sys') ? adminMenu(t, user) : menuItems(t, user)
+      const m: MenuItem[] = user.organization ? menuItems(t, user) : adminMenu(t, user)
       m.forEach((item, index) => {
         if (item.submenu) {
           const hasActiveChild = item.submenu.some((subItem) => isActive(subItem.href))
@@ -203,10 +204,20 @@ export function Sidebar({ className }: Props) {
   // }, [pathname])
 
   return (
-    <div className={`w-64 min-h-screen border-r ${className}`}>
+    <div className={`w-64 min-h-screen border-r flex flex-col ${className}`}>
+      {user?.organization &&
+        <div className="flex justify-between items-center border-b mb-1 bg-gr11een-600 text-green-600 px-2 py-1 font-bold">
+          <div className="flex gap-2">
+            <Building2Icon />
+            {user?.organization?.name?.toUpperCase()}
+          </div>
+          <SignOutButton />
+        </div>
+      }
       {menu &&
         <nav className="p-2 mt-0">
           <Accordion type="multiple" value={openAccordions} className="space-y-1">
+
             {menu.map((item, index) => {
               // If the item has a submenu, render as accordion
               if (item.submenu) {
@@ -259,6 +270,7 @@ export function Sidebar({ className }: Props) {
                 </Link>
               )
             })}
+
           </Accordion>
         </nav>
       }

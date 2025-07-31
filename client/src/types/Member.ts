@@ -2,7 +2,7 @@ import { Organization } from "./Organization"
 
 export interface Member {
   _id?: string
-  organization?:Organization
+  organization?:Organization | null
   username?: string
   name?: string
   role?: string

@@ -115,5 +115,6 @@
   "Sales Serial":"Satış Seri",
   "Location":"Lokasyon",
   "New Organization":"Yeni Organizasyon",
-  "Edit Organization":"Organizasyon Düzenle"
+  "Edit Organization":"Organizasyon Düzenle",
+  "Do you want to connect to organization?":"Organizasyona bağlanmak istiyor musunuz?"
 }

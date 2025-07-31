@@ -115,5 +115,6 @@
   "Sales Serial":"Sales Serial",
   "Location":"Location",
   "New Organization":"New Organization",
-  "Edit Organization":"Edit Organization"
+  "Edit Organization":"Edit Organization",
+  "Do you want to connect to organization?":"Do you want to connect to organization?"
 }

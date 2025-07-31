@@ -57,6 +57,7 @@ exports.saveSession = async function (orgDoc, memberDoc, req, loginProvider = 'd
 						db: newDoc.db,
 						lang: newDoc.lang,
 						user: memberDoc.toJSON(),
+						organization: orgDoc || null
 					}
 					delete obj.user.password
 					resolve(obj)

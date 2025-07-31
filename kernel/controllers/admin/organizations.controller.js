@@ -10,7 +10,12 @@ module.exports = (dbModel, sessionDoc, req) =>
         }
         break
       case 'POST':
-        post(dbModel, sessionDoc, req).then(resolve).catch(reject)
+        if (req.params.param1 == 'connect') {
+          connectOrg(dbModel, sessionDoc, req).then(resolve).catch(reject)
+        } else {
+          post(dbModel, sessionDoc, req).then(resolve).catch(reject)
+        }
+
 
         break
       case 'PUT':
@@ -24,6 +29,29 @@ module.exports = (dbModel, sessionDoc, req) =>
         break
     }
   })
+
+function connectOrg(dbModel, sessionDoc, req) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!req.params.param2) return reject(`param2 required`)
+      const orgDoc = await dbModel.organizations.findOne({ _id: req.params.param2 })
+      if (!orgDoc) return reject(`organization not found`)
+      if (orgDoc.passive) return reject(`organization is not active`)
+      sessionDoc.organization = orgDoc._id
+      sessionDoc.save()
+        .then(() => {
+          let obj = orgDoc.toJSON()
+          delete obj.connector
+          delete obj.settings
+          resolve(obj)
+        })
+        .catch(reject)
+    } catch (err) {
+      reject(err)
+    }
+
+  })
+}
 
 function getOne(dbModel, sessionDoc, req) {
   return new Promise((resolve, reject) => {
@@ -66,8 +94,8 @@ function post(dbModel, sessionDoc, req) {
 
       let data = req.body || {}
       delete data._id
+      data.name = (data.name || '').toLowerCase().replace(/[^a-z0-9\-\_]/g, '')
       if (!data.name) return reject('name required')
-
       if (await dbModel.organizations.countDocuments({ name: data.name }) > 0)
         return reject(`name already exists`)
 
@@ -92,6 +120,10 @@ function put(dbModel, sessionDoc, req) {
 
       let doc = await dbModel.organizations.findOne({ _id: req.params.param1 })
       if (!doc) return reject(`organization not found`)
+      if (data.name) {
+        data.name = (data.name || '').toLowerCase().replace(/[^a-z0-9\-\_]/g, '')
+        if (!data.name) return reject('name required')
+      }
 
       Object.assign(doc, data)
       if (await dbModel.organizations.countDocuments({ name: doc.name, _id: { $ne: doc._id } }) > 0)
