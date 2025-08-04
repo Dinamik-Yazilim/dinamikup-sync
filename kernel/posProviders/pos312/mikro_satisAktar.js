@@ -370,7 +370,6 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
             @Vergi3 /*cha_vergi3*/, @Vergi4 /*cha_vergi4*/, @Vergi5 /*cha_vergi5*/, @Vergi6 /*cha_vergi6*/, @Vergi7 /*cha_vergi7*/, @Vergi8 /*cha_vergi8*/, @Vergi9 /*cha_vergi9*/, 
             @Vergi10 /*cha_vergi10*/, 0 /*cha_ilave_edilecek_kdv1*/, 0 /*cha_ilave_edilecek_kdv2*/,0 /*cha_ilave_edilecek_kdv3*/, 0 /*cha_ilave_edilecek_kdv4*/, 
             0 /*cha_ilave_edilecek_kdv5*/, 0 /*cha_ilave_edilecek_kdv6*/, 0 /*cha_ilave_edilecek_kdv7*/, 0 /*cha_ilave_edilecek_kdv8*/, 0 /*cha_ilave_edilecek_kdv9*/, 0 /*cha_ilave_edilecek_kdv10*/
-            
             ${cha_m17values}${cha_m16values});
 
       `

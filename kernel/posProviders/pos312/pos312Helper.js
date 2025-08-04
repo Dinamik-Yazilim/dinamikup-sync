@@ -148,10 +148,10 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
           sto_lastup_date as updatedAt , sto_reyon_kodu as rayon
            FROM STOKLAR WITH (NOLOCK)
             WHERE sto_kod in (SELECT sfiyat_stokkod FROM STOK_SATIS_FIYAT_LISTELERI WITH (NOLOCK) WHERE sfiyat_listesirano=1)
+            
             AND (sto_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}' 
               OR sto_kod IN (SELECT bar_stokkodu FROM BARKOD_TANIMLARI WITH (NOLOCK) WHERE bar_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}') 
-              OR sto_kod IN (SELECT sfiyat_stokkod FROM STOK_SATIS_FIYAT_LISTELERI WITH (NOLOCK) WHERE sfiyat_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}') 
-            )
+              OR sto_kod IN (SELECT sfiyat_stokkod FROM STOK_SATIS_FIYAT_LISTELERI WITH (NOLOCK) WHERE sfiyat_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}') )
             ORDER BY sto_lastup_date`)
 
       console.log('docs.length', docs.length)
@@ -170,11 +170,28 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
         WHERE B.bar_stokkodu IN ('${docs.map(e => e.code).join("','")}') `)
       console.log('barcodeDocs.length', barcodeDocs.length)
 
-      let priceDocs = await getList(sessionDoc, orgDoc, `SELECT sfiyat_stokkod as code, 0 as isBarcode, sfiyat_listesirano as ordr, 0 as storeId, GETDATE() as startDate, GETDATE() as endDate, sfiyat_fiyati as price, sfiyat_fiyati as newPrice, 0 as [deleted] FROM STOK_SATIS_FIYAT_LISTELERI F 
+      // let priceDocs = await getList(sessionDoc, orgDoc, `SELECT sfiyat_stokkod as code, 0 as isBarcode, sfiyat_listesirano as ordr, 0 as storeId, GETDATE() as startDate, GETDATE() as endDate, sfiyat_fiyati as price, sfiyat_fiyati as newPrice, 0 as [deleted] FROM STOK_SATIS_FIYAT_LISTELERI F 
+      //   INNER JOIN STOKLAR S ON S.sto_kod=F.sfiyat_stokkod
+      //   WHERE (sfiyat_listesirano=1 OR sfiyat_listesirano>=100)  and sfiyat_deposirano in (0)
+      //   AND S.sto_kod IN ('${docs.map(e => e.code).join("','")}')
+      //  `)
+
+      let priceDocs = await getList(sessionDoc, orgDoc, `SELECT sfiyat_stokkod as code, 0 as isBarcode, sfiyat_listesirano as ordr, 0 as storeId, GETDATE() as startDate, GETDATE() as endDate, sfiyat_fiyati as price, sfiyat_fiyati as newPrice, 0 as [deleted]
+, F.sfiyat_birim_pntr
+FROM STOK_SATIS_FIYAT_LISTELERI F 
         INNER JOIN STOKLAR S ON S.sto_kod=F.sfiyat_stokkod
         WHERE (sfiyat_listesirano=1 OR sfiyat_listesirano>=100)  and sfiyat_deposirano in (0)
+		AND F.sfiyat_birim_pntr=1 
         AND S.sto_kod IN ('${docs.map(e => e.code).join("','")}')
-       `)
+UNION ALL
+SELECT B.bar_kodu as code, 1 as isBarcode, sfiyat_listesirano as ordr, 0 as storeId, GETDATE() as startDate, GETDATE() as endDate, sfiyat_fiyati as price, sfiyat_fiyati as newPrice, 0 as [deleted]
+, F.sfiyat_birim_pntr
+FROM STOK_SATIS_FIYAT_LISTELERI F 
+        INNER JOIN STOKLAR S ON S.sto_kod=F.sfiyat_stokkod INNER JOIN
+		BARKOD_TANIMLARI B ON B.bar_stokkodu = S.sto_kod AND B.bar_birimpntr=F.sfiyat_birİ
+        WHERE (sfiyat_listesirano=1 OR sfiyat_listesirano>=100)  and sfiyat_deposirano in (0)
+		AND F.sfiyat_birim_pntr<>1 
+        AND S.sto_kod IN ('${docs.map(e => e.code).join("','")}') `)
 
       console.log('priceDocs.length', priceDocs.length)
 
@@ -210,11 +227,11 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
               unit = 2
               Scale = true
             }
-            StockPrices = ((priceDocs || []).filter(e => e.code == docs[i].code).map(e => {
+            StockPrices = ((priceDocs || []).filter((e, index) => e.code == docs[i].code).map(e => {
               return {
                 master: e.code,
-                isBarcode: false,
-                ordr: e.ordr,
+                isBarcode: e.isBarcode == 1 ? true : false,
+                ordr: index,
                 storeId: 0,
                 startDate: new Date().toISOString(),
                 endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 12)).toISOString(),
