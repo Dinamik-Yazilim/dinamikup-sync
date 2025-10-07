@@ -151,7 +151,6 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             AND (sto_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}' 
               OR sto_kod IN (SELECT bar_stokkodu FROM BARKOD_TANIMLARI WITH (NOLOCK) WHERE bar_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}') 
               OR sto_kod IN (SELECT sfiyat_stokkod FROM STOK_SATIS_FIYAT_LISTELERI WITH (NOLOCK) WHERE sfiyat_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}') 
-                OR sto_kod = '29003853' OR sto_kod IN (SELECT bar_stokkodu FROM BARKOD_TANIMLARI WITH (NOLOCK) WHERE bar_stokkodu='29003853')
             )
             ORDER BY sto_lastup_date`)
 
