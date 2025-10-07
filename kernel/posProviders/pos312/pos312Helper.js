@@ -151,6 +151,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             AND (sto_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}' 
               OR sto_kod IN (SELECT bar_stokkodu FROM BARKOD_TANIMLARI WITH (NOLOCK) WHERE bar_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}') 
               OR sto_kod IN (SELECT sfiyat_stokkod FROM STOK_SATIS_FIYAT_LISTELERI WITH (NOLOCK) WHERE sfiyat_lastup_date>'${storeDoc.posIntegration.lastUpdate_items || ''}') 
+                OR sto_kod = '29003853' OR sto_kod IN (SELECT bar_stokkodu FROM BARKOD_TANIMLARI WITH (NOLOCK) WHERE bar_stokkodu='29003853')
             )
             ORDER BY sto_lastup_date`)
 
@@ -160,7 +161,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
         return resolve('stok kartlari zaten guncel')
       }
       let barcodeDocs = await getList(sessionDoc, orgDoc, `SELECT  bar_kodu as barcode, bar_stokkodu as code,
-         B.bar_birimpntr,
+         B.bar_birimpntr, bar_icerigi,
         CASE 
             WHEN B.bar_birimpntr=1 OR B.bar_birimpntr=0 THEN S.sto_birim1_katsayi 
             WHEN B.bar_birimpntr=2 THEN S.sto_birim2_katsayi 
@@ -188,10 +189,10 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
           let t1 = new Date().getTime() / 1000
           let Scale = false
           let unit = 1
-          if (['KİLOGRAM', 'KILOGRAM', 'KG', 'kg', 'Kg', 'kilogram', 'KİLO', 'kilo', 'Kilogram'].includes(docs[i].unit)) {
-            unit = 2
-            Scale = true
-          }
+          // if (['KİLOGRAM', 'KILOGRAM', 'KG', 'kg', 'Kg', 'kilogram', 'KİLO', 'kilo', 'Kilogram'].includes(docs[i].unit)) {
+          //   unit = 2
+          //   Scale = true
+          // }
           let DepartmentId = 0
           let StockBarcodes = []
           let StockPrices = []
@@ -200,18 +201,37 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             DepartmentId = Kdv.id
             StockBarcodes = (barcodeDocs || []).filter(e => e.code == docs[i].code).map(e => {
               if (e.Multiplier <= 0) e.Multiplier = 1
-              return {
-                "barcode": e.barcode,
-                "stockCode": e.code,
-                "multiplier": e.Multiplier
+              if (e.bar_icerigi > 1) {
+                unit = 1
+                Scale = true
+                return {
+                  "barcode": e.barcode,
+                  "stockCode": e.code,
+                  "multiplier": e.Multiplier
+                }
+              } else if (e.bar_icerigi == 1) {
+                unit = 2
+                Scale = true
+                return {
+                  "barcode": e.barcode,
+                  "stockCode": e.code,
+                  "multiplier": e.Multiplier
+                }
+              } else {
+                return {
+                  "barcode": e.barcode,
+                  "stockCode": e.code,
+                  "multiplier": e.Multiplier
+                }
               }
             })
             // let tartiliUrunMu = StockBarcodes.find(e => (e.barcode.startsWith('27') || e.barcode.startsWith('28') || e.barcode.startsWith('29')) && e.barcode.length == 7)
-            let tartiliUrunMu = StockBarcodes.find(e => e.bar_birimpntr == 1 && e.barcode.length == 7)
-            if (tartiliUrunMu) {
-              unit = 2
-              Scale = true
-            }
+
+            // let tartiliUrunMu = StockBarcodes.find(e => e.bar_birimpntr == 1 && e.barcode.length == 7)
+            // if (tartiliUrunMu) {
+            //   unit = 2
+            //   Scale = true
+            // }
             StockPrices = ((priceDocs || []).filter(e => e.code == docs[i].code).map(e => {
               return {
                 master: e.code,
