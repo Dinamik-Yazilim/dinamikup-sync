@@ -28,11 +28,14 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
       if (!posComputerDoc.cashAccountId) reject(`POS Bilgisayari:${posComputerDoc.name} nakit kasa tanimlanmamis`)
       if (!posComputerDoc.bankAccountId) reject(`POS Bilgisayari:${posComputerDoc.name} banka hesabi tanimlanmamis`)
 
+
       const tarih = util.yyyyMMdd(fisData.endDate)
       // const depoNo = util.pad(storeDoc.warehouseId, 3)
 
       let seriNo = posComputerDoc.salesDocNoSerial || ''
       const iade = fisData.type == 3 ? true : false
+
+      eventLog(`Mikro ${mainApp} satis aktarim basladi. 312Pos storeId:${fisData.storeId}  Depo:${storeDoc.warehouseId} fisData.type:${fisData.type} SeriNo:${seriNo} FisNo:${fisData.batchNo || 0}${util.pad(fisData.stanNo || 0, 4)}`)
 
       let cha_m17fields = ''
       let cha_m17values = ''
@@ -263,9 +266,34 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
             @CariEInvoiceAlias /*adr_efatura_alias*/, @CariEWayBillAlias /*adr_eirsaliye_alias*/
             ${adr_m17values});
 
+            SET @CariKod=@YeniCariKod;  
+          END ELSE BEGIN
+            SET @CariKod=@YeniCariKod;
+
+            UPDATE CARI_HESAPLAR SET
+              cari_lastup_user=@MikroUserNo,
+              cari_lastup_date=GETDATE(),
+              cari_unvan1=@CariUnvan1,
+              cari_unvan2=@CariUnvan2,
+              cari_vdaire_adi=@CariVergiDairesi,
+              cari_vdaire_no=@CariVergiNo,
+              cari_VergiKimlikNo=SUBSTRING(@CariVergiNo,1,10),
+              cari_EMail=@CariEmail,
+              cari_CepTel=@CariCepTel
+            WHERE cari_kod=@CariKod;
+
+            UPDATE CARI_HESAP_ADRESLERI SET
+              adr_lastup_user=@MikroUserNo,
+              adr_lastup_date=GETDATE(),
+              adr_cadde=@AdresCadde,
+              adr_mahalle=@AdresMahalle,
+              adr_sokak=@AdresSokak,
+              adr_Semt=@AdresSemt
+            WHERE adr_adres_no=1 AND adr_cari_kod=@CariKod;
           END
-          SET @CariKod=@YeniCariKod;  
+          
         `
+
       }
       query += `
         IF NOT EXISTS(SELECT * FROM CARI_HESAP_HAREKETLERI WHERE cha_Guid='${fisData.id}' ) BEGIN

@@ -4,6 +4,7 @@
 	require('use-strict')
 	require('colors')
 	require('dotenv').config()
+
 	global.path = require('path')
 	global.fs = require('fs')
 	global.__root = __dirname

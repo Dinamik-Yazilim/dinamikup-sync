@@ -217,6 +217,8 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
                   "multiplier": e.Multiplier
                 }
               } else {
+                unit = 1
+                Scale = false
                 return {
                   "barcode": e.barcode,
                   "stockCode": e.code,
@@ -379,23 +381,43 @@ function AddCustomer(webServiceUrl, token, data) {
 }
 
 
-function GetCustomerById(webServiceUrl, token, data) {
+function GetCustomerById(webServiceUrl, token312, data) {
   return new Promise((resolve, reject) => {
     //return resolve([ddd])
-    axios({
-      method: 'post',
-      url: `${webServiceUrl}/integration/getcustomerbyid`,
-      timeout: 120 * 60 * 1000, // 120 dakika
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      data: data
+    console.log('GetCustomerById data:', data)
+    fetch(`${webServiceUrl}/integration/getcustomerbyid`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token312}` },
+      body: `"${data}"`,
     })
-      .then(resp => {
-        resolve(resp.data)
+      .then(async resp => {
+        if (resp.ok) {
+          resp
+            .json()
+            .then(result => {
+              console.log('GetCustomerById result:', result)
+              resolve(result)
+            })
+            .catch(reject)
+        } else reject(await resp.json())
       })
       .catch(err => {
-        // errorLog('[pos312 SetStock] Error:', err.response.data.errors || err.response.data.error)
         reject((err.response && err.response.data.errors || err.response.data.error) || 'error')
       })
+    // axios({
+    //   method: 'post',
+    //   url: `${webServiceUrl}/integration/getcustomerbyid`,
+    //   timeout: 120 * 60 * 1000, // 120 dakika
+    //   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    //   data: `${data}`
+    // })
+    //   .then(resp => {
+
+    //     resolve(resp.data)
+    //   })
+    //   .catch(err => {
+    //     // errorLog('[pos312 SetStock] Error:', err.response.data.errors || err.response.data.error)
+    //     reject((err.response && err.response.data.errors || err.response.data.error) || 'error')
+    //   })
 
   })
 }
@@ -419,8 +441,8 @@ exports.syncFirms_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
           cari_efatura_fl as eInvoice, cari_eirsaliye_fl as eWaybill,cari_vdaire_adi as taxOffice,
           cari_vdaire_no as taxNumber, cari_lastup_date as updatedAt , (cari_satis_fk-1) as priceOrdr
           FROM CARI_HESAPLAR WITH (NOLOCK)
-          WHERE (cari_lastup_date>'${storeDoc.posIntegration.lastUpdate_firs || ''}' 
-    			  OR cari_kod in (SELECT adr_cari_kod FROM CARI_HESAP_ADRESLERI WITH (NOLOCK) WHERE adr_lastup_date>='${storeDoc.posIntegration.lastUpdate_firs || ''}')
+          WHERE (cari_lastup_date>'${storeDoc.posIntegration.lastUpdate_firms || '1899-12-30'}' 
+    			  OR cari_kod in (SELECT adr_cari_kod FROM CARI_HESAP_ADRESLERI WITH (NOLOCK) WHERE adr_lastup_date>='${storeDoc.posIntegration.lastUpdate_firms || '1899-12-30'}')
 			    ) 
 			    ORDER BY cari_lastup_date`)
 
@@ -432,7 +454,7 @@ exports.syncFirms_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
         LTRIM(adr_cadde + ' ' + adr_mahalle + ' ' + adr_sokak + ' ' + adr_Apt_No + ' ' + 
         adr_Daire_No + ' ' + adr_posta_kodu + ' ' + adr_ilce + ' ' + adr_il + ' ' + adr_ulke) as [address] FROM CARI_HESAP_ADRESLERI A INNER JOIN
         CARI_HESAPLAR C ON C.cari_kod=A.adr_cari_kod
-        WHERE (C.cari_lastup_date>'${storeDoc.posIntegration.lastUpdate_firms || ''}' OR A.adr_lastup_date>'${storeDoc.posIntegration.lastUpdate_firms || ''}')
+        WHERE A.adr_cari_kod IN ('${docs.map(e => e.code).join("','")}') 
         ORDER BY adr_adres_no
         `)
 
@@ -563,6 +585,7 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
       socketSend(sessionDoc, { event: 'syncSales_progress', caption: `312 Pos GetDocuments` })
       GetDocuments(storeDoc.posIntegration.pos312.webServiceUrl, token312, { startDate: startDate, endDate: endDate })
         .then(fisler => {
+          fisler = fisler.filter(fis => fis.storeId.toString() == storeDoc.posIntegration.pos312.storeId.toString())
           eventLog('[syncGetSales_pos312] fisler adet:'.green, fisler.length)
 
           resolve('Mikroya Aktarim Basliyor. Evrak Sayisi:' + fisler.length)
@@ -572,6 +595,7 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             return new Promise(async (resolve, reject) => {
               if (i >= fisler.length) return resolve()
               if ((fisler[i].customers || []).length > 0) {
+                console.log('fisler[i].customers:', fisler[i].customers)
                 if (fisler[i].customers[0].customerId) {
                   try {
                     const customer = await GetCustomerById(storeDoc.posIntegration.pos312.webServiceUrl, token312, fisler[i].customers[0].customerId)
