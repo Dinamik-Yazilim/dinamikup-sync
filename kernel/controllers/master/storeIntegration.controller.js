@@ -25,6 +25,8 @@ module.exports = (dbModel, sessionDoc, req, orgDoc) =>
           syncItems(dbModel, sessionDoc, req, orgDoc).then(resolve).catch(reject)
         } else if (req.params.param2 == 'syncFirms') {
           syncFirms(dbModel, sessionDoc, req, orgDoc).then(resolve).catch(reject)
+        } else if (req.params.param2 == 'syncStaff') {
+          syncStaff(dbModel, sessionDoc, req, orgDoc).then(resolve).catch(reject)
         } else if (req.params.param2 == 'syncSales') {
           syncSales(dbModel, sessionDoc, req, orgDoc).then(resolve).catch(reject)
         } else {
@@ -91,6 +93,7 @@ function syncReset(dbModel, sessionDoc, req, orgDoc) {
       // storeDoc.posIntegration.lastUpdate_barcodes = ''
       storeDoc.posIntegration.lastUpdate_firms = ''
       storeDoc.posIntegration.lastUpdate_items = ''
+      storeDoc.posIntegration.lastUpdate_staff = ''
       // storeDoc.posIntegration.lastUpdate_prices = ''
       storeDoc.save()
         .then(() => resolve())
@@ -122,6 +125,25 @@ function syncFirms(dbModel, sessionDoc, req, orgDoc) {
   })
 }
 
+function syncStaff(dbModel, sessionDoc, req, orgDoc) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const storeDoc = await db.stores.findOne({ organization: sessionDoc.organization, db: sessionDoc.db, _id: req.params.param1 })
+      if (!storeDoc) return reject('store not found')
+      switch (storeDoc.posIntegration.integrationType) {
+        case 'pos312':
+          pos312.syncStaff_pos312(dbModel, sessionDoc, req, orgDoc, storeDoc).then(resolve).catch(reject)
+          break
+        default:
+          reject('integration type not supported yet')
+          break
+      }
+    } catch (err) {
+      reject(err)
+    }
+
+  })
+}
 function syncItems(dbModel, sessionDoc, req, orgDoc) {
   return new Promise(async (resolve, reject) => {
     try {

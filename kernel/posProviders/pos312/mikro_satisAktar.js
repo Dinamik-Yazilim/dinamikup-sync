@@ -34,6 +34,10 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
 
       let seriNo = posComputerDoc.salesDocNoSerial || ''
       const iade = fisData.type == 3 ? true : false
+      const personelMi = fisData.musteri && (fisData.musteri.customerCode || '').startsWith('cp.') ? true : false
+      let personelCariKodu = ''
+      if (personelMi)
+        personelCariKodu = (fisData.musteri.customerCode || '').substring(3)
 
       eventLog(`Mikro ${mainApp} satis aktarim basladi. 312Pos storeId:${fisData.storeId}  Depo:${storeDoc.warehouseId} fisData.type:${fisData.type} SeriNo:${seriNo} FisNo:${fisData.batchNo || 0}${util.pad(fisData.stanNo || 0, 4)}`)
 
@@ -114,7 +118,9 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
         DECLARE @STH_IADE INT = ${iade ? 1 : 0};
         DECLARE @STH_EVRAKTIP INT = ${iade ? 3 : 4};
         DECLARE @STH_DISTICARET_TURU INT = ${iade ? 1 : 0};
-
+        DECLARE @sth_cari_cinsi INT =0; 
+        DECLARE @sth_cari_kodu nVARCHAR(25)='';
+        
         DECLARE @CariVergiNo VARCHAR(15)='';
         
         DECLARE @MikroVersionNo nVARCHAR(10)='17.03d'
@@ -139,6 +145,7 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
         `
       }
       if (fisData.musteri) {
+
         query += `
           DECLARE @CariHesapPattern VARCHAR(25)='${storeDoc.newFirm && storeDoc.newFirm.codePattern || '120.____'}';
           DECLARE @CariMuhKodu VARCHAR(255)='${storeDoc.newFirm && storeDoc.newFirm.accountingCode || '120'}';
@@ -160,18 +167,25 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
           DECLARE @CariEWayBillAlias VARCHAR(120)=SUBSTRING('',1,120);
 
           DECLARE @MaxCariKod VARCHAR(25)='';
-          DECLARE @YeniCariKod VARCHAR(25);
+          DECLARE @YeniCariKod VARCHAR(25)=null;
           DECLARE @NextCariKodInt BIGINT=1;
 
           SET @CariVergiNo = '${fisData.musteri.taxNumber || '11111111111'}';
         `
-        if (mainApp == 'mikro16') {
-          query += `SELECT @YeniCariKod = cari_kod FROM CARI_HESAPLAR WHERE (cari_Guid=@CariId);`
-        } else if (mainApp == 'mikro17') {
-          query += `SELECT @YeniCariKod = cari_kod FROM CARI_HESAPLAR WHERE (cari_Guid=@CariId or cari_ExternalProgramId=@CariId );`
-        }
+        if (personelMi && personelCariKodu != '') {
+          query += `
+            SET @CariKod='${personelCariKodu}';
+            SET @CHA_CARI_CINS=1;
+            SET @CHA_CINS=1;
+          `
+        } else {
+          if (mainApp == 'mikro16') {
+            query += `SELECT @YeniCariKod = cari_kod FROM CARI_HESAPLAR WHERE (cari_Guid=@CariId);`
+          } else if (mainApp == 'mikro17') {
+            query += `SELECT @YeniCariKod = cari_kod FROM CARI_HESAPLAR WHERE (cari_Guid=@CariId or cari_ExternalProgramId=@CariId );`
+          }
 
-        query += `
+          query += `
           IF @YeniCariKod IS NULL BEGIN
 
             SELECT @MaxCariKod= REPLACE(RTRIM(MAX(cari_kod)),' ','.') FROM CARI_HESAPLAR WITH(NOLOCK) WHERE  cari_kod like @CariHesapPattern 
@@ -293,7 +307,7 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
           END
           
         `
-
+        }
       }
       query += `
         IF NOT EXISTS(SELECT * FROM CARI_HESAP_HAREKETLERI WHERE cha_Guid='${fisData.id}' ) BEGIN
@@ -445,7 +459,7 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
           '${e.stockCode}' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 1 /*sth_isk_mas2*/, 1 /*sth_isk_mas3*/, 1 /*sth_isk_mas4*/, 1 /*sth_isk_mas5*/, 1 /*sth_isk_mas6*/, 
           1 /*sth_isk_mas7*/, 1 /*sth_isk_mas8*/, 1 /*sth_isk_mas9*/, 1 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/, 0 /*sth_sat_iskmas4*/, 
           0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/, 0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/,
-          0 /*sth_cari_cinsi*/, @CariKod /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 
+          @sth_cari_cinsi, @sth_cari_kodu /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 
           0 /*sth_har_doviz_cinsi*/, 1 /*sth_har_doviz_kuru*/, 1 /*sth_alt_doviz_kuru*/, 0 /*sth_stok_doviz_cinsi*/, 1 /*sth_stok_doviz_kuru*/, 
           ${e.quantity} /*sth_miktar*/,  ${e.quantity} /*sth_miktar2*/, 1 /*sth_birim_pntr*/, ${tutar} /*sth_tutar*/, 
           0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 0 /*sth_masraf1*/, 0 /*sth_masraf2*/, 

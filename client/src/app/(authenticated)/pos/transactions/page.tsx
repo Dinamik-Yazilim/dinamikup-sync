@@ -17,19 +17,21 @@ import { ButtonConfirm } from "@/components/button-confirm"
 
 interface Props {
 }
-export default function PosPage({}: Props) {
+export default function PosPage({ }: Props) {
   const [stores, setStores] = useState<Store[]>([])
   const [token, setToken] = useState('')
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [busyItems, setBusyItems] = useState(false)
   const [busyFirms, setBusyFirms] = useState(false)
+  const [busyStaff, setBusyStaff] = useState(false)
   const router = useRouter()
   const { t } = useLanguage()
   const posIntegrationTypeList = getPosIntegrationTypeList()
 
   const [sonucItems, setSonucItems] = useState<any>({})
   const [sonucFirms, setSonucFirms] = useState<any>({})
+  const [sonucStaff, setSonucStaff] = useState<any>({})
 
   const load = () => {
     setLoading(true)
@@ -45,7 +47,7 @@ export default function PosPage({}: Props) {
     return (<div className="border rounded-md border-dashed px-4 py-2 flex flex-col gap-4 w-full min-h-40">
       <div className="flex justify-between">
         <div className="flex gap-4"><StoreIcon /> {store.name}</div>
-        {!busyItems && !busyFirms &&
+        {!busyItems && !busyFirms && !busyStaff &&
           <ButtonConfirm
             title="Reset?"
             description={'Son Guncelleme tarihleri resetlenecek. Onayliyor musunuz?'}
@@ -62,6 +64,7 @@ export default function PosPage({}: Props) {
           </ButtonConfirm>
         }
       </div>
+      {/* Stok Kartlar */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 items-end">
         <Button disabled={busyItems} variant={'outline'}
           onClick={() => {
@@ -75,7 +78,9 @@ export default function PosPage({}: Props) {
         <ProgressBar className="col-span-3" title={'Stok Aktarimi'} eventName="syncItems_progress" onProgress={e => setBusyItems(true)} onFinished={() => setBusyItems(false)} />
         <div>{JSON.stringify(sonucItems)}</div>
       </div>
+      {/* ---------------- */}
 
+      {/* Cari Kartlar */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 items-end">
         <Button disabled={busyFirms} variant={'outline'}
           onClick={() => {
@@ -89,8 +94,26 @@ export default function PosPage({}: Props) {
         <ProgressBar className="col-span-3" title={'Cari Aktarimi'} eventName="syncFirms_progress" onProgress={e => setBusyFirms(true)} onFinished={() => setBusyFirms(false)} />
         <div>{JSON.stringify(sonucFirms)}</div>
       </div>
+      {/* ---------------- */}
+
+      {/* Cari Personeller */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 items-end">
+        <Button disabled={busyStaff} variant={'outline'}
+          onClick={() => {
+            setBusyStaff(true)
+            postItem(`/storeIntegration/${store._id}/syncStaff`, token, store)
+              .then(result => setSonucStaff(result))
+              .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+          }}
+          className="flex gap-2 justify-start"
+        ><LucideUserSquare />Personel Aktar</Button>
+        <ProgressBar className="col-span-3" title={'Personel Aktarimi'} eventName="syncStaff_progress" onProgress={e => setBusyStaff(true)} onFinished={() => setBusyStaff(false)} />
+        <div>{JSON.stringify(sonucStaff)}</div>
+      </div>
+      {/* ---------------- */}
+
       <div className="flex justify-start">
-        {!busyItems && !busyFirms &&
+        {!busyItems && !busyFirms && !busyStaff &&
           <ButtonConfirm
             title="Güncellemeleri Gönder?"
             description={'Yeni Stok/Barkod/Fiyat Bilgileri Mağaza Terminallerine gönderilecek. Onayliyor musunuz?'}
@@ -110,11 +133,12 @@ export default function PosPage({}: Props) {
   }
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  
+
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
   useEffect(() => { token && load() }, [token])
   useEffect(() => { !busyItems && audioRef?.current && audioRef.current.play() }, [busyItems])
   useEffect(() => { !busyFirms && audioRef?.current && audioRef.current.play() }, [busyFirms])
+  useEffect(() => { !busyStaff && audioRef?.current && audioRef.current.play() }, [busyStaff])
 
   return (
     <StandartForm

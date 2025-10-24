@@ -1,5 +1,6 @@
 const { saveSession } = require('./helper')
 const { sendAuthEmail, sendAuthSms } = require('../../lib/sender')
+console.log('login.controller.js loaded')
 module.exports = (req) =>
   new Promise(async (resolve, reject) => {
     try {

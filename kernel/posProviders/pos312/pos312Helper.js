@@ -142,7 +142,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
       }
       devLog('Kdvler:', Kdvler)
 
-      let docs = await getList(sessionDoc, orgDoc, `SELECT TOP 3000 sto_kod as code, sto_isim as [name], 
+      let docs = await getList(sessionDoc, orgDoc, `SELECT TOP 9000 sto_kod as code, sto_isim as [name], 
           CASE WHEN sto_kisa_ismi<>'' THEN sto_kisa_ismi ELSE SUBSTRING(sto_isim,1,20) END as shortName, 
           sto_birim1_ad as unit, sto_birim2_ad as unit2, dbo.fn_VergiYuzde(sto_perakende_vergi) as vatRate ,
           sto_lastup_date as updatedAt , sto_reyon_kodu as rayon, sto_anagrup_kod
@@ -478,6 +478,7 @@ exports.syncFirms_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
           let dataItem = {
             "id": docs[i].id,
             "name": docs[i].name.replaceAll('İ', 'I') + '#' + docs[i].code,
+            "customerCode": docs[i].code,
             "taxOffice": docs[i].taxOffice,
             "taxNumber": docs[i].taxNumber,
             "eInvoice": docs[i].eInvoice ? true : false,
@@ -490,7 +491,7 @@ exports.syncFirms_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             "groups": [{ "id": 1, "name": "Genel" }],
             "phones": [{ "ordr": 0, "phone": docs[i].phone }]
           }
-          process.env.NODE_ENV == 'development' && fs.writeFileSync(path.join(__dirname, 'logs', '!!__customerDataItem.json.txt'), JSON.stringify(dataItem, null, 2), 'utf8')
+          process.env.NODE_ENV == 'development' && fs.appendFileSync(path.join(__dirname, 'logs', '!!__customerDataItem.json.txt'), JSON.stringify(dataItem, null, 2), 'utf8')
           AddCustomer(storeDoc.posIntegration.pos312.webServiceUrl, token312, dataItem)
             .then(async sonuc => {
               eventLog('[syncFirms_pos312] AddCustomer sonuc:', sonuc)
@@ -539,6 +540,111 @@ exports.syncFirms_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
   })
 
 }
+
+exports.syncStaff_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc) {
+  return new Promise(async (resolve, reject) => {
+    let token312 = ''
+
+
+    try {
+      socketSend(sessionDoc, { event: 'syncStaff_progress', caption: `312 Pos login in` })
+      token312 = await exports.login(storeDoc.posIntegration.pos312.webServiceUrl,
+        storeDoc.posIntegration.pos312.webServiceUsername,
+        storeDoc.posIntegration.pos312.webServicePassword)
+
+
+      socketSend(sessionDoc, { event: 'syncStaff_progress', caption: `Mikrodan personeller listeleniyor` })
+
+
+      let docs = await getList(sessionDoc, orgDoc, `SELECT cari_per_Guid as id, cari_per_kod as code, 
+          cari_per_adi + ' ' + cari_per_soyadi as [name], cari_per_cepno as phone , 
+          0 as eInvoice, 0 as eWaybill,'' as taxOffice,
+          cari_per_TcKimlikNo as taxNumber, cari_per_lastup_date as updatedAt , 0 as priceOrdr
+          FROM CARI_PERSONEL_TANIMLARI WITH (NOLOCK)
+          WHERE (cari_per_lastup_date>'${storeDoc.posIntegration.lastUpdate_staff || '1899-12-30'}' ) 
+			    ORDER BY cari_per_lastup_date`)
+
+      if (docs.length == 0) {
+        socketSend(sessionDoc, { event: 'syncStaff_progress_end' })
+        return resolve('personeller zaten guncel')
+      }
+
+
+      socketSend(sessionDoc, { event: 'syncStaff_progress', caption: `Mikrodan Personeller cekildi` })
+      resolve(`${docs.length} adet personel aktarilacak. baslama:${new Date(new Date().setMinutes(new Date().getMinutes() + (-1 * new Date().getTimezoneOffset()))).toISOString().substring(0, 19)}`)
+      let i = 0
+      function calistir() {
+        return new Promise((resolve, reject) => {
+          if (i >= docs.length) return resolve(true)
+          let t1 = new Date().getTime() / 1000
+
+          let dataItem = {
+            "id": docs[i].id,
+            "name": docs[i].name.replaceAll('İ', 'I') + '#' + docs[i].code,
+            "customerCode": "cp." + docs[i].code,
+            "taxOffice": docs[i].taxOffice,
+            "taxNumber": docs[i].taxNumber,
+            "eInvoice": docs[i].eInvoice ? true : false,
+            "eWaybill": docs[i].eWaybill ? true : false,
+            "fsd": false,
+            "status": 1,
+            "priceOrdr": docs[i].priceOrdr,
+            "addresses": [],
+            "cards": [],
+            "groups": [{ "id": 1, "name": "Genel" }],
+            "phones": [{ "ordr": 0, "phone": docs[i].phone }]
+          }
+          process.env.NODE_ENV == 'development' && fs.appendFileSync(path.join(__dirname, 'logs', '!!__staffDataItem.json.txt'), JSON.stringify(dataItem, null, 2), 'utf8')
+          AddCustomer(storeDoc.posIntegration.pos312.webServiceUrl, token312, dataItem)
+            .then(async sonuc => {
+              eventLog('[syncStaff_pos312] AddCustomer sonuc:', sonuc)
+              if (sonuc) {
+                storeDoc.posIntegration.lastUpdate_staff = docs[i].updatedAt
+                await storeDoc.save()
+              }
+
+              let t2 = new Date().getTime() / 1000
+              socketSend(sessionDoc, {
+                event: 'syncStaff_progress',
+                max: docs.length,
+                position: i + 1,
+                percent: Math.round(10 * 100 * (i + 1) / docs.length) / 10,
+                caption: `Time:${Math.round(10 * (t2 - t1)) / 10}sn ${i + 1}/${docs.length} ${docs[i].code} - ${docs[i].name}`
+              })
+              i++
+              setTimeout(() => calistir().then(resolve).catch(reject), 50)
+            })
+            .catch(err => {
+              errorLog(`[syncStaff_progress] calistir() Error:`, err)
+              i++
+              return reject(err)
+              //setTimeout(() => calistir().then(resolve).catch(reject), 50)
+            })
+
+        })
+      }
+
+      calistir()
+        .then(() => {
+          socketSend(sessionDoc, { event: 'syncStaff_progress_end' })
+        })
+        .catch(err => {
+          errorLog(`[syncStaff_pos312] Error:`, err)
+          socketSend(sessionDoc, { event: 'syncStaff_progress_end', caption: 'Error' })
+        })
+    } catch (err) {
+      errorLog(`[syncStaff_pos312] Error:`, err)
+      socketSend(sessionDoc, { event: 'syncStaff_progress_end' })
+      reject(err)
+    }
+
+
+
+  })
+
+}
+
+
 function GetDocuments(webServiceUrl, token, data) {
   return new Promise((resolve, reject) => {
     //return resolve([ddd])

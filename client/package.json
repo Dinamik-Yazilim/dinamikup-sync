@@ -1,12 +1,12 @@
 {
-  "name": "trendsenfoni-webapp",
+  "name": "dinamikup-webapp",
   "version": "0.1.0",
   "private": false,
-  "description": "TrendSenfoni Web App",
-  "homepage": "https://aliabi.org",
-  "repository": "https://github.com/trendsenfoni/tsn-client",
+  "description": "dinamikup Web App",
+  "homepage": "https://dinamikup.com",
+  "repository": "https://github.com/Dinamik-Yazilim/dinamikup",
   "bugs": {
-    "url": "https://github.com/trendsenfoni/tsn-client/issues"
+    "url": "https://github.com/Dinamik-Yazilim/dinamikup/issues"
   },
   "author": "Ali TEK <alitek@gmail.com>",
   "scripts": {
@@ -75,6 +75,7 @@
     "@eslint/js": "^9.8.0",
     "@types/eslint__js": "^8.42.3",
     "@types/js-cookie": "^3.0.6",
+    "@types/minimatch": "^6.0.0",
     "@types/next": "^9.0.0",
     "@types/next-pwa": "^5.6.9",
     "@types/node": "^20",
