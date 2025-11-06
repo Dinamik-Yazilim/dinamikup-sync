@@ -1,10 +1,16 @@
+const { login, getPayments } = require('../../posProviders/pos312/pos312Helper')
 module.exports = (dbModel, sessionDoc, req, orgDoc) =>
   new Promise(async (resolve, reject) => {
 
     switch (req.method.toUpperCase()) {
       case 'GET':
         if (req.params.param1 != undefined) {
-          getOne(dbModel, sessionDoc, req).then(resolve).catch(reject)
+          if (req.params.param2 == 'paymentList') {
+            getPaymentList(dbModel, sessionDoc, req).then(resolve).catch(reject)
+          } else {
+            getOne(dbModel, sessionDoc, req).then(resolve).catch(reject)
+          }
+
         } else {
           getList(dbModel, sessionDoc, req).then(resolve).catch(reject)
         }
@@ -24,6 +30,22 @@ module.exports = (dbModel, sessionDoc, req, orgDoc) =>
         break
     }
   })
+
+
+function getPaymentList(dbModel, sessionDoc, req) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const storeDoc = await dbModel.stores.findOne({ _id: req.params.param1, organization: sessionDoc.organization, db: sessionDoc.db })
+      const token312 = await login(storeDoc.posIntegration.pos312.webServiceUrl,
+        storeDoc.posIntegration.pos312.webServiceUsername,
+        storeDoc.posIntegration.pos312.webServicePassword)
+      let paymentList = await getPayments(storeDoc.posIntegration.pos312.webServiceUrl, token312, null)
+      resolve(paymentList)
+    } catch (err) {
+      reject(err)
+    }
+  })
+}
 
 function getOne(dbModel, sessionDoc, req) {
   return new Promise((resolve, reject) => {

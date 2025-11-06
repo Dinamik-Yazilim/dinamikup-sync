@@ -33,7 +33,11 @@ function mikroWorkDataAktar(mainApp, orgDoc, storeDoc, fisData) {
 
       let seriNo = posComputerDoc.salesDocNoSerial || ''
       const iade = fisData.type == 3 ? true : false
-
+      let paymentTypeDoc = null;
+      let odeme = fisData.payments.find(p => p.type > 2)
+      if (odeme) {
+        paymentTypeDoc = await db.storePaymentTypes.findOne({ organization: orgDoc._id, db: storeDoc.db, store: storeDoc._id, paymentId: odeme.paymentId.toString() })
+      }
 
       let sth_m17fields = ''
       let sth_m17values = ''
@@ -236,6 +240,15 @@ function mikroWorkDataAktar(mainApp, orgDoc, storeDoc, fisData) {
           SET @CariKod=@YeniCariKod;  
         `
       }
+      else {
+        if (paymentTypeDoc) {
+          console.log('buraya geldi2 defaultFirmId:', paymentTypeDoc.defaultFirmId)
+          query += `
+            SET @CariKod='${paymentTypeDoc.defaultFirmId}';
+          `
+          console.log('paymentCariKod:', paymentTypeDoc.defaultFirmId)
+        }
+      }
       query += `
         IF NOT EXISTS(SELECT * FROM S_${tarih}_${depoNo} WHERE sth_yetkili_uid='${fisData.id}' ) BEGIN
       `
@@ -308,35 +321,36 @@ function mikroWorkDataAktar(mainApp, orgDoc, storeDoc, fisData) {
         }
       })
       query += `SET @SatirNo=-1;`
-      let odemeToplam = 0
-      let nakitToplam = 0
-      let krediToplam = 0
-      let digerToplam = 0
-      fisData.payments.forEach(e => {
-        if (e.status) {
-          if (e.change == false) {
-            odemeToplam += e.amount
-          } else {
-            odemeToplam -= e.amount
-          }
-          if (e.type == 1) {
+      if (!paymentTypeDoc) {
+        let odemeToplam = 0
+        let nakitToplam = 0
+        let krediToplam = 0
+        let digerToplam = 0
+        fisData.payments.forEach(e => {
+          if (e.status) {
             if (e.change == false) {
-              nakitToplam += e.amount
+              odemeToplam += e.amount
             } else {
-              nakitToplam -= e.amount
+              odemeToplam -= e.amount
             }
-          } else if (e.type == 2) {
-            krediToplam += e.amount
-          } else {
-            digerToplam += e.amount
+            if (e.type == 1) {
+              if (e.change == false) {
+                nakitToplam += e.amount
+              } else {
+                nakitToplam -= e.amount
+              }
+            } else if (e.type == 2) {
+              krediToplam += e.amount
+            } else {
+              digerToplam += e.amount
+            }
           }
-        }
-      })
+        })
 
 
-      query += `SET @SatirNo=@SatirNo+1;\n`
-      query += odemeInsert(mainApp, fisData, tarih, depoNo, odemeToplam, odemeToplam)
-
+        query += `SET @SatirNo=@SatirNo+1;\n`
+        query += odemeInsert(mainApp, fisData, tarih, depoNo, odemeToplam, odemeToplam)
+      }
       query += `END`
 
       // process.env.NODE_ENV=='development' && fs.writeFileSync(path.join(__dirname,'logs', 'workdataInsert_query.sql'), query, 'utf8')

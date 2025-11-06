@@ -50,6 +50,27 @@ exports.login = function (webServiceUrl, webServiceUsername, webServicePassword)
 
 }
 
+exports.getPayments = function (webServiceUrl, token, data) {
+  return new Promise(async (resolve, reject) => {
+
+    axios({
+      method: 'post',
+      url: `${webServiceUrl}/integration/getpayments`,
+      timeout: 120 * 60 * 1000, // 120 dakika
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      data: data
+    })
+      .then(resp => {
+        // eventLog('resp:', resp.data)
+        resolve(resp.data)
+      })
+      .catch(err => {
+        // errorLog('[pos312 SetStock] Error:', err)
+        reject(err.response.data.errors || err.response.data.error)
+      })
+
+  })
+}
 
 function GetDepartments(webServiceUrl, token, body) {
   return new Promise((resolve, reject) => {
