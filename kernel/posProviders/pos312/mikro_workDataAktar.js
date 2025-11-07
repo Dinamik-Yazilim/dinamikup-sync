@@ -321,36 +321,36 @@ function mikroWorkDataAktar(mainApp, orgDoc, storeDoc, fisData) {
         }
       })
       query += `SET @SatirNo=-1;`
-      if (!paymentTypeDoc) {
-        let odemeToplam = 0
-        let nakitToplam = 0
-        let krediToplam = 0
-        let digerToplam = 0
-        fisData.payments.forEach(e => {
-          if (e.status) {
-            if (e.change == false) {
-              odemeToplam += e.amount
-            } else {
-              odemeToplam -= e.amount
-            }
-            if (e.type == 1) {
-              if (e.change == false) {
-                nakitToplam += e.amount
-              } else {
-                nakitToplam -= e.amount
-              }
-            } else if (e.type == 2) {
-              krediToplam += e.amount
-            } else {
-              digerToplam += e.amount
-            }
+
+      let odemeToplam = 0
+      let nakitToplam = 0
+      let krediToplam = 0
+      let digerToplam = 0
+      fisData.payments.forEach(e => {
+        if (e.status) {
+          if (e.change == false) {
+            odemeToplam += e.amount
+          } else {
+            odemeToplam -= e.amount
           }
-        })
+          if (e.type == 1) {
+            if (e.change == false) {
+              nakitToplam += e.amount
+            } else {
+              nakitToplam -= e.amount
+            }
+          } else if (e.type == 2) {
+            krediToplam += e.amount
+          } else {
+            digerToplam += e.amount
+          }
+        }
+      })
 
 
-        query += `SET @SatirNo=@SatirNo+1;\n`
-        query += odemeInsert(mainApp, fisData, tarih, depoNo, odemeToplam, odemeToplam)
-      }
+      query += `SET @SatirNo=@SatirNo+1;\n`
+      query += odemeInsert(mainApp, fisData, tarih, depoNo, odemeToplam, odemeToplam)
+
       query += `END`
 
       // process.env.NODE_ENV=='development' && fs.writeFileSync(path.join(__dirname,'logs', 'workdataInsert_query.sql'), query, 'utf8')
@@ -391,8 +391,8 @@ function odemeInsert(mainApp, fisData, tarih, depoNo, amount, odemeToplam) {
             @Vergi1*@OdemeOran /*po_Vergi1*/, @Vergi2*@OdemeOran /*po_Vergi2*/, @Vergi3*@OdemeOran /*po_Vergi3*/, @Vergi4*@OdemeOran /*po_Vergi4*/, 
             @Vergi5*@OdemeOran /*po_Vergi5*/, @Vergi6*@OdemeOran /*po_Vergi6*/, 0 /*po_Vergi7*/, 0 /*po_Vergi8*/, 0 /*po_Vergi9*/, 
             0 /*po_Vergi10*/, 0 /*po_Vergi11*/, 0 /*po_Vergi12*/, 0 /*po_Vergi13*/, 0 /*po_Vergi14*/, 0 /*po_Vergi15*/, 0 /*po_Vergi16*/, 
-            0 /*po_Vergi17*/, 0 /*po_Vergi18*/, 0 /*po_Vergi19*/, 0 /*po_Vergi20*/, 0 /*po_Fisfatura*/, 1 /*po_Pozisyon*/, 
-            '' /*po_CariKodu*/, 0 /*po_Yuvarlama*/, ${amount} /*po_Odm_AnaDtut1*/, ${amount} /*po_Odm_OrjDtut1*/, 0 /*po_Odm_AnaDtut2*/, 0 /*po_Odm_OrjDtut2*/, 0 /*po_Odm_AnaDtut3*/, 0 /*po_Odm_OrjDtut3*/, 0 /*po_Odm_AnaDtut4*/, 
+            0 /*po_Vergi17*/, 0 /*po_Vergi18*/, 0 /*po_Vergi19*/, 0 /*po_Vergi20*/, 0 /*po_Fisfatura*/, case @CariKod when '' then 1 else 0 END /*po_Pozisyon*/, 
+            @CariKod /*po_CariKodu*/, 0 /*po_Yuvarlama*/, ${amount} /*po_Odm_AnaDtut1*/, ${amount} /*po_Odm_OrjDtut1*/, 0 /*po_Odm_AnaDtut2*/, 0 /*po_Odm_OrjDtut2*/, 0 /*po_Odm_AnaDtut3*/, 0 /*po_Odm_OrjDtut3*/, 0 /*po_Odm_AnaDtut4*/, 
             0 /*po_Odm_OrjDtut4*/, 0 /*po_Odm_AnaDtut5*/, 0 /*po_Odm_OrjDtut5*/, 0 /*po_Odm_AnaDtut6*/, 0 /*po_Odm_OrjDtut6*/, 0 /*po_Odm_AnaDtut7*/, 0 /*po_Odm_OrjDtut7*/, 
             0 /*po_Odm_AnaDtut8*/, 0 /*po_Odm_OrjDtut8*/, 0 /*po_Odm_AnaDtut9*/, 0 /*po_Odm_OrjDtut9*/, 0 /*po_Odm_AnaDtut10*/, 0 /*po_Odm_OrjDtut10*/, 
             0 /*po_Odm_AnaDtut11*/, 0 /*po_Odm_OrjDtut11*/, 0 /*po_Odm_AnaDtut12*/, 0 /*po_Odm_OrjDtut12*/, 0 /*po_Odm_AnaDtut13*/, 0 /*po_Odm_OrjDtut13*/, 
