@@ -7,7 +7,6 @@ import { cookies } from 'next/headers'
 import { RedirectType, redirect } from 'next/navigation'
 import { Header } from './(components)/header'
 import { Footer } from './(components)/footer'
-import { getAuthToken } from '@/lib/authHelper'
 import React from 'react'
 import '@/styles/piechart-style.css'
 import { Sidebar } from './(components)/sidebar'
@@ -19,7 +18,7 @@ export interface AppLayoutProps {
 const AppLayout: FC<AppLayoutProps> = ({ children }) => {
 
   // if (!getAuthToken()) {
-  //   return redirect('/auth/login', RedirectType.push)
+  //   return redirec'/auth/login', RedirectType.push
   // }
 
 

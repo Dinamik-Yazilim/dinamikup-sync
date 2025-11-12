@@ -2,7 +2,6 @@
 
 import { useToast } from "@/components/ui/use-toast"
 import { StandartForm } from "@/components/ui216/standart-form"
-import { useLanguage } from "@/i18n"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Cookies from 'js-cookie'
@@ -26,14 +25,20 @@ interface Props {
 
 export default function EditPage({ params }: Props) {
   const [token, setToken] = useState('')
+
   const { toast } = useToast()
+
   const [loading, setLoading] = useState(false)
+
   const router = useRouter()
-  const { t } = useLanguage()
   const [storePosComputer, setStorePosComputer] = useState<StorePosComputer>()
+
   const [stores, setStores] = useState<Store[]>()
+
   const [password, setPassword] = useState('')
+
   const [rePassword, setRePassword] = useState('')
+
 
   const load = () => {
     setLoading(true)
@@ -42,7 +47,7 @@ export default function EditPage({ params }: Props) {
         setStorePosComputer(result as StorePosComputer)
 
       })
-      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
       .finally(() => setLoading(false))
   }
 
@@ -51,18 +56,18 @@ export default function EditPage({ params }: Props) {
       .then(result => {
         result.docs && setStores(result.docs as Store[])
       })
-      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
   }
 
   const save = () => {
     if (!storePosComputer?._id) {
       postItem(`/storePosComputers`, token, storePosComputer)
         .then(result => router.back())
-        .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+        .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
     } else {
       putItem(`/storePosComputers/${storePosComputer?._id}`, token, storePosComputer)
         .then(result => router.back())
-        .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+        .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
     }
   }
 
@@ -76,33 +81,34 @@ export default function EditPage({ params }: Props) {
   }, [token])
 
   return (<StandartForm
-    title={params.id == 'addnew' ? t('New POS Computer') : t('Edit POS Computer')}
+    title={params.id == 'addnew' ? 'Yeni POS Bilgisayarı' : 'POS Bilgisayarı Düzenle'}
     onSaveClick={save}
     onCancelClick={() => router.back()}
     loading={loading}
   >
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <TsnSelect title={t('Store')} defaultValue={storePosComputer?.store?._id}
+        <TsnSelect title="Mağaza" defaultValue={storePosComputer?.store?._id}
           onValueChange={e => setStorePosComputer({ ...storePosComputer, store: { ...storePosComputer?.store, _id: e } })}
           list={stores}
         />
-        <TsnInput title={t('Name')} defaultValue={storePosComputer?.name} onBlur={e => setStorePosComputer({ ...storePosComputer, name: e.target.value })} />
+        <TsnInput title="İsim" defaultValue={storePosComputer?.name} onBlur={e => setStorePosComputer({ ...storePosComputer, name: e.target.value })} />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <TsnInput title={t('Integration Code')} defaultValue={storePosComputer?.integrationCode} onBlur={e => setStorePosComputer({ ...storePosComputer, integrationCode: e.target.value })} />
-          <TsnInput title={t('Sales Serial')} maxLength={4} defaultValue={storePosComputer?.salesDocNoSerial} onBlur={e => setStorePosComputer({ ...storePosComputer, salesDocNoSerial: e.target.value })} />
+          <TsnInput title="Entegrasyon Kodu" defaultValue={storePosComputer?.integrationCode} onBlur={e => setStorePosComputer({ ...storePosComputer, integrationCode: e.target.value })} />
+          <TsnInput title="Satış Seri" maxLength={4} defaultValue={storePosComputer?.salesDocNoSerial} onBlur={e => setStorePosComputer({ ...storePosComputer, salesDocNoSerial: e.target.value })} />
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <SelectProjectWithLabel caption={storePosComputer?.project} t={t} onSelect={e => { setStorePosComputer({ ...storePosComputer, projectId: e._id, project: e.name }) }} />
-        <SelectResponsibilityWithLabel caption={storePosComputer?.responsibility} t={t} onSelect={e => { setStorePosComputer({ ...storePosComputer, responsibilityId: e._id, responsibility: e.name }) }} />
-        <SelectCashAccountWithLabel caption={storePosComputer?.cashAccount} t={t} onSelect={e => { setStorePosComputer({ ...storePosComputer, cashAccountId: e._id, cashAccount: e.name }) }} />
-        <SelectBankAccountWithLabel caption={storePosComputer?.bankAccount} t={t} onSelect={e => { setStorePosComputer({ ...storePosComputer, bankAccountId: e._id, bankAccount: e.name }) }} />
+        <SelectProjectWithLabel caption={storePosComputer?.project} onSelect={e => { setStorePosComputer({ ...storePosComputer, projectId: e._id, project: e.name }) }} />
+        <SelectResponsibilityWithLabel caption={storePosComputer?.responsibility} onSelect={e => { setStorePosComputer({ ...storePosComputer, responsibilityId: e._id, responsibility: e.name }) }} />
+        <SelectCashAccountWithLabel caption={storePosComputer?.cashAccount} onSelect={e => { setStorePosComputer({ ...storePosComputer, cashAccountId: e._id, cashAccount: e.name }) }} />
+        <SelectBankAccountWithLabel caption={storePosComputer?.bankAccount} onSelect={e => { setStorePosComputer({ ...storePosComputer, bankAccountId: e._id, bankAccount: e.name }) }} />
       </div>
-      <TsnPanel name='scaleOptions' trigger={'Terazi Ayarlari'} >
+      <TsnPanel name='scaleOptions' trigger="Terazi Ayarlari" >
 
       </TsnPanel>
-      <TsnSwitch title={t('Passive?')} defaultChecked={storePosComputer?.passive} onCheckedChange={e => setStorePosComputer({ ...storePosComputer, passive: e })} />
+      <TsnSwitch title="Pasif?" defaultChecked={storePosComputer?.passive}
+        onCheckedChange={e => setStorePosComputer({ ...storePosComputer, passive: e })} />
     </div>
 
   </StandartForm>)

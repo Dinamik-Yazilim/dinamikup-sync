@@ -7,7 +7,6 @@ import Cookies from 'js-cookie'
 import { Settings } from '@/types/Settings'
 import { useToast } from '@/components/ui/use-toast'
 import { TsnSelect } from '@/components/ui216/tsn-select'
-import { useLanguage } from '@/i18n'
 import { StandartForm } from '@/components/ui216/standart-form'
 import { TsnInput } from '@/components/ui216/tsn-input'
 import { Label } from '@/components/ui/label'
@@ -19,12 +18,16 @@ interface Props {
 }
 export default function SettingsPage({ }: Props) {
   const [members, setMembers] = useState<Member[]>([])
+
   const [token, setToken] = useState('')
+
   const { toast } = useToast()
+
   const [loading, setLoading] = useState(false)
+
   const router = useRouter()
-  const { t } = useLanguage()
-  const roleList=getRoleList(t)
+  const roleList = getRoleList()
+
 
   const load = () => {
     setLoading(true)
@@ -43,19 +46,19 @@ export default function SettingsPage({ }: Props) {
     <ListGrid
       apiPath='/members'
 
-      title={t('Users')}
+      title="Kullanıcılar"
       icon=<Users2Icon />
       onHeaderPaint={() => <div className='grid grid-cols-4 w-full'>
-        <div>{t('Username')}</div>
-        <div>{t('Name')}</div>
-        <div>{t('Rol')}</div>
-        <div className='text-center'>{t('Passive?')}</div>
+        <div>Kullanıcı Adı</div>
+        <div>İsim</div>
+        <div>Rol</div>
+        <div className='text-center'>Pasif?</div>
       </div>}
-      onRowPaint={(e:Member,colIndex) => <div className='grid grid-cols-4 w-full'>
+      onRowPaint={(e: Member, colIndex) => <div className='grid grid-cols-4 w-full'>
         <div>{e.username}</div>
         <div>{e.name}</div>
-        <div>{roleList.find(r=>r._id==e.role)?.name}</div>
-        <div className='text-center'>{e.passive?'✅':''}</div>
+        <div>{roleList.find(r => r._id == e.role)?.name}</div>
+        <div className='text-center'>{e.passive ? '✅' : ''}</div>
       </div>}
     />
   )

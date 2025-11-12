@@ -9,21 +9,25 @@ import { Skeleton } from '../ui/skeleton'
 interface TsnSelectRemoteProps extends TsnSelectProps {
   apiPath?: string
   textField?: string
-  query?:string
-  
+  query?: string
+
 }
 
-export function TsnSelectRemote({ apiPath='/mikro/get', textField = 'name', query, ...props }: TsnSelectRemoteProps) {
+export function TsnSelectRemote({ apiPath = '/mikro/get', textField = 'name', query, ...props }: TsnSelectRemoteProps) {
   const [token, setToken] = useState('')
+
   const { toast } = useToast()
+
   const [loading, setLoading] = useState(false)
+
   const [list, setList] = useState<TsnListType[]>([])
+
   const load = () => {
     setLoading(true)
-    postItem(`${apiPath}`, token, {query:query})
+    postItem(`${apiPath}`, token, { query: query })
       .then(result => {
-        let l=result.docs || result || []
-        setList((l).map((e: any) => { return ({ _id: e._id, text: e[textField] }) }))
+        let l = result.docs || result || []
+        setList(l.map((e: any) => { return ({ _id: e._id, text: e[textField] }) }))
       })
       .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
       .finally(() => setLoading(false))

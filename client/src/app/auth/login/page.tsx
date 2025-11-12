@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label'
 
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
-import { useLanguage } from '@/i18n'
 import { useState } from 'react'
 import { LogInIcon } from 'lucide-react'
 import { HeaderLogo2 } from '@/components/logo'
@@ -16,11 +15,12 @@ import { postItem } from '@/lib/fetch'
 import Cookies from 'js-cookie'
 
 export default function LoginPage() {
-  const { t } = useLanguage()
   const router = useRouter()
+
   const [username, setUsername] = useState(Cookies.get('login_last_username') || '')
   const [organization, setOrganization] = useState(Cookies.get('login_last_organization') || '')
   const { toast } = useToast()
+
   const deviceId = Cookies.get('deviceId') || ''
   const login = () => {
     if (username) {
@@ -37,14 +37,13 @@ export default function LoginPage() {
         })
         .catch(err =>
           toast({
-            title: t('Error'),
-            description: err,
-            variant: 'destructive',
-          }),
+            title: 'Hata',
+            description: err, variant: 'destructive',
+          })
         )
     } else {
       toast({
-        title: t('Please enter your email or phone number'),
+        title: 'Please enter your email or phone number',
         variant: 'destructive',
       })
     }
@@ -58,20 +57,20 @@ export default function LoginPage() {
       <div className="flex flex-col justify-between gap-4 w-full h-full  mb-6 text-2xl max-w-[350px] max-h-[240px]  rounded-lg border border-dashed border-opacity-50 border-slate-400 p-4">
         <div className="flex flex-col gap-6 ">
           <div className="flex flex-col gap-2 ">
-            <Label className="ms-2">{t('Organization')}</Label>
+            <Label className="ms-2">Organization</Label>
             <Input
               defaultValue={organization}
-              placeholder={t('Organization')}
+              placeholder="Organization"
               onChange={e => setOrganization(e.target.value)}
             />
           </div>
 
           <div className="flex flex-col gap-2 ">
-            <Label className="ms-2">{t('Phone Number or Email')}</Label>
+            <Label className="ms-2">Phone Number or Email</Label>
             <div className="flex gap-2">
               <Input
                 defaultValue={username}
-                placeholder={t('Phone Number or Email')}
+                placeholder="Phone Number or Email"
                 onChange={e => setUsername(e.target.value)}
               />
               <Button className="flex-shrink" onClick={login}>

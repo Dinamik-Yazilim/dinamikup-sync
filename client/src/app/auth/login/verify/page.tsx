@@ -3,7 +3,6 @@
 import { HeaderLogo2 } from '@/components/logo'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { useLanguage } from '@/i18n'
 import { useState } from 'react'
 import {
   InputOTP,
@@ -19,10 +18,12 @@ import Cookies from 'js-cookie'
 import { Member } from '@/types/Member'
 
 export default function VerifyPage() {
-  const { t } = useLanguage()
   const [authCode, setAuthCode] = useState('')
+
   const router = useRouter()
+
   const { toast } = useToast()
+
   const username = useSearchParams().get('username')
   const deviceId = Cookies.get('deviceId') || ''
 
@@ -44,17 +45,16 @@ export default function VerifyPage() {
             if (meResult.organization) {
               getItem(`/databases`, Cookies.get('token') || '')
                 .then(result => Cookies.set('dbList', JSON.stringify(result)))
-                .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive', duration: 1500 }))
-                .finally(()=> router.push('/'))
-            }else{
-               router.push('/')
+                .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive', duration: 1500 }))
+                .finally(() => router.push('/'))
+            } else {
+              router.push('/')
             }
 
-           
           })
-          .catch(err => toast({ title: t('Error'), description: err, variant: 'destructive' }))
+          .catch(err => toast({ title: 'Hata', description: err, variant: 'destructive' }))
       })
-      .catch(err => toast({ title: t('Error'), description: err, variant: 'destructive' }))
+      .catch(err => toast({ title: 'Hata', description: err, variant: 'destructive' }))
   }
   return (
     <div className="relative h-full flex flex-col justify-center items-center gap-4">
@@ -66,7 +66,7 @@ export default function VerifyPage() {
           <Label className="ms-2 my-4 text-blue-600 font-bold">
             {username}
           </Label>
-          <Label className="ms-2">{t('Enter 6-digits Auth Code')}</Label>
+          <Label className="ms-2">Enter 6-digits Auth Code</Label>
           <div className="flex gap-2 ">
             <InputOTP maxLength={6} onChange={e => setAuthCode(e)}>
               <InputOTPGroup>
@@ -84,7 +84,7 @@ export default function VerifyPage() {
           </div>
         </div>
         <div className="flex justify-between w-full my-4">
-          <Button variant={'secondary'} onClick={() => router.back()}>
+          <Button variant="secondary" onClick={() => router.back()}>
             <ArrowLeftIcon />
           </Button>
           <Button className="flex-shrink" onClick={verify}>

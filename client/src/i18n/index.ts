@@ -16,21 +16,23 @@ const { useGlobalState } = createGlobalState(initialState)
 
 export const useLanguage = () => {
   const [lang, setLang] = useGlobalState("lang")
-  const [defaultLang, setDefaultLang] = useState('en')
+
+  const [defaultLang, setDefaultLang] = useState('tr')
 
 
   useEffect(() => {
     const navLang = navigator.language.substring(0, 2)
-    setDefaultLang(Object.keys(LANG_LISTS).indexOf(navLang) > -1 ? navLang : 'en')
-    if (!Cookies.get("lang")) {
+    setDefaultLang(Object.keys(LANG_LISTS).indexOf(navLang) > -1 ? navLang : 'tr')
+    if (!Cookies.get('lang')) {
       Cookies.set("lang", defaultLang)
     }
-    setLang(Cookies.get("lang") || defaultLang)
+    setLang(Cookies.get('lang') || defaultLang)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+
   const t = (key: string) => {
-    const list = LANG_LISTS[lang || defaultLang] || __en
+    const list = LANG_LISTS[lang || defaultLang] || __tr
 
     if (Object.keys(list).includes(key)) {
       return list[key] as string

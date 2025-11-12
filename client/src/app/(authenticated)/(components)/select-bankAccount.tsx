@@ -23,16 +23,20 @@ import { ButtonSelect } from "@/components/icon-buttons"
 import { Label } from "@/components/ui/label"
 
 interface Props {
-  t: (text: string) => string
   children?: React.ReactNode | any
   onSelect?: (e: BankAccount) => void
 }
-export function SelectBankAccount({ t, children, onSelect }: Props) {
+export function SelectBankAccount({ children, onSelect }: Props) {
   const [search, setSearch] = useState('')
+
   const [token, setToken] = useState('')
+
   const { toast } = useToast()
+
   const [loading, setLoading] = useState(false)
+
   const [list, setList] = useState<BankAccount[]>([])
+
   const load = (s?: string) => {
     setLoading(true)
     postItem(`/mikro/get`, token, { query: bankAccountListQuery({ search: s }) })
@@ -52,7 +56,7 @@ export function SelectBankAccount({ t, children, onSelect }: Props) {
         <AlertDialogHeader className="p-0 m-0 ">
           <AlertDialogTitle className="p-0">
             <div className="flex justify-between">
-              <span>{t('Select responsibility')}</span>
+              <span>Sorumluluk seç</span>
               <AlertDialogCancel>X</AlertDialogCancel>
             </div>
           </AlertDialogTitle>
@@ -64,7 +68,7 @@ export function SelectBankAccount({ t, children, onSelect }: Props) {
             <Input
               type='search'
               className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-              placeholder={t('search...')}
+              placeholder="ara..."
               defaultValue={search}
               onChange={e => {
                 setSearch(e.target.value)
@@ -75,7 +79,7 @@ export function SelectBankAccount({ t, children, onSelect }: Props) {
           </div>
 
           <div className='grid grid-cols-1 w-full text-xs lg:text-sm border-b my-2 ps-2 pe-5'>
-            <div className=''>{t('BankAccount')}</div>
+            <div className=''>BankAccount</div>
           </div>
           <div className="w-fu11ll overflow-y-auto h-[450px] ps-2 pe-2 lg:pe-4">
             {!loading && list && list.map((e: BankAccount, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}
@@ -105,14 +109,14 @@ interface WithLabelProps extends Props {
   className?: string
   caption?: React.ReactNode | any
 }
-export function SelectBankAccountWithLabel({ t, children, onSelect, className, caption }: WithLabelProps) {
+export function SelectBankAccountWithLabel({ children, onSelect, className, caption }: WithLabelProps) {
   return (
     <div className={`w-full flex justify-between p-2 pe-4 items-start  border rounded-md border-dashed ${className}`}>
       <div className="flex flex-col gap-1">
-        <Label className="text-muted-foreground">{t('Bank Account')}</Label>
+        <Label className="text-muted-foreground">Banka Hesabı</Label>
         <div className="capitalize">{caption}</div>
       </div>
-      <SelectBankAccount t={t} onSelect={onSelect} ><ButtonSelect /></SelectBankAccount>
+      <SelectBankAccount onSelect={onSelect} ><ButtonSelect /></SelectBankAccount>
     </div>
   )
 }

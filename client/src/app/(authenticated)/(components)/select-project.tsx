@@ -23,16 +23,20 @@ import { Label } from "@/components/ui/label"
 import { ButtonSelect } from "@/components/icon-buttons"
 
 interface Props {
-  t: (text: string) => string
   children?: React.ReactNode | any
   onSelect?: (e: Project) => void
 }
-export function SelectProject({ t, children, onSelect }: Props) {
+export function SelectProject({ children, onSelect }: Props) {
   const [search, setSearch] = useState('')
+
   const [token, setToken] = useState('')
+
   const { toast } = useToast()
+
   const [loading, setLoading] = useState(false)
+
   const [list, setList] = useState<Project[]>([])
+
   const load = (s?: string) => {
     setLoading(true)
     postItem(`/mikro/get`, token, { query: projectListQuery({ search: s }) })
@@ -51,7 +55,7 @@ export function SelectProject({ t, children, onSelect }: Props) {
         <AlertDialogHeader className="p-0 m-0 ">
           <AlertDialogTitle className="p-0">
             <div className="flex justify-between">
-              <span>{t('Select project')}</span>
+              <span>Proje seç</span>
               <AlertDialogCancel>X</AlertDialogCancel>
             </div>
           </AlertDialogTitle>
@@ -63,7 +67,7 @@ export function SelectProject({ t, children, onSelect }: Props) {
             <Input
               type='search'
               className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-              placeholder={t('search...')}
+              placeholder="ara..."
               defaultValue={search}
               onChange={e => {
                 setSearch(e.target.value)
@@ -74,7 +78,7 @@ export function SelectProject({ t, children, onSelect }: Props) {
           </div>
 
           <div className='grid grid-cols-1 w-full text-xs lg:text-sm border-b my-2 ps-2 pe-5'>
-            <div className=''>{t('Project')}</div>
+            <div className=''>Proje</div>
           </div>
           <div className="w-fu11ll overflow-y-auto h-[450px] ps-2 pe-2 lg:pe-4">
             {!loading && list && list.map((e: Project, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}
@@ -105,14 +109,14 @@ interface WithLabelProps extends Props {
   className?: string
   caption?: React.ReactNode | any
 }
-export function SelectProjectWithLabel({ t, children, onSelect, className, caption }: WithLabelProps) {
+export function SelectProjectWithLabel({ children, onSelect, className, caption }: WithLabelProps) {
   return (
     <div className={`w-full flex justify-between p-2 pe-4 items-start  border rounded-md border-dashed ${className}`}>
       <div className="flex flex-col gap-1">
-        <Label className="text-muted-foreground">{t('Project')}</Label>
+        <Label className="text-muted-foreground">Proje</Label>
         <div className="capitalize">{caption}</div>
       </div>
-      <SelectProject t={t} onSelect={onSelect} ><ButtonSelect /></SelectProject>
+      <SelectProject onSelect={onSelect} ><ButtonSelect /></SelectProject>
     </div>
   )
 }

@@ -5,7 +5,6 @@ import { getItem, getList, putItem } from '@/lib/fetch'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
 import { useToast } from '@/components/ui/use-toast'
-import { useLanguage } from '@/i18n'
 import { StoreIcon, Users2Icon } from 'lucide-react'
 import { ListGrid } from '@/components/ui216/list-grid'
 import { Store, getPosIntegrationTypeList } from '@/types/Store'
@@ -13,12 +12,16 @@ interface Props {
 }
 export default function SettingsPage({ }: Props) {
   const [stores, setStores] = useState<Store[]>([])
+
   const [token, setToken] = useState('')
+
   const { toast } = useToast()
+
   const [loading, setLoading] = useState(false)
+
   const router = useRouter()
-  const { t } = useLanguage()
-  const posIntegrationTypeList=getPosIntegrationTypeList()
+  const posIntegrationTypeList = getPosIntegrationTypeList()
+
 
   const load = () => {
     setLoading(true)
@@ -37,25 +40,25 @@ export default function SettingsPage({ }: Props) {
     <ListGrid
       apiPath='/stores'
 
-      title={t('Stores')}
+      title="Mağazalar"
       icon=<StoreIcon />
       onHeaderPaint={() => <div className='grid grid-cols-7 w-full'>
-        <div>{t('Name')}</div>
-        <div>{t('Default Firm')}</div>
-        <div>{t('Warehouse')}</div>
-        <div>{t('Responsibility')}</div>
-        <div>{t('Project')}</div>
-        <div>{t('Pos')}</div>
-        <div className='text-center'>{t('Passive?')}</div>
+        <div>İsim</div>
+        <div>Default Firm</div>
+        <div>Depo</div>
+        <div>Sorumluluk</div>
+        <div>Proje</div>
+        <div>Pos</div>
+        <div className='text-center'>Pasif?</div>
       </div>}
-      onRowPaint={(e:Store,colIndex) => <div className='grid grid-cols-7 w-full'>
+      onRowPaint={(e: Store, colIndex) => <div className='grid grid-cols-7 w-full'>
         <div>{e.name}</div>
         <div>{e.defaultFirm}</div>
         <div>{e.warehouse}</div>
         <div>{e.responsibility}</div>
         <div>{e.project}</div>
-        <div>{posIntegrationTypeList.find(r=>r._id==e.posIntegration?.integrationType)?.name}</div>
-        <div className='text-center'>{e.passive?'✅':''}</div>
+        <div>{posIntegrationTypeList.find(r => r._id == e.posIntegration?.integrationType)?.name}</div>
+        <div className='text-center'>{e.passive ? '✅' : ''}</div>
       </div>}
     />
   )

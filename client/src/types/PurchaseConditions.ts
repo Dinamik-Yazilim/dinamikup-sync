@@ -118,7 +118,7 @@ export function purchaseConditionListQuery({ top = 100, search = '', warehouseId
     sas_isk_miktar4 +
     sas_isk_miktar5 +
     sas_isk_miktar6)),2) AS amount,
-    count(*) as lineCount,
+    coun* as lineCount,
     CAST(SA.sas_depo_no as VARCHAR(10)) as warehouseId,
     ISNULL(CAST(D.dep_no as varchar(10)) + ' - ' + D.dep_adi,'') as warehouse,
     SA.sas_srmmrk_kodu as responsibilityId,
@@ -168,7 +168,7 @@ export function purchaseConditionHeaderQuery(docId: string) {
     sas_isk_miktar4 +
     sas_isk_miktar5 +
     sas_isk_miktar6)),2) AS amount,
-    count(*) as lineCount,
+    coun* as lineCount,
     CAST(SA.sas_depo_no as VARCHAR(10)) as warehouseId,
     ISNULL(CAST(D.dep_no as varchar(10)) + ' - ' + D.dep_adi,'') as warehouse,
     SA.sas_srmmrk_kodu as responsibilityId,
@@ -222,9 +222,8 @@ WHERE docId='${docId}' `
 
 function preSavePurchaseCondition(token: string, pcHeader: PurchaseConditionHeader, pcDetails: PurchaseConditionDetail[]) {
   return new Promise<void>((resolve, reject) => {
-    if (pcDetails.length == 0) return reject('Lines cannot be empty')
-    if (!pcHeader.firmId) return reject('Firm required')
-    // if (!pcHeader.warehouseId) return reject('Warehouse required')
+    if (pcDetails.length == 0) return reject('Satırlar boş olamaz')
+    if (!pcHeader.firmId) return reject('Firma gereklidir')
 
     resolve()
   })
@@ -257,7 +256,7 @@ export function savePurchaseCondition(token: string, pcHeader: PurchaseCondition
                 if (e.deleted) {
                   //return `DELETE FROM SATINALMA_SARTLARI WHERE sas_Guid='${e.sas_Guid}';`
                 } else {
-                  return updateLineQuery(pcHeader, e);
+                  return updateLineQuery(pcHeader, e)
                 }
 
               } else {
@@ -265,7 +264,7 @@ export function savePurchaseCondition(token: string, pcHeader: PurchaseCondition
               }
             }
           }) as string[]
-          query += qList.join('\n');
+          query += qList.join('\n')
 
           postItem(`/mikro/save`, token, { query: query })
             .then(result => {

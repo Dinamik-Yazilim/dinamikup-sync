@@ -6,3 +6,4 @@ export const metadata: Metadata = pageMeta('Users')
 export default function PageLayout({ children }: { children: any }) {
   return (<>{children}</>)
 }
+

@@ -18,6 +18,10 @@ const nextConfig = {
     keepAlive: false
   },
   poweredByHeader: false,
+  eslint: {
+    // Eski deprecated seçenekleri devre dışı bırak
+    ignoreDuringBuilds: false,
+  },
 
   // experimental: {
   //   mdxRs: true,

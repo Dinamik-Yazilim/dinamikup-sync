@@ -6,7 +6,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Cookies from 'js-cookie'
 import { useToast } from '@/components/ui/use-toast'
 import { PaginationType } from '@/types/PaginationType'
-import { useLanguage } from '@/i18n'
 import Loading from '@/components/loading'
 import {
   Table,
@@ -59,15 +58,22 @@ export function ListTable({
   params
 }: Props) {
   const [list, setList] = useState<any[]>([])
+
   const [filter, setFilter] = useState<any>(defaultFilter)
+
   const [token, setToken] = useState('')
+
   const { toast } = useToast()
+
   const [loading, setLoading] = useState(false)
+
   const router = useRouter()
+
   const pathName = usePathname()
+
   const [pagination, setPagination] = useState<PaginationType>({ pageCount: 0, page: 1, pageSize: 10, totalDocs: 0 })
+
   const [search, setSearch] = useState('')
-  const { t } = useLanguage()
   const searchParams = useSearchParams()
   options = Object.assign({
     type: 'Update',
@@ -77,6 +83,7 @@ export function ListTable({
     showEdit: true,
     paging: true,
   }, options)
+
   const load = (pageNo?: number, s?: string, f?: any) => {
     let url = `${apiPath}${(apiPath || '').indexOf('?') > -1 ? '&' : '?'}`
     if (options.paging == false) {
@@ -98,7 +105,7 @@ export function ListTable({
         }
       }).join('&')
       console.log('yeniurl:', yeniUrl)
-      yeniUrl += '&' + Object.keys(f).map(key => `${key}=${encodeURIComponent((f[key] || '').trim())}`).join('&')
+      yeniUrl += '&' + Object.keys(f).map(key => `${key}=${encodeURIComponent(f[key] || '').trim()}`).join('&')
       url = yeniUrl
     }
     console.log(`list grid url:`, url)
@@ -136,7 +143,7 @@ export function ListTable({
             <Input
               type='search'
               className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-              placeholder={t('search...')}
+              placeholder="ara..."
               defaultValue={search}
               onChange={e => {
                 setSearch(e.target.value)
@@ -174,7 +181,7 @@ export function ListTable({
                       <div
                         onClick={() => router.push(`${pathName}/addnew?${searchParams.toString()}`)}
                         className={`w-8 cursor-pointer px-2 py-2 rounded-md bg-green-800 text-white hover:bg-green-500 hover:text-white`}>
-                        <PlusSquareIcon size={'16px'} />
+                        <PlusSquareIcon size="16px" />
                       </div>
 
                     }
@@ -196,7 +203,7 @@ export function ListTable({
                     <div
                       onClick={() => router.push(`${pathName}/${e._id}?${searchParams.toString()}`)}
                       className={`cursor-pointer px-2 py-2 rounded-md bg-blue-800 text-white hover:bg-blue-500 hover:text-white`}>
-                      <EditIcon size={'16px'} />
+                      <EditIcon size="16px" />
                     </div>
                   </>}
 
@@ -209,12 +216,12 @@ export function ListTable({
                           deleteRecord(e._id)
                         }
                       }}
-                      title={t('Do you want to delete the record?')}
+                      title="Do you want to delete the record?"
                       description={<span className='text-lg'>{e.name || e.description || e.documentNumber || e.issueDate || e._id}</span>}
 
                     >
                       <div className='px-2 py-2 rounded-md bg-red-800 text-white hover:bg-red-500 hover:text-white'>
-                        <Trash2Icon size={'16px'} />
+                        <Trash2Icon size="16px" />
                       </div>
                     </ButtonConfirm>
                   }

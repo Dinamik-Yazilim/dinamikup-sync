@@ -6,7 +6,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Cookies from 'js-cookie'
 import { useToast } from '@/components/ui/use-toast'
 import { PaginationType } from '@/types/PaginationType'
-import { useLanguage } from '@/i18n'
 import Loading from '@/components/loading'
 
 import { Input } from '@/components/ui/input'
@@ -40,11 +39,11 @@ interface Props {
   params?: any
   icon?: React.ReactNode
   onAddNew?: () => void
-  onDelete?: (e: any, rowIndex:number) => void
+  onDelete?: (e: any, rowIndex: number) => void
 
   onEdit?: (e: any, rowIndex: number) => void
-  onLoadingChange?:(e:boolean)=>void
-  onSearchChanged?:(e:string)=>void
+  onLoadingChange?: (e: boolean) => void
+  onSearchChanged?: (e: string) => void
 }
 export function TsnGrid({
   // headers = [],
@@ -69,18 +68,25 @@ export function TsnGrid({
   onEdit,
   onLoadingChange,
   onSearchChanged,
-  
+
 }: Props) {
   const [list, setList] = useState<any[]>([])
+
   const [filter, setFilter] = useState<any>(defaultFilter)
+
   const [token, setToken] = useState('')
+
   const { toast } = useToast()
+
   const [loading, setLoading] = useState(false)
+
   const router = useRouter()
+
   const pathName = usePathname()
+
   const [search, setSearch] = useState('')
-  const { t } = useLanguage()
   const searchParams = useSearchParams()
+
 
   const load = () => {
     if (!query) return
@@ -97,7 +103,7 @@ export function TsnGrid({
       .then(result => {
         setList(result as any[])
       })
-      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
       .finally(() => setLoading(false))
   }
 
@@ -107,7 +113,7 @@ export function TsnGrid({
       .then(result => {
         load()
       })
-      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
   }
 
   const classBgOdd = 'bg-slate-300 bg-opacity-10 hover:bg-blue-500 hover:bg-opacity-10'
@@ -133,12 +139,12 @@ export function TsnGrid({
             <Input
               type='search'
               className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-              placeholder={t('search...')}
+              placeholder="ara..."
               defaultValue={search}
               onChange={e => {
                 onSearchChanged && onSearchChanged(e.target.value)
               }}
-              onKeyDown={e => (e.code == 'Enter' || e.key =='Enter' ) && load()}
+              onKeyDown={e => (e.code == 'Enter' || e.key == 'Enter') && load()}
             />
           </div>
         }
@@ -169,7 +175,7 @@ export function TsnGrid({
                   if (onAddNew)
                     onAddNew()
                   else
-                    router.push(`${pathName}/addnew${searchParams?'?':''}${searchParams.toString()}`)
+                    router.push(`${pathName}/addnew${searchParams ? '?' : ''}${searchParams.toString()}`)
                 }} />
 
               }
@@ -200,14 +206,13 @@ export function TsnGrid({
                     {/* <div
                       onClick={() => router.push(`${pathName}/${e._id}?${searchParams.toString()}`)}
                       className={`cursor-pointer px-2 py-2 rounded-md bg-blue-800 text-white hover:bg-blue-500 hover:text-white`}>
-                      <EditIcon size={'16px'} />
+                      <EditIcon size="16px" />
                     </div> */}
                   </>}
 
                   {options.type == 'Update' && options.showDelete && e._id &&
                     <TsnGridButtonDelete
-                      t={t}
-                      title={t('Do you want to delete the record?')}
+                      title="Do you want to delete the record?"
                       description={e.name || e.itemName || e.itemCode || e.code || e.description || e.documentNumber || e.issueDate || e._id}
                       onOk={() => {
                         if (onDelete) {
@@ -249,34 +254,33 @@ interface TsnGridButtonProps {
 export function TsnGridButtonAddNew({ onClick }: TsnGridButtonProps) {
   return (<div onClick={() => onClick && onClick()}
     className={`w-8 cursor-pointer px-2 py-2 rounded-md bg-green-800 text-white hover:bg-green-500 hover:text-white`}>
-    <PlusSquareIcon size={'16px'} />
+    <PlusSquareIcon size="16px" />
   </div>)
 }
 
 export function TsnGridButtonEdit({ onClick }: TsnGridButtonProps) {
   return (<div onClick={() => onClick && onClick()}
     className={`cursor-pointer px-2 py-2 rounded-md bg-blue-800 text-white hover:bg-blue-500 hover:text-white`}>
-    <EditIcon size={'16px'} />
+    <EditIcon size="16px" />
   </div>)
 }
 
 interface TsnGridButtonDeleteProps {
   onOk?: () => void
   onCancel?: () => void
-  t: (text: string) => string
   description?: string
   title?: string
 }
-export function TsnGridButtonDelete({ onOk, onCancel, t, title, description }: TsnGridButtonDeleteProps) {
+export function TsnGridButtonDelete({ onOk, onCancel, title, description }: TsnGridButtonDeleteProps) {
 
   return (<ButtonConfirm
     onOk={() => onOk && onOk()}
     onCancel={() => onCancel && onCancel()}
-    title={t(title || '')}
-    description={<span className='text-lg'>{t(description || '')}</span>}
+    title={title || ''}
+    description={<span className='text-lg'>{description || ''}</span>}
   >
     <div className='px-2 py-2 rounded-md bg-red-800 text-white hover:bg-red-500 hover:text-white'>
-      <Trash2Icon size={'16px'} />
+      <Trash2Icon size="16px" />
     </div>
   </ButtonConfirm>)
 }

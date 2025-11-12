@@ -21,19 +21,23 @@ import { DeliveryType, deliveryTypeListQuery } from "@/types/DeliveryType"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface Props {
-  t: (text: string) => string
   children?: React.ReactNode | any
   onSelect?: (e: DeliveryType) => void
 }
-export function SelectDeliveryType({ t, children, onSelect }: Props) {
+export function SelectDeliveryType({ children, onSelect }: Props) {
   const [search, setSearch] = useState('')
+
   const [token, setToken] = useState('')
+
   const { toast } = useToast()
+
   const [loading, setLoading] = useState(false)
+
   const [list, setList] = useState<DeliveryType[]>([])
+
   const load = (s?: string) => {
     setLoading(true)
-    postItem(`/mikro/get`, token, { query: deliveryTypeListQuery({search:s}) })
+    postItem(`/mikro/get`, token, { query: deliveryTypeListQuery({ search: s }) })
       .then(result => {
         setList(result as DeliveryType[])
       })
@@ -49,7 +53,7 @@ export function SelectDeliveryType({ t, children, onSelect }: Props) {
         <AlertDialogHeader className="p-0 m-0 ">
           <AlertDialogTitle className="p-0">
             <div className="flex justify-between">
-              <span>{t('Select project')}</span>
+              <span>Proje seç</span>
               <AlertDialogCancel>X</AlertDialogCancel>
             </div>
           </AlertDialogTitle>
@@ -61,7 +65,7 @@ export function SelectDeliveryType({ t, children, onSelect }: Props) {
             <Input
               type='search'
               className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-              placeholder={t('search...')}
+              placeholder="ara..."
               defaultValue={search}
               onChange={e => {
                 setSearch(e.target.value)
@@ -72,7 +76,7 @@ export function SelectDeliveryType({ t, children, onSelect }: Props) {
           </div>
 
           <div className='grid grid-cols-1 w-full text-xs lg:text-sm border-b my-2 ps-2 pe-5'>
-            <div className=''>{t('DeliveryType')}</div>
+            <div className=''>DeliveryType</div>
           </div>
           <div className="w-fu11ll overflow-y-auto h-[450px] ps-2 pe-2 lg:pe-4">
             {!loading && list && list.map((e: DeliveryType, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}

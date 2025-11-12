@@ -5,7 +5,6 @@ import { getItem, getList, putItem } from '@/lib/fetch'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
 import { useToast } from '@/components/ui/use-toast'
-import { useLanguage } from '@/i18n'
 import { ComputerIcon, StoreIcon, Users2Icon } from 'lucide-react'
 import { ListGrid } from '@/components/ui216/list-grid'
 import { StorePaymentType } from '@/types/StorePaymentType'
@@ -13,12 +12,14 @@ interface Props {
 }
 export default function SettingsPage({ }: Props) {
   const [storePaymentTypes, setStorePaymentTypes] = useState<StorePaymentType[]>([])
-  const [token, setToken] = useState('')
-  const { toast } = useToast()
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
-  const { t } = useLanguage()
 
+  const [token, setToken] = useState('')
+
+  const { toast } = useToast()
+
+  const [loading, setLoading] = useState(false)
+
+  const router = useRouter()
   const load = () => {
     setLoading(true)
     getList(`/storePaymentTypes`, token)
@@ -36,13 +37,13 @@ export default function SettingsPage({ }: Props) {
     <ListGrid
       apiPath='/storePaymentTypes'
 
-      title={t('Payment Types')}
+      title="Payment Types"
       icon=<ComputerIcon />
       onHeaderPaint={() => <div className='grid grid-cols-3 w-full'>
-        <div>{t('Store')}</div>
-        <div>{t('Name')}</div>
-        <div>{t('Firm')}</div>
-        <div className='text-center'>{t('Passive?')}</div>
+        <div>Mağaza</div>
+        <div>İsim</div>
+        <div>Firma</div>
+        <div className='text-center'>Pasif?</div>
       </div>}
       onRowPaint={(e: StorePaymentType, colIndex) => <div className='grid grid-cols-3 w-full'>
         <div>{e.store?.name}</div>

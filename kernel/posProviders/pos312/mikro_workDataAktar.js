@@ -97,6 +97,9 @@ function mikroWorkDataAktar(mainApp, orgDoc, storeDoc, fisData) {
         DECLARE @Vergi5 FLOAT=0;
         DECLARE @Vergi6 FLOAT=0; 
         DECLARE @OdemeOran FLOAT=0;
+
+        SELECT @EvrakSira=ISNULL(MAX(sth_evrakno_sira),0)+52001 FROM S_${tarih}_${depoNo} WITH(NOLOCK) WHERE sth_evrakno_seri=@EvrakSeri AND sth_evraktip=@STH_EVRAKTIP;
+
       `
       if (mainApp == 'mikro17') {
         query += `

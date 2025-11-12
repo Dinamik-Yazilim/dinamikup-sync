@@ -6,14 +6,11 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
-  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
 import { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
-import { useLanguage } from '@/i18n'
 import { Button } from '@/components/ui/button'
 import { DatabaseIcon, DatabaseZapIcon, ListIcon, RefreshCcwDotIcon, Settings2Icon } from 'lucide-react'
 import { getItem, postItem } from '@/lib/fetch'
@@ -25,12 +22,16 @@ import { useRouter } from 'next/navigation'
 
 export function DatabaseSelect() {
   const [db, setDb] = useState('')
+
   const [dbList, setDbList] = useState<Database[]>([])
+
   const [token, setToken] = useState('')
+
   const [loading, setLoading] = useState(false)
-  const { t } = useLanguage()
   const { toast } = useToast()
+
   const router = useRouter()
+
 
   const changeDb = (dbId: string) => {
     setLoading(true)
@@ -38,7 +39,7 @@ export function DatabaseSelect() {
       .then(result => {
         console.log('result:', result)
         Cookies.set('db', dbId)
-        toast({ title: t('Database changed'), description: `database:${result.db.name}`, variant: 'default', duration: 500 })
+        toast({ title: 'Veritabanı Değişti', description: `database:${result.db.name}`, variant: 'default', duration: 500 })
         setTimeout(() => location.reload(), 1000)
       })
       .catch(err => toast({ title: err, variant: 'destructive', duration: 1500 }))
@@ -52,7 +53,7 @@ export function DatabaseSelect() {
         setDbList(result as Database[])
         Cookies.set('dbList', JSON.stringify(result))
       })
-      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive', duration: 1500 }))
+      .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive', duration: 1500 }))
       .finally(() => setLoading(false))
   }
 
@@ -84,7 +85,7 @@ export function DatabaseSelect() {
             }}
           >
             <SelectTrigger className={`w-[180px] px-1 border-0`}>
-              <SelectValue placeholder={'[' + t('Select Database') + ']'} />
+              <SelectValue placeholder={'[' + 'Veritabanı Seç' + ']'} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
@@ -100,11 +101,11 @@ export function DatabaseSelect() {
                 }
               </SelectGroup>
               <SelectGroup>
-              <Button onClick={load} variant={'outline'} className="flex gap-2" ><RefreshCcwDotIcon /> {t('Reload Databases')}</Button>
+                <Button onClick={load} variant="outline" className="flex gap-2" ><RefreshCcwDotIcon />Veritabanlarını yeniden yükle</Button>
               </SelectGroup>
             </SelectContent>
           </Select>
-          
+
         </div>
       }
       {loading && <Skeleton className='w-[180px]  h-11' />}

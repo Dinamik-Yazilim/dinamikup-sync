@@ -2,7 +2,6 @@
 
 import { useToast } from "@/components/ui/use-toast"
 import { StandartForm } from "@/components/ui216/standart-form"
-import { useLanguage } from "@/i18n"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Cookies from 'js-cookie'
@@ -19,15 +18,18 @@ interface Props {
 
 export default function EditPage({ params }: Props) {
   const [token, setToken] = useState('')
+  
   const { toast } = useToast()
+  
   const [loading, setLoading] = useState(false)
+  
   const router = useRouter()
-  const { t } = useLanguage()
   const [organization, setOrganization] = useState<Organization>({
     startDate:new Date().toISOString().substring(0,10),
     endDate: new Date(new Date().setFullYear(new Date().getFullYear()+2)).toISOString().substring(0,10)
   })
 
+  
   const load = () => {
     setLoading(true)
     getItem(`/admin/organizations/${params.id}`, token)
@@ -35,7 +37,7 @@ export default function EditPage({ params }: Props) {
         console.log(result)
         setOrganization(result as Organization)
       })
-      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
       .finally(() => setLoading(false))
   }
 
@@ -43,27 +45,27 @@ export default function EditPage({ params }: Props) {
     if(!organization?._id){
       postItem(`/admin/organizations`,token,organization)
       .then(result=>router.back())
-      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
     }else{
       putItem(`/admin/organizations/${organization?._id}`,token,organization)
       .then(result=>router.back())
-      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
     }
   }
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
   useEffect(() => { token && params.id != 'addnew' && load() }, [token])
 
   return (<StandartForm
-    title={params.id == 'addnew' ? t('New Organization') : t('Edit Organization')}
+    title={params.id == 'addnew' ? 'Yeni Organizasyon' : 'Organizasyon Düzenle'}
     onSaveClick={save}
     onCancelClick={()=>router.back()}
     loading={loading}
   >
-    <TsnInput title={t('Name')} defaultValue={organization?.name} onBlur={e => setOrganization({ ...organization, name: e.target.value })} />
-    <TsnInput title={t('Location')} defaultValue={organization?.location} onBlur={e => setOrganization({ ...organization, location: e.target.value })} />
-    <TsnInput type='date' readOnly title={t('Start Date')} defaultValue={organization?.startDate}  />
-    <TsnInput type='date' title={t('End Date')} defaultValue={organization?.endDate} onBlur={e => setOrganization({ ...organization, endDate: e.target.value })} />
-    <TsnSwitch title={t('Passive?')} defaultChecked={organization?.passive} onCheckedChange={e=>setOrganization({...organization,passive:e})} />
+    <TsnInput title="İsim" defaultValue={organization?.name} onBlur={e => setOrganization({ ...organization, name: e.target.value })} />
+    <TsnInput title="Lokasyon" defaultValue={organization?.location} onBlur={e => setOrganization({ ...organization, location: e.target.value })} />
+    <TsnInput type='date' readOnly title="Başlangıç Tarihi" defaultValue={organization?.startDate}  />
+    <TsnInput type='date' title="Bitiş Tarihi" defaultValue={organization?.endDate} onBlur={e => setOrganization({ ...organization, endDate: e.target.value })} />
+    <TsnSwitch title="Pasif?" defaultChecked={organization?.passive} onCheckedChange={e=>setOrganization({...organization,passive:e})} />
     
   </StandartForm>)
 }

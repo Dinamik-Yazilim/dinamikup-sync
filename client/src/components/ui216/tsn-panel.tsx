@@ -24,7 +24,9 @@ interface Props {
 }
 export function TsnPanel({ name, children, trigger, defaultOpen = true, className, contentClassName, collapsible = true }: Props) {
   const [open, setOpen] = useState(collapsible ? defaultOpen : true)
+  
   const pathName = usePathname()
+  
   const storageKey = generateStorageKey('', name, pathName)
   useEffect(() => {
     if (collapsible) {
@@ -54,7 +56,7 @@ export function TsnPanel({ name, children, trigger, defaultOpen = true, classNam
         className={`cursor-pointer ps-2 bg-slate-500 text-white dark:bg-slate-900 py-[4px]  ${!open ? 'rounded-lg' : 'rounded-t-lg'} flex items-center gap-2`}
       >
         {collapsible && <ChevronsUpDown />}
-        {!collapsible && <PanelBottomIcon size={'16px'} />}
+        {!collapsible && <PanelBottomIcon size="16px" />}
 
         {trigger}
       </div>

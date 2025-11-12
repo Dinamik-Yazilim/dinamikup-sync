@@ -5,6 +5,6 @@ import { Metadata } from 'next/types'
 
 export const metadata: Metadata = pageMeta('Login')
 
-export default function MeLayout({ children }: { children: any }) {
+export default function PageLayout({ children }: { children: any }) {
   return (<>{children}</>)
 }

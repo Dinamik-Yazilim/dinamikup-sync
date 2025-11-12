@@ -6,7 +6,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Cookies from 'js-cookie'
 import { useToast } from '@/components/ui/use-toast'
 import { PaginationType } from '@/types/PaginationType'
-import { useLanguage } from '@/i18n'
 import Loading from '@/components/loading'
 
 import { Input } from '@/components/ui/input'
@@ -36,7 +35,7 @@ interface Props {
   onFilterPanel?: (e: any, setFilter: (a: any) => void) => ReactNode
   defaultFilter?: any
   params?: any
-  icon?:React.ReactNode
+  icon?: React.ReactNode
 }
 export function ListGrid({
   // headers = [],
@@ -52,15 +51,22 @@ export function ListGrid({
   icon
 }: Props) {
   const [list, setList] = useState<any[]>([])
+
   const [filter, setFilter] = useState<any>(defaultFilter)
+
   const [token, setToken] = useState('')
+
   const { toast } = useToast()
+
   const [loading, setLoading] = useState(false)
+
   const router = useRouter()
+
   const pathName = usePathname()
+
   const [pagination, setPagination] = useState<PaginationType>({ pageCount: 0, page: 1, pageSize: 10, totalDocs: 0 })
+
   const [search, setSearch] = useState('')
-  const { t } = useLanguage()
   const searchParams = useSearchParams()
   options = Object.assign({
     type: 'Update',
@@ -70,6 +76,7 @@ export function ListGrid({
     showEdit: true,
     paging: true,
   }, options)
+
   const load = (pageNo?: number, s?: string, f?: any) => {
     let url = `${apiPath}${(apiPath || '').indexOf('?') > -1 ? '&' : '?'}`
     if (options.paging == false) {
@@ -89,7 +96,7 @@ export function ListGrid({
           return e
         }
       }).join('&')
-      yeniUrl += '&' + Object.keys(f).map(key => `${key}=${encodeURIComponent((f[key] || '').trim())}`).join('&')
+      yeniUrl += '&' + Object.keys(f).map(key => `${key}=${encodeURIComponent(f[key] || ''.trim())}`).join('&')
       url = yeniUrl
     }
     setLoading(true)
@@ -98,7 +105,7 @@ export function ListGrid({
         setList(result.docs as any[])
         setPagination(result as PaginationType)
       })
-      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
       .finally(() => setLoading(false))
   }
 
@@ -108,7 +115,7 @@ export function ListGrid({
       .then(result => {
         load(1, search)
       })
-      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
   }
 
   const classBgOdd = 'bg-slate-300 bg-opacity-10 hover:bg-blue-500 hover:bg-opacity-10'
@@ -124,7 +131,7 @@ export function ListGrid({
       <h1 className='text-2xl lg:text-3xl lg:ms-2 flex items-center gap-2'>
         {icon}
         {title}
-        </h1>
+      </h1>
       <div className='flex items-center gap-4'>
         {options.showSearch &&
           <div className="relative w-full">
@@ -132,7 +139,7 @@ export function ListGrid({
             <Input
               type='search'
               className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-              placeholder={t('search...')}
+              placeholder="ara..."
               defaultValue={search}
               onChange={e => {
                 setSearch(e.target.value)
@@ -169,7 +176,7 @@ export function ListGrid({
                     <div
                       onClick={() => router.push(`${pathName}/addnew?${searchParams.toString()}`)}
                       className={`w-8 cursor-pointer px-2 py-2 rounded-md bg-green-800 text-white hover:bg-green-500 hover:text-white`}>
-                      <PlusSquareIcon size={'16px'} />
+                      <PlusSquareIcon size="16px" />
                     </div>
 
                   }
@@ -190,11 +197,11 @@ export function ListGrid({
                     <div
                       onClick={() => router.push(`${pathName}/${e._id}?${searchParams.toString()}`)}
                       className={`cursor-pointer px-2 py-2 rounded-md bg-blue-800 text-white hover:bg-blue-500 hover:text-white`}>
-                      <EditIcon size={'16px'} />
+                      <EditIcon size="16px" />
                     </div>
                   </>}
 
-                  {options.type == 'Update' && options.showDelete && e._id && 
+                  {options.type == 'Update' && options.showDelete && e._id &&
                     <ButtonConfirm
                       onOk={() => {
                         if (onDelete) {
@@ -203,12 +210,12 @@ export function ListGrid({
                           deleteRecord(e._id)
                         }
                       }}
-                      title={t('Do you want to delete the record?')}
+                      title="Do you want to delete the record?"
                       description={<span className='text-lg'>{e.name || e.description || e.documentNumber || e.issueDate || e._id}</span>}
 
                     >
                       <div className='px-2 py-2 rounded-md bg-red-800 text-white hover:bg-red-500 hover:text-white'>
-                        <Trash2Icon size={'16px'} />
+                        <Trash2Icon size="16px" />
                       </div>
                     </ButtonConfirm>
                   }

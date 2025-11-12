@@ -2,7 +2,6 @@
 
 import { useToast } from "@/components/ui/use-toast"
 import { StandartForm } from "@/components/ui216/standart-form"
-import { useLanguage } from "@/i18n"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Cookies from 'js-cookie'
@@ -28,13 +27,18 @@ interface Props {
 
 export default function EditPage({ params }: Props) {
   const [token, setToken] = useState('')
+
   const { toast } = useToast()
+
   const [loading, setLoading] = useState(false)
+
   const router = useRouter()
-  const { t } = useLanguage()
   const [storePaymentType, setStorePaymentType] = useState<StorePaymentType>()
+
   const [stores, setStores] = useState<Store[]>()
+
   const [paymentList, setPaymentList] = useState<StorePaymentTypeListItem[]>()
+
 
 
   const load = () => {
@@ -44,7 +48,7 @@ export default function EditPage({ params }: Props) {
         setStorePaymentType(result as StorePaymentType)
 
       })
-      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
       .finally(() => setLoading(false))
   }
 
@@ -53,14 +57,14 @@ export default function EditPage({ params }: Props) {
       .then(result => {
         result.docs && setStores(result.docs as Store[])
       })
-      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
   }
 
   const loadPaymentList = () => {
     console.log('storePaymentType?.store?._id', storePaymentType?.store?._id)
     getList(`/stores/${storePaymentType?.store?._id}/paymentList`, token)
       .then((result: any[]) => {
-        console.log('result', result)
+
         let list: StorePaymentTypeListItem[] = []
         if (Array.isArray(result)) {
           list = result.map(r => ({
@@ -69,21 +73,20 @@ export default function EditPage({ params }: Props) {
             name: r.name
           } as StorePaymentTypeListItem))
         }
-        console.log('list', list)
         setPaymentList(list)
       })
-      .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+      .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
   }
 
   const save = () => {
     if (!storePaymentType?._id) {
       postItem(`/storePaymentTypes`, token, storePaymentType)
         .then(result => router.back())
-        .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+        .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
     } else {
       putItem(`/storePaymentTypes/${storePaymentType?._id}`, token, storePaymentType)
         .then(result => router.back())
-        .catch(err => toast({ title: t('Error'), description: t(err || ''), variant: 'destructive' }))
+        .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
     }
   }
 
@@ -103,18 +106,18 @@ export default function EditPage({ params }: Props) {
     }
   }, [storePaymentType?.store?._id])
   return (<StandartForm
-    title={params.id == 'addnew' ? t('New Paymet Type') : t('Edit Paymet Type')}
+    title={params.id == 'addnew' ? 'New Paymet Type' : 'Edit Paymet Type'}
     onSaveClick={save}
     onCancelClick={() => router.back()}
     loading={loading}
   >
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <TsnSelect title={t('Store')} defaultValue={storePaymentType?.store?._id}
+        <TsnSelect title="Mağaza" defaultValue={storePaymentType?.store?._id}
           onValueChange={e => setStorePaymentType({ ...storePaymentType, store: { ...storePaymentType?.store, _id: e } })}
           list={stores}
         />
-        <TsnSelect title={t('Name')} defaultValue={storePaymentType?.paymentId?.toString()} onValueChange={e => {
+        <TsnSelect title="İsim" defaultValue={storePaymentType?.paymentId?.toString()} onValueChange={e => {
           let val = paymentList?.find(p => p._id == e)
           if (val) {
             setStorePaymentType({ ...storePaymentType, paymentId: val._id, paymentName: val.name, paymentType: val.type })
@@ -127,10 +130,8 @@ export default function EditPage({ params }: Props) {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="flex gap-4">
-          <SelectFirmWithLabel caption={storePaymentType?.defaultFirm} t={t} onSelect={e => { setStorePaymentType({ ...storePaymentType, defaultFirmId: e._id, defaultFirm: e.name }) }} />
-          <Button variant="outline" onClick={() => { setStorePaymentType({ ...storePaymentType, defaultFirmId: '', defaultFirm: '' }) }}>
-            {t('Clear Firm')}
-          </Button>
+          <SelectFirmWithLabel caption={storePaymentType?.defaultFirm} onSelect={e => { setStorePaymentType({ ...storePaymentType, defaultFirmId: e._id, defaultFirm: e.name }) }} />
+          <Button variant="outline" onClick={() => { setStorePaymentType({ ...storePaymentType, defaultFirmId: '', defaultFirm: '' }) }}>Clear Firm</Button>
         </div>
       </div>
     </div>

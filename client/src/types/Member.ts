@@ -2,27 +2,27 @@ import { Organization } from "./Organization"
 
 export interface Member {
   _id?: string
-  organization?:Organization | null
+  organization?: Organization | null
   username?: string
   name?: string
   role?: string
   passive?: boolean
 }
 
-export function getRoleList(t:any){
+export function getRoleList(): any[] {
   return [
-    {_id:'user',name:t('User')},
-    {_id:'owner',name:t('Owner')},
-    {_id:'purchase',name:t('Purchase')},
-    {_id:'sales',name:t('Sales')},
-    {_id:'admin',name:t('Administrator')},
+    { _id: 'user', name: 'Kullanıcı' },
+    { _id: 'owner', name: 'Owner' },
+    { _id: 'purchase', name: 'Satın Alma' },
+    { _id: 'sales', name: 'Satış' },
+    { _id: 'admin', name: 'Yönetici' },
   ]
 }
 
 
-export function getAdminRoleList(t:any){
+export function getAdminRoleList(): any[] {
   return [
-    {_id:'sysuser',name:t('Sys User')},
-    {_id:'sysadmin',name:t('Sys Admin')},
+    { _id: 'sysuser', name: 'Sys User' },
+    { _id: 'sysadmin', name: 'Sys Admin' },
   ]
 }

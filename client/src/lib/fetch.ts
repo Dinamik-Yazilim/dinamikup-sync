@@ -71,9 +71,9 @@ export function postItem(path: string, token?: string, item?: any) {
         }
       }).catch(err => {
         console.log('err:', err)
-        if(err=='aborted' || (err.message && err.message=='aborted')){
+        if (err == 'aborted' || (err.message && err.message == 'aborted')) {
           resolve(undefined)
-        }else{
+        } else {
           reject(err.message || err || 'error')
         }
       })

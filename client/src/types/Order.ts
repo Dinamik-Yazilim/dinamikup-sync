@@ -239,9 +239,9 @@ order by [lineNo]
 
 function preSaveOrder(token: string, orderHeader: OrderHeader, orderDetails: OrderDetail[]) {
   return new Promise<void>((resolve, reject) => {
-    if (orderDetails.length == 0) return reject('Lines cannot be empty')
-    if (!orderHeader.firmId) return reject('Firm required')
-    if (!orderHeader.warehouseId) return reject('Warehouse required')
+    if (orderDetails.length == 0) return reject('Satırlar boş olamaz')
+    if (!orderHeader.firmId) return reject('Firma gereklidir')
+    if (!orderHeader.warehouseId) return reject('Depo gereklidir')
 
     resolve()
   })
@@ -253,7 +253,7 @@ export function saveOrder(token: string, orderHeader: OrderHeader, orderDetails:
       let query = ''
       preSaveOrder(token, orderHeader, orderDetails)
         .then(() => {
-         
+
           query = `
             DECLARE @EvrakSira INT=${orderHeader.sip_Guid ? orderHeader.docNoSequence : 0};
             DECLARE @EvrakSeri VARCHAR(50)='${(orderHeader.docNoSerial || '').replaceAll("'", "''")}';
@@ -272,14 +272,14 @@ export function saveOrder(token: string, orderHeader: OrderHeader, orderDetails:
               if (e.deleted) {
                 return `DELETE FROM SIPARISLER WHERE sip_Guid='${e.sip_Guid}';`
               } else {
-                return updateLineQuery(orderHeader, e);
+                return updateLineQuery(orderHeader, e)
               }
 
             } else {
               return insertLineQuery(orderHeader, e)
             }
           }) as string[]
-          query += qList.join('\n');
+          query += qList.join('\n')
 
           postItem(`/mikro/save`, token, { query: query })
             .then(result => {

@@ -18,27 +18,27 @@ export interface TsnSelectProps extends SelectPrimitive.SelectProps {
   className?: string
   itemClassName?: string
   autoFocus?: boolean
-empty?:boolean
+  empty?: boolean
 }
+
 export function TsnSelect({ all, empty, list, title, onValueChange, autoFocus, itemClassName, ...props }: TsnSelectProps) {
-  if(empty){
-    list=[{_id:' ', name:'---'}].concat(list as any[])
+  if (empty) {
+    list = [{ _id: ' ', name: '---' }].concat(list as any[])
   }
   useEffect(() => {
     if (props.defaultValue && list) {
       const findex = list.findIndex(e => e._id == props.defaultValue)
+
       const text = findex > -1 ? list[findex].text : ''
       onValueChange && onValueChange(props.defaultValue || '', text)
     }
-    // if (props.defaultValue) {
-    //   onValueChange && onValueChange(props.defaultValue || '')
-    // }
+
   }, [])
 
   return (<div className={`flex flex-col gap-1 my-1 w-full min-w-24 ${props.className}`} >
     <Label className='ms-2'>{title}</Label>
     <Select
-  
+
       // onValueChange={onValueChange}
       onValueChange={val => {
         if (onValueChange) {
@@ -49,7 +49,7 @@ export function TsnSelect({ all, empty, list, title, onValueChange, autoFocus, i
       {...props}
     >
       <SelectTrigger className={`w-full ${itemClassName}`} autoFocus={autoFocus} suppressHydrationWarning>
-        
+
         {!all && <SelectValue placeholder="---" />}
         {all && <SelectValue placeholder="*" />}
       </SelectTrigger>

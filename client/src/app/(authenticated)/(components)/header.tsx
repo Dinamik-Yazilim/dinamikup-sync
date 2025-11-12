@@ -10,7 +10,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { BoxesIcon, DatabaseIcon, FactoryIcon, HomeIcon, PiggyBankIcon, ShoppingCartIcon, TruckIcon } from 'lucide-react'
-import { useLanguage } from '@/i18n'
 import Cookies from 'js-cookie'
 import { DatabaseSelect } from '@/app/(authenticated)/(components)/database-select'
 import { NotificationButton } from '@/components/notify-icon'
@@ -19,48 +18,48 @@ import { Member } from '@/types/Member'
 import { Organization } from '@/types/Organization'
 
 export function Header() {
-  const { t } = useLanguage()
   const [user, setUser] = useState<Member>()
-  
+
+
   const [showDbList, setShowDbList] = useState(false)
 
   useEffect(() => {
     if (!user) {
-      try{
-        let u=JSON.parse(Cookies.get('user') || '{}') as Member
+      try {
+        let u = JSON.parse(Cookies.get('user') || '{}') as Member
         setUser(u)
-        
-        if(u.organization){
+
+        if (u.organization) {
           setShowDbList(true)
         }
-      }catch{}
+      } catch { }
     }
   }, [])
 
   return (
     <header className="flex h-16 items-center justify-between bor11der-b bg-white px-0 md:px-2 dark:border-gray-800 dark:bg-gray-950"    >
-        <div className="flex items-center gap-8">
-          <CustomLink className="" href="/">
-            <HeaderLogo2 className='w-40 lg:w-48' />
-          </CustomLink>
-          {showDbList && <>
-            <div className='hidden lg:flex'>
-              <DatabaseSelect />
-            </div>
-          </>}
-        </div>
-        <div className="flex items-center justify-end gap-2">
+      <div className="flex items-center gap-8">
+        <CustomLink className="" href="/">
+          <HeaderLogo2 className='w-40 lg:w-48' />
+        </CustomLink>
+        {showDbList && <>
+          <div className='hidden lg:flex'>
+            <DatabaseSelect />
+          </div>
+        </>}
+      </div>
+      <div className="flex items-center justify-end gap-2">
 
-          <UserMenu />
-          <div className='flex lg:hidden'>{MobileMenu(showDbList)}</div>
+        <UserMenu />
+        <div className='flex lg:hidden'>{MobileMenu(showDbList)}</div>
 
-        </div>
+      </div>
     </header>
   )
 }
 
 
-function MobileMenu(showDbList:boolean) {
+function MobileMenu(showDbList: boolean) {
   return (<>
     <DropdownMenu >
       <DropdownMenuTrigger asChild  >

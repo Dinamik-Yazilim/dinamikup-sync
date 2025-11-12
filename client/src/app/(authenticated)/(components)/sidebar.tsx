@@ -10,7 +10,6 @@ import { Home, Settings, Users, ShoppingCart, BarChart, FileText, Mail, Bell, He
 import { cn } from "@/lib/utils"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { HeaderLogo2 } from "@/components/logo"
-import { useLanguage } from "@/i18n"
 import Cookies from 'js-cookie'
 import { Member } from "@/types/Member"
 import { SignOutButton } from "./signout-button"
@@ -32,25 +31,25 @@ interface Props {
   className?: string
 }
 
-function menuItems(t: (s: string) => string, user: Member) {
+function menuItems(user: Member) {
   let l = [
     {
-      title: t('Dashboard'),
+      title: 'Gösterge Paneli',
       icon: <Home className="h-5 w-5" />,
       href: "/",
     },
     {
-      title: t('Purchase'),
+      title: 'Satın Alma',
       icon: <TruckIcon className="h-5 w-5" />,
       submenu: [
-        { title: t('Inventory'), href: "/purchase/inventory" },
-        { title: t('Vendors'), href: "/module-closed/vendors" },
-        { title: t('Purchase Orders'), href: "/purchase/orders" },
-        { title: t('Purchase Conditions'), href: "/purchase/conditions" },
+        { title: 'Envanter', href: "/purchase/inventory" },
+        { title: 'Tedarikçiler', href: "/module-closed/vendors" },
+        { title: 'Satın Alma Siparişleri', href: "/purchase/orders" },
+        { title: 'Satın Alma Şartları', href: "/purchase/conditions" },
       ],
     },
     // {
-    //   title: t('Sales'),
+    //   title: 'Satış',
     //   icon: <ShoppingCartIcon className="h-5 w-5" />,
     //   submenu: [
     //     { title: "Reports", href: "/module-closed/reports" },
@@ -58,7 +57,7 @@ function menuItems(t: (s: string) => string, user: Member) {
     //   ],
     // },
     {
-      title: t('POS'),
+      title: 'POS',
       icon: <ComputerIcon className="h-5 w-5" />,
       submenu: [
         { title: "POS Güncelle", href: "/pos/transactions" },
@@ -66,10 +65,10 @@ function menuItems(t: (s: string) => string, user: Member) {
       ],
     },
     // {
-    //   title: t('Reports'),
+    //   title: 'Raporlar',
     //   icon: <ChartAreaIcon className="h-5 w-5" />,
     //   submenu: [
-    //     // { title: t('Sales Profit'), href: "/reports/sales-profit" },
+    //     // { title: 'Satış Karlılık', href: "/reports/sales-profit" },
     //     { title: "Satın Alma Raporu", href: "/reports/purchase" },
     //     { title: "Satış Devir Hızı", href: "/module-closed/sales-cycle" },
     //     { title: "Satış Raporu", href: "/module-closed/satis-raporu" },
@@ -98,20 +97,20 @@ function menuItems(t: (s: string) => string, user: Member) {
     //   ],
     // },
     // {
-    //   title: t('Notifications'),
+    //   title: 'Bildirimler',
     //   icon: <Bell className="h-5 w-5" />,
     //   href: "/notifications",
     // },
     {
-      title: t('Settings'),
+      title: 'Ayarlar',
       icon: <Settings className="h-5 w-5" />,
       submenu: [
-        { title: t('Users'), href: "/settings/users" },
-        { title: t('Connector'), href: "/settings/connector" },
-        { title: t('Stores'), href: "/settings/stores" },
-        { title: t('POS Computers'), href: "/settings/posComputers" },
-        { title: t('Payment Types'), href: "/settings/paymentTypes" },
-        // { title: t('Working Parameters'), href: "/settings/workingParams" },
+        { title: 'Kullanıcılar', href: "/settings/users" },
+        { title: 'Konnektör', href: "/settings/connector" },
+        { title: 'Mağazalar', href: "/settings/stores" },
+        { title: 'POS Bilgisayarları', href: "/settings/posComputers" },
+        { title: 'Payment Types', href: "/settings/paymentTypes" },
+        // { title: 'Çalışma Parametreleri', href: "/settings/workingParams" },
       ],
     },
   ]
@@ -119,22 +118,22 @@ function menuItems(t: (s: string) => string, user: Member) {
 }
 
 
-function adminMenu(t: (s: string) => string, user: Member) {
+function adminMenu(user: Member) {
   let l = [
     {
-      title: t('Dashboard'),
+      title: 'Gösterge Paneli',
       icon: <Home className="h-5 w-5" />,
       href: "/",
     },
     {
-      title: t('Organizations'),
+      title: 'Organizations',
       icon: <Building2Icon className="h-5 w-5" />,
       href: '/admin/organizations'
     }
   ]
   if (user.role == 'sysadmin') {
     l.push({
-      title: t('Admin Users'),
+      title: 'Admin Users',
       icon: <Users2Icon className="h-5 w-5" />,
       href: "/admin/adminUsers",
     })
@@ -145,11 +144,12 @@ function adminMenu(t: (s: string) => string, user: Member) {
 
 export function Sidebar({ className }: Props) {
   // const [pathname, setPathname] = useState(usePathname())
+
   const pathname = usePathname()
   // Track open accordion values
   const [openAccordions, setOpenAccordions] = useState<string[]>([])
-  const { t } = useLanguage()
   const [user, setUser] = useState<Member>()
+
   const [menu, setMenu] = useState<MenuItem[]>([])
   // Define menu items
 
@@ -187,7 +187,7 @@ export function Sidebar({ className }: Props) {
   }, [])
   useEffect(() => {
     if (user) {
-      const m: MenuItem[] = user.organization ? menuItems(t, user) : adminMenu(t, user)
+      const m: MenuItem[] = user.organization ? menuItems(user) : adminMenu(user)
       m.forEach((item, index) => {
         if (item.submenu) {
           const hasActiveChild = item.submenu.some((subItem) => isActive(subItem.href))

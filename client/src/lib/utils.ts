@@ -27,7 +27,7 @@ export function moneyFormat(x?: number, decimal: number = 2) {
   // }
 
   return x.toLocaleString("en-US", { minimumFractionDigits: decimal, maximumFractionDigits: decimal })
-  // return x.toLocaleString("en-US") + (x - Math.floor(x) == 0 && decimal > 0 ? '.' + '0'.repeat(decimal - (x - Math.floor(x)).toString().length + 1) : '0'.repeat(decimal - (x - Math.floor(x)).toString().length + 1))
+  // return x.toLocaleString("en-US") + (x - Math.floor(x) == 0 && decimal > 0 ? '.' + '0'.repeadecimal - (x - Math.floor(x).toString().length + 1) : '0'.repeadecimal - (x - Math.floor(x).toString().length + 1))
   // return x.toLocaleString() + (x - Math.floor(x) == 0 ? '.00' : '')
 
 

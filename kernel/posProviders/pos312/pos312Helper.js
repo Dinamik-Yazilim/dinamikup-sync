@@ -147,13 +147,13 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
 
     try {
-      socketSend(sessionDoc, { event: 'syncItems_progress', caption: `312 Pos login in` })
+      socketSend(sessionDoc, { event: 'syncItems_progress', storeId: storeDoc._id, caption: `312 Pos login in` })
       token312 = await exports.login(storeDoc.posIntegration.pos312.webServiceUrl,
         storeDoc.posIntegration.pos312.webServiceUsername,
         storeDoc.posIntegration.pos312.webServicePassword)
 
 
-      socketSend(sessionDoc, { event: 'syncItems_progress', caption: `Mikrodan stok, barkod ve fiyatlar listeleniyor` })
+      socketSend(sessionDoc, { event: 'syncItems_progress', storeId: storeDoc._id, caption: `Mikrodan stok, barkod ve fiyatlar listeleniyor` })
       let Kdvler = []
       try {
         Kdvler = await GetDepartments(storeDoc.posIntegration.pos312.webServiceUrl, token312, {})
@@ -177,7 +177,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
       console.log('docs.length', docs.length)
       if (docs.length == 0) {
-        socketSend(sessionDoc, { event: 'syncItems_progress_end' })
+        socketSend(sessionDoc, { event: 'syncItems_progress_end', storeId: storeDoc._id })
         return resolve('stok kartlari zaten guncel')
       }
       let barcodeDocs = await getList(sessionDoc, orgDoc, `SELECT  bar_kodu as barcode, bar_stokkodu as code,
@@ -200,7 +200,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
       console.log('priceDocs.length', priceDocs.length)
 
-      socketSend(sessionDoc, { event: 'syncItems_progress', caption: `Mikrodan Kartlar cekildi` })
+      socketSend(sessionDoc, { event: 'syncItems_progress', storeId: storeDoc._id, caption: `Mikrodan Kartlar cekildi` })
       resolve(`${docs.length} adet stok karti aktarilacak. baslama:${new Date().toString()}`)
       let i = 0
       function calistir() {
@@ -338,7 +338,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
                 let t2 = new Date().getTime() / 1000
                 socketSend(sessionDoc, {
-                  event: 'syncItems_progress',
+                  event: 'syncItems_progress', storeId: storeDoc._id,
                   max: docs.length,
                   position: i + 1,
                   percent: Math.round(10 * 100 * (i + 1) / docs.length) / 10,
@@ -362,15 +362,15 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
       calistir()
         .then(() => {
-          socketSend(sessionDoc, { event: 'syncItems_progress_end' })
+          socketSend(sessionDoc, { event: 'syncItems_progress_end', storeId: storeDoc._id })
         })
         .catch(err => {
           errorLog(`[syncItems_pos312] Error:`, err)
-          socketSend(sessionDoc, { event: 'syncItems_progress_end' })
+          socketSend(sessionDoc, { event: 'syncItems_progress_end', storeId: storeDoc._id })
         })
     } catch (err) {
       errorLog(`[syncItems_pos312] Error:`, err)
-      socketSend(sessionDoc, { event: 'syncItems_progress_end' })
+      socketSend(sessionDoc, { event: 'syncItems_progress_end', storeId: storeDoc._id })
       reject(err)
     }
 
@@ -449,13 +449,13 @@ exports.syncFirms_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
 
     try {
-      socketSend(sessionDoc, { event: 'syncFirms_progress', caption: `312 Pos login in` })
+      socketSend(sessionDoc, { event: 'syncFirms_progress', storeId: storeDoc._id, caption: `312 Pos login in` })
       token312 = await exports.login(storeDoc.posIntegration.pos312.webServiceUrl,
         storeDoc.posIntegration.pos312.webServiceUsername,
         storeDoc.posIntegration.pos312.webServicePassword)
 
 
-      socketSend(sessionDoc, { event: 'syncFirms_progress', caption: `Mikrodan cari kartlar listeleniyor` })
+      socketSend(sessionDoc, { event: 'syncFirms_progress', storeId: storeDoc._id, caption: `Mikrodan cari kartlar listeleniyor` })
 
 
       let docs = await getList(sessionDoc, orgDoc, `SELECT cari_Guid as id, cari_kod as code, cari_unvan1 as [name], cari_CepTel as phone , 
@@ -468,7 +468,7 @@ exports.syncFirms_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 			    ORDER BY cari_lastup_date`)
 
       if (docs.length == 0) {
-        socketSend(sessionDoc, { event: 'syncFirms_progress_end' })
+        socketSend(sessionDoc, { event: 'syncFirms_progress_end', storeId: storeDoc._id })
         return resolve('cari kartlar zaten guncel')
       }
       let addressDocs = await getList(sessionDoc, orgDoc, `SELECT adr_cari_kod as code, adr_adres_no-1 as ordr, 
@@ -480,7 +480,7 @@ exports.syncFirms_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
         `)
 
 
-      socketSend(sessionDoc, { event: 'syncFirms_progress', caption: `Mikrodan Cari Kartlar cekildi` })
+      socketSend(sessionDoc, { event: 'syncFirms_progress', storeId: storeDoc._id, caption: `Mikrodan Cari Kartlar cekildi` })
       resolve(`${docs.length} adet cari kart aktarilacak. baslama:${new Date(new Date().setMinutes(new Date().getMinutes() + (-1 * new Date().getTimezoneOffset()))).toISOString().substring(0, 19)}`)
       let i = 0
       function calistir() {
@@ -523,7 +523,7 @@ exports.syncFirms_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
               let t2 = new Date().getTime() / 1000
               socketSend(sessionDoc, {
-                event: 'syncFirms_progress',
+                event: 'syncFirms_progress', storeId: storeDoc._id,
                 max: docs.length,
                 position: i + 1,
                 percent: Math.round(10 * 100 * (i + 1) / docs.length) / 10,
@@ -544,15 +544,15 @@ exports.syncFirms_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
       calistir()
         .then(() => {
-          socketSend(sessionDoc, { event: 'syncFirms_progress_end' })
+          socketSend(sessionDoc, { event: 'syncFirms_progress_end', storeId: storeDoc._id })
         })
         .catch(err => {
           errorLog(`[syncFirms_pos312] Error:`, err)
-          socketSend(sessionDoc, { event: 'syncFirms_progress_end', caption: 'Error' })
+          socketSend(sessionDoc, { event: 'syncFirms_progress_end', storeId: storeDoc._id, caption: 'Error' })
         })
     } catch (err) {
       errorLog(`[syncFirms_pos312] Error:`, err)
-      socketSend(sessionDoc, { event: 'syncFirms_progress_end' })
+      socketSend(sessionDoc, { event: 'syncFirms_progress_end', storeId: storeDoc._id })
       reject(err)
     }
 
@@ -568,13 +568,13 @@ exports.syncStaff_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
 
     try {
-      socketSend(sessionDoc, { event: 'syncStaff_progress', caption: `312 Pos login in` })
+      socketSend(sessionDoc, { event: 'syncStaff_progress', storeId: storeDoc._id, caption: `312 Pos login in` })
       token312 = await exports.login(storeDoc.posIntegration.pos312.webServiceUrl,
         storeDoc.posIntegration.pos312.webServiceUsername,
         storeDoc.posIntegration.pos312.webServicePassword)
 
 
-      socketSend(sessionDoc, { event: 'syncStaff_progress', caption: `Mikrodan personeller listeleniyor` })
+      socketSend(sessionDoc, { event: 'syncStaff_progress', storeId: storeDoc._id, caption: `Mikrodan personeller listeleniyor` })
 
 
       let docs = await getList(sessionDoc, orgDoc, `SELECT cari_per_Guid as id, cari_per_kod as code, 
@@ -586,12 +586,12 @@ exports.syncStaff_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 			    ORDER BY cari_per_lastup_date`)
 
       if (docs.length == 0) {
-        socketSend(sessionDoc, { event: 'syncStaff_progress_end' })
+        socketSend(sessionDoc, { event: 'syncStaff_progress_end', storeId: storeDoc._id })
         return resolve('personeller zaten guncel')
       }
 
 
-      socketSend(sessionDoc, { event: 'syncStaff_progress', caption: `Mikrodan Personeller cekildi` })
+      socketSend(sessionDoc, { event: 'syncStaff_progress', storeId: storeDoc._id, caption: `Mikrodan Personeller cekildi` })
       resolve(`${docs.length} adet personel aktarilacak. baslama:${new Date(new Date().setMinutes(new Date().getMinutes() + (-1 * new Date().getTimezoneOffset()))).toISOString().substring(0, 19)}`)
       let i = 0
       function calistir() {
@@ -626,7 +626,7 @@ exports.syncStaff_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
               let t2 = new Date().getTime() / 1000
               socketSend(sessionDoc, {
-                event: 'syncStaff_progress',
+                event: 'syncStaff_progress', storeId: storeDoc._id,
                 max: docs.length,
                 position: i + 1,
                 percent: Math.round(10 * 100 * (i + 1) / docs.length) / 10,
@@ -647,15 +647,15 @@ exports.syncStaff_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
       calistir()
         .then(() => {
-          socketSend(sessionDoc, { event: 'syncStaff_progress_end' })
+          socketSend(sessionDoc, { event: 'syncStaff_progress_end', storeId: storeDoc._id })
         })
         .catch(err => {
           errorLog(`[syncStaff_pos312] Error:`, err)
-          socketSend(sessionDoc, { event: 'syncStaff_progress_end', caption: 'Error' })
+          socketSend(sessionDoc, { event: 'syncStaff_progress_end', storeId: storeDoc._id, caption: 'Error' })
         })
     } catch (err) {
       errorLog(`[syncStaff_pos312] Error:`, err)
-      socketSend(sessionDoc, { event: 'syncStaff_progress_end' })
+      socketSend(sessionDoc, { event: 'syncStaff_progress_end', storeId: storeDoc._id })
       reject(err)
     }
 
@@ -699,24 +699,24 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
       if (endDate < startDate) return reject(`baslangic tarihi bitisten buyuk olamaz`)
 
       if (orgDoc.mainApp == 'mikro16_workdata' || orgDoc.mainApp == 'mikro17_workdata') {
-        socketSend(sessionDoc, { event: 'syncSales_progress', caption: `Mikro WorkData olusturuluyor` })
+        socketSend(sessionDoc, { event: 'syncSales_progress', storeId: storeDoc._id, caption: `Mikro WorkData olusturuluyor` })
         await mikroWorkDataOlustur(orgDoc, storeDoc, startDate.substring(0, 10), endDate.substring(0, 10))
       }
 
-      socketSend(sessionDoc, { event: 'syncSales_progress', caption: `312 Pos login in` })
+      socketSend(sessionDoc, { event: 'syncSales_progress', storeId: storeDoc._id, caption: `312 Pos login in` })
       token312 = await exports.login(storeDoc.posIntegration.pos312.webServiceUrl,
         storeDoc.posIntegration.pos312.webServiceUsername,
         storeDoc.posIntegration.pos312.webServicePassword)
 
       eventLog('[syncGetSales_pos312]'.green, 'GetDocuments started')
-      socketSend(sessionDoc, { event: 'syncSales_progress', caption: `312 Pos GetDocuments` })
+      socketSend(sessionDoc, { event: 'syncSales_progress', storeId: storeDoc._id, caption: `312 Pos GetDocuments` })
       GetDocuments(storeDoc.posIntegration.pos312.webServiceUrl, token312, { startDate: startDate, endDate: endDate })
         .then(fisler => {
           fisler = fisler.filter(fis => fis.storeId.toString() == storeDoc.posIntegration.pos312.storeId.toString())
           eventLog('[syncGetSales_pos312] fisler adet:'.green, fisler.length)
 
           resolve('Mikroya Aktarim Basliyor. Evrak Sayisi:' + fisler.length)
-          socketSend(sessionDoc, { event: 'syncSales_progress', caption: `Aktariliyor`, max: fisler.length, position: 0, percent: 0 })
+          socketSend(sessionDoc, { event: 'syncSales_progress', storeId: storeDoc._id, caption: `Aktariliyor`, max: fisler.length, position: 0, percent: 0 })
           let i = 0
           function calistir() {
             return new Promise(async (resolve, reject) => {
@@ -737,7 +737,7 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
               satislariAktar(orgDoc, storeDoc, fisler[i])
                 .then(sonuc => {
                   // eventLog('[syncGetSales_pos312]'.green, 'sonuc:', sonuc)
-                  socketSend(sessionDoc, { event: 'syncSales_progress', caption: `${fisler[i].date} Kalem:${fisler[i].sales.length} Station:${fisler[i].stationId} Batch:${fisler[i].batchNo}/${fisler[i].stanNo}`, max: fisler.length, position: (i + 1), percent: 100 * (i + 1) / fisler.length })
+                  socketSend(sessionDoc, { event: 'syncSales_progress', storeId: storeDoc._id, caption: `${fisler[i].date} Kalem:${fisler[i].sales.length} Station:${fisler[i].stationId} Batch:${fisler[i].batchNo}/${fisler[i].stanNo}`, max: fisler.length, position: (i + 1), percent: 100 * (i + 1) / fisler.length })
                   i++
                   setTimeout(() => calistir().then(resolve).catch(reject), 50)
                 })
@@ -747,24 +747,24 @@ exports.syncSales_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
           calistir()
             .then(() => {
               eventLog('[syncGetSales_pos312]'.green, 'Bitti')
-              socketSend(sessionDoc, { event: 'syncSales_progress_end' })
+              socketSend(sessionDoc, { event: 'syncSales_progress_end', storeId: storeDoc._id })
               process.env.NODE_ENV == 'development' && fs.writeFileSync(path.join(__dirname, 'logs', '!!__syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
             })
             .catch(err => {
               errorLog('[syncGetSales_pos312]'.green, 'Error:', err)
               process.env.NODE_ENV == 'development' && fs.writeFileSync(path.join(__dirname, 'logs', '!!__syncSales.json.txt'), JSON.stringify(fisler, null, 2), 'utf8')
             })
-            .finally(() => socketSend(sessionDoc, { event: 'syncSales_progress_end' }))
+            .finally(() => socketSend(sessionDoc, { event: 'syncSales_progress_end', storeId: storeDoc._id }))
 
         })
         .catch(err => {
           errorLog(`[syncSales_pos312] Error:`, err)
-          socketSend(sessionDoc, { event: 'syncSales_progress_end' })
+          socketSend(sessionDoc, { event: 'syncSales_progress_end', storeId: storeDoc._id })
           reject(err)
         })
     } catch (err) {
       errorLog(`[syncSales_pos312] Error:`, err)
-      socketSend(sessionDoc, { event: 'syncSales_progress_end' })
+      socketSend(sessionDoc, { event: 'syncSales_progress_end', storeId: storeDoc._id })
       reject(err)
     }
   })

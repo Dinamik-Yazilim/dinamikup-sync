@@ -15,6 +15,7 @@ const CustomLink = ({
   ...rest
 }: CustomLinkProps) => {
   const isInternalLink = href?.startsWith("/")
+  
   const isAnchorLink = href?.startsWith("#")
 
   if (isInternalLink || isAnchorLink) {

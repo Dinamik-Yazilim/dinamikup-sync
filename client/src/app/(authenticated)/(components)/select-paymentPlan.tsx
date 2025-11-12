@@ -23,16 +23,20 @@ import { Label } from "@/components/ui/label"
 import { ButtonSelect } from "@/components/icon-buttons"
 
 interface Props {
-  t: (text: string) => string
   children?: React.ReactNode | any
   onSelect?: (e: PaymentPlan) => void
 }
-export function SelectPaymentPlan({ t, children, onSelect }: Props) {
+export function SelectPaymentPlan({ children, onSelect }: Props) {
   const [search, setSearch] = useState('')
+
   const [token, setToken] = useState('')
+
   const { toast } = useToast()
+
   const [loading, setLoading] = useState(false)
+
   const [list, setList] = useState<PaymentPlan[]>([])
+
   const load = (s?: string) => {
     setLoading(true)
     postItem(`/mikro/get`, token, { query: paymentPlanListQuery({ search: s }) })
@@ -51,11 +55,11 @@ export function SelectPaymentPlan({ t, children, onSelect }: Props) {
         <AlertDialogHeader className="p-0 m-0 ">
           <AlertDialogTitle className="p-0">
             <div className="flex justify-between">
-              <span>{t('Select payment plan')}</span>
+              <span>Ödeme planı seç</span>
               <AlertDialogCancel>X</AlertDialogCancel>
             </div>
           </AlertDialogTitle>
-        <AlertDialogDescription></AlertDialogDescription>
+          <AlertDialogDescription></AlertDialogDescription>
         </AlertDialogHeader>
         <div className="overflow-y-auto h-[600px]">
           <div className="relative w-full pe-4">
@@ -63,7 +67,7 @@ export function SelectPaymentPlan({ t, children, onSelect }: Props) {
             <Input
               type='search'
               className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-              placeholder={t('search...')}
+              placeholder="ara..."
               defaultValue={search}
               onChange={e => {
                 setSearch(e.target.value)
@@ -74,7 +78,7 @@ export function SelectPaymentPlan({ t, children, onSelect }: Props) {
           </div>
 
           <div className='grid grid-cols-1 w-full text-xs lg:text-sm border-b my-2 ps-2 pe-5'>
-            <div className=''>{t('Payment Plan')}</div>
+            <div className=''>Ödeme Planı</div>
           </div>
           <div className="w-fu11ll overflow-y-auto h-[450px] ps-2 pe-2 lg:pe-4">
             {!loading && list && list.map((e: PaymentPlan, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}
@@ -104,14 +108,14 @@ interface WithLabelProps extends Props {
   className?: string
   caption?: React.ReactNode | any
 }
-export function SelectPaymentPlanWithLabel({ t, children, onSelect, className, caption }: WithLabelProps) {
+export function SelectPaymentPlanWithLabel({ children, onSelect, className, caption }: WithLabelProps) {
   return (
     <div className={`w-full flex justify-between p-2 pe-4 items-start  border rounded-md border-dashed ${className}`}>
       <div className="flex flex-col gap-1">
-        <Label className="text-muted-foreground">{t('Project')}</Label>
+        <Label className="text-muted-foreground">Proje</Label>
         <div className="capitalize">{caption}</div>
       </div>
-      <SelectPaymentPlan t={t} onSelect={onSelect} ><ButtonSelect /></SelectPaymentPlan>
+      <SelectPaymentPlan onSelect={onSelect} ><ButtonSelect /></SelectPaymentPlan>
     </div>
   )
 }

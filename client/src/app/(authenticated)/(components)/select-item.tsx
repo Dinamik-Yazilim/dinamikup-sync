@@ -28,14 +28,21 @@ interface ItemSelectProps {
   children?: React.ReactNode | any
   onSelect?: (e: Item) => void
 }
-export function SelectItem({ t, children, onSelect }: ItemSelectProps) {
+export function SelectItem({ children, onSelect }: ItemSelectProps) {
   const [filter, setFilter] = useState<any>({ mainGroup: '', subGroup: '', category: '', brand: '', rayon: '' })
+
   const [search, setSearch] = useState('')
+
   const [mainLoading, setMainLoading] = useState(false)
+
   const [token, setToken] = useState('')
+
   const { toast } = useToast()
+
   const [loading, setLoading] = useState(false)
+
   const [list, setList] = useState<Item[]>([])
+
   const load = (s?: string, f?: any) => {
     setLoading(true)
     postItem(`/mikro/get`, token, { query: itemListQuery({ ...filter, search: s }) })
@@ -46,7 +53,6 @@ export function SelectItem({ t, children, onSelect }: ItemSelectProps) {
       .finally(() => setLoading(false))
   }
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
-  // useEffect(() => { token && load('', filter) }, [token])
   useEffect(() => { token && load(search, filter) }, [filter])
 
   return (
@@ -56,7 +62,7 @@ export function SelectItem({ t, children, onSelect }: ItemSelectProps) {
         <AlertDialogHeader className="p-0 m-0">
           <AlertDialogTitle className="p-0">
             <div className="flex justify-between">
-              <span>{t('Select item')}</span>
+              <span>Kalem seç</span>
               <AlertDialogCancel>X</AlertDialogCancel>
             </div>
           </AlertDialogTitle>
@@ -68,7 +74,7 @@ export function SelectItem({ t, children, onSelect }: ItemSelectProps) {
             <Input
               type='search'
               className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-              placeholder={t('search...')}
+              placeholder="ara..."
               defaultValue={search}
               onChange={e => {
                 setSearch(e.target.value)
@@ -77,8 +83,8 @@ export function SelectItem({ t, children, onSelect }: ItemSelectProps) {
               onKeyDown={e => e.code == 'Enter' && load(search, filter)}
             />
           </div>
-          <TsnPanel name="itemSelect_filter" trigger={<>{t('Group')}/{t('Category')}/{t('Brand')}/{t('Rayon')} </>} defaultOpen={false} className="pe-4">
-            <TsnSelectRemote all title={t('Main Group')} value={filter.mainGroup}
+          <TsnPanel name="itemSelect_filter" trigger={<>{'Group'}/{'Kategori'}/{'Marka'}/{'Reyon'} </>} defaultOpen={false} className="pe-4">
+            <TsnSelectRemote all title="Ana Grup" value={filter.mainGroup}
               onValueChange={e => {
                 setMainLoading(true)
                 setFilter({ ...filter, mainGroup: e, subGroup: '', category: '', brand: '', rayon: '' })
@@ -86,15 +92,15 @@ export function SelectItem({ t, children, onSelect }: ItemSelectProps) {
               }}
               query={`SELECT san_kod as _id, san_isim as name FROM STOK_ANA_GRUPLARI ORDER BY san_isim`}
             />
-            {filter.mainGroup && !mainLoading && <TsnSelectRemote all title={t('Sub Group')} value={filter.subGroup} onValueChange={e => setFilter({ ...filter, subGroup: e })} query={`SELECT sta_kod as _id, sta_isim as name FROM STOK_ALT_GRUPLARI WHERE sta_ana_grup_kod='${filter.mainGroup}' ORDER BY sta_isim`} />}
-            {filter.mainGroup && !mainLoading && <TsnSelectRemote all title={t('Category')} value={filter.category} onValueChange={e => setFilter({ ...filter, category: e })} query={`SELECT ktg_kod as _id, ktg_isim as name FROM STOK_KATEGORILERI WHERE ktg_kod IN (SELECT DISTINCT sto_kategori_kodu FROM STOKLAR WHERE sto_anagrup_kod='${filter.mainGroup}') ORDER BY ktg_isim`} />}
-            {filter.mainGroup && !mainLoading && <TsnSelectRemote all title={t('Brand')} value={filter.brand} onValueChange={e => setFilter({ ...filter, brand: e })} query={`SELECT mrk_kod as _id, mrk_ismi as name FROM STOK_MARKALARI WHERE mrk_kod IN (SELECT DISTINCT sto_marka_kodu FROM STOKLAR WHERE sto_anagrup_kod='${filter.mainGroup}') ORDER BY mrk_ismi`} />}
-            {filter.mainGroup && !mainLoading && <TsnSelectRemote all title={t('Rayon')} value={filter.rayon} onValueChange={e => setFilter({ ...filter, rayon: e })} query={`SELECT ryn_kod as _id, ryn_ismi as name FROM STOK_REYONLARI WHERE ryn_kod IN (SELECT DISTINCT sto_reyon_kodu FROM STOKLAR WHERE sto_anagrup_kod='${filter.mainGroup}')  ORDER BY ryn_ismi`} />}
+            {filter.mainGroup && !mainLoading && <TsnSelectRemote all title="Alt Grup" value={filter.subGroup} onValueChange={e => setFilter({ ...filter, subGroup: e })} query={`SELECT sta_kod as _id, sta_isim as name FROM STOK_ALT_GRUPLARI WHERE sta_ana_grup_kod='${filter.mainGroup}' ORDER BY sta_isim`} />}
+            {filter.mainGroup && !mainLoading && <TsnSelectRemote all title="Kategori" value={filter.category} onValueChange={e => setFilter({ ...filter, category: e })} query={`SELECT ktg_kod as _id, ktg_isim as name FROM STOK_KATEGORILERI WHERE ktg_kod IN (SELECT DISTINCT sto_kategori_kodu FROM STOKLAR WHERE sto_anagrup_kod='${filter.mainGroup}') ORDER BY ktg_isim`} />}
+            {filter.mainGroup && !mainLoading && <TsnSelectRemote all title="Marka" value={filter.brand} onValueChange={e => setFilter({ ...filter, brand: e })} query={`SELECT mrk_kod as _id, mrk_ismi as name FROM STOK_MARKALARI WHERE mrk_kod IN (SELECT DISTINCT sto_marka_kodu FROM STOKLAR WHERE sto_anagrup_kod='${filter.mainGroup}') ORDER BY mrk_ismi`} />}
+            {filter.mainGroup && !mainLoading && <TsnSelectRemote all title="Reyon" value={filter.rayon} onValueChange={e => setFilter({ ...filter, rayon: e })} query={`SELECT ryn_kod as _id, ryn_ismi as name FROM STOK_REYONLARI WHERE ryn_kod IN (SELECT DISTINCT sto_reyon_kodu FROM STOKLAR WHERE sto_anagrup_kod='${filter.mainGroup}')  ORDER BY ryn_ismi`} />}
           </TsnPanel>
           <div className='grid grid-cols-6 w-full text-xs lg:text-sm border-b mb-2 ps-2 pe-5'>
-            <div className='col-span-3 flex flex-row gap-1'>{t('Item')}</div>
-            <div className='col-span-2 flex flex-row gap-1'>{t('Group')}</div>
-            <div className='text-end'>{t('Price')}</div>
+            <div className='col-span-3 flex flex-row gap-1'>Kalem</div>
+            <div className='col-span-2 flex flex-row gap-1'>Group</div>
+            <div className='text-end'>Fiyat</div>
           </div>
           <div className="w-fu11ll overflow-y-auto h-[450px] ps-2 pe-2 lg:pe-4">
             {!loading && list && list.map((e: Item, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}

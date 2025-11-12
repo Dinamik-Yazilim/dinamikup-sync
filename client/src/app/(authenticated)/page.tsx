@@ -4,7 +4,8 @@ import { pageMeta } from '@/lib/meta-info'
 export const metadata: Metadata = pageMeta('Home')
 
 
-const IndexPage = () => {
+
+  const IndexPage = () => {
   return (<HomePage />)
 }
 

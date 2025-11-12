@@ -23,16 +23,20 @@ import { Label } from "@/components/ui/label"
 import { ButtonSelect } from "@/components/icon-buttons"
 
 interface Props {
-  t: (text: string) => string
   children?: React.ReactNode | any
   onSelect?: (e: Salesperson) => void
 }
-export function SelectSalesperson({ t, children, onSelect }: Props) {
+export function SelectSalesperson({ children, onSelect }: Props) {
   const [search, setSearch] = useState('')
+
   const [token, setToken] = useState('')
+
   const { toast } = useToast()
+
   const [loading, setLoading] = useState(false)
+
   const [list, setList] = useState<Salesperson[]>([])
+
   const load = (s?: string) => {
     setLoading(true)
     postItem(`/mikro/get`, token, { query: salespersonListQuery({ search: s }) })
@@ -51,7 +55,7 @@ export function SelectSalesperson({ t, children, onSelect }: Props) {
         <AlertDialogHeader className="p-0 m-0 ">
           <AlertDialogTitle className="p-0">
             <div className="flex justify-between">
-              <span>{t('Select project')}</span>
+              <span>Proje seç</span>
               <AlertDialogCancel>X</AlertDialogCancel>
             </div>
           </AlertDialogTitle>
@@ -63,7 +67,7 @@ export function SelectSalesperson({ t, children, onSelect }: Props) {
             <Input
               type='search'
               className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-              placeholder={t('search...')}
+              placeholder="ara..."
               defaultValue={search}
               onChange={e => {
                 setSearch(e.target.value)
@@ -74,7 +78,7 @@ export function SelectSalesperson({ t, children, onSelect }: Props) {
           </div>
 
           <div className='grid grid-cols-1 w-full text-xs lg:text-sm border-b my-2 ps-2 pe-5'>
-            <div className=''>{t('Salesperson')}</div>
+            <div className=''>Satış elemanı</div>
           </div>
           <div className="w-fu11ll overflow-y-auto h-[450px] ps-2 pe-2 lg:pe-4">
             {!loading && list && list.map((e: Salesperson, rowIndex) => <TsnDialogSelectButton key={'gridList-' + rowIndex}
@@ -106,14 +110,14 @@ interface WithLabelProps extends Props {
   className?: string
   caption?: React.ReactNode | any
 }
-export function SelectSalespersonWithLabel({ t, children, onSelect, className, caption }: WithLabelProps) {
+export function SelectSalespersonWithLabel({ children, onSelect, className, caption }: WithLabelProps) {
   return (
     <div className={`w-full flex justify-between p-2 pe-4 items-start  border rounded-md border-dashed ${className}`}>
       <div className="flex flex-col gap-1">
-        <Label className="text-muted-foreground">{t('Warehouse')}</Label>
+        <Label className="text-muted-foreground">Depo</Label>
         <div className="capitalize">{caption}</div>
       </div>
-      <SelectSalesperson t={t} onSelect={onSelect} ><ButtonSelect /></SelectSalesperson>
+      <SelectSalesperson onSelect={onSelect} ><ButtonSelect /></SelectSalesperson>
     </div>
   )
 }
