@@ -38,9 +38,11 @@ function StorePage({ store, token, startDate, endDate, setStartDate, setEndDate,
         <div className="flex justify-end items-center">
           <div>Tarih:</div>
           <div className="flex justify-end items-center">
-            <Input type='date' defaultValue={startDate} onChange={e => setStartDate(e.target.value)} />
-            -
-            <Input type='date' defaultValue={endDate} onChange={e => setEndDate(e.target.value)} />
+            <Input type='date' defaultValue={startDate} onChange={e => {
+              setStartDate(e.target.value)
+              setEndDate(e.target.value)
+            }} />
+
           </div>
         </div>
       </div>
@@ -86,18 +88,7 @@ export default function PosGetSalesPage({ }: Props) {
       .finally(() => setLoading(false))
   }
 
-  const [endDate, setEndDate] = useState(yesterday())
-  const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  const load = () => {
-    setLoading(true)
-    getList(`/stores`, token)
-      .then(result => {
-        setStores(result.docs as Store[])
-      })
-      .catch(err => toast({ title: 'Error', description: err || '', variant: 'destructive' }))
-      .finally(() => setLoading(false))
-  }
 
   useEffect(() => { !token && setToken(Cookies.get('token') || '') }, [])
   useEffect(() => { token && load() }, [token])
