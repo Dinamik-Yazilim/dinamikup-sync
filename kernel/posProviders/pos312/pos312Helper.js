@@ -192,9 +192,10 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
         WHERE B.bar_stokkodu IN ('${docs.map(e => e.code).join("','")}') `)
       console.log('barcodeDocs.length', barcodeDocs.length)
 
-      let priceDocs = await getList(sessionDoc, orgDoc, `SELECT sfiyat_stokkod as code, 0 as isBarcode, sfiyat_listesirano as ordr, 0 as storeId, GETDATE() as startDate, GETDATE() as endDate, sfiyat_fiyati as price, sfiyat_fiyati as newPrice, 0 as [deleted] FROM STOK_SATIS_FIYAT_LISTELERI F 
+      let priceDocs = await getList(sessionDoc, orgDoc, `SELECT sfiyat_stokkod as code, 0 as isBarcode, sfiyat_listesirano as ordr, 
+        sfiyat_deposirano as storeId, GETDATE() as startDate, GETDATE() as endDate, sfiyat_fiyati as price, sfiyat_fiyati as newPrice, 0 as [deleted], sfiyat_lastup_date as updatedAt FROM STOK_SATIS_FIYAT_LISTELERI F 
         INNER JOIN STOKLAR S ON S.sto_kod=F.sfiyat_stokkod
-        WHERE (sfiyat_listesirano=1 OR sfiyat_listesirano>=100)  and sfiyat_deposirano in (0)
+        WHERE (sfiyat_listesirano=1 OR sfiyat_listesirano>=100)  --and sfiyat_deposirano in (0)
         AND S.sto_kod IN ('${docs.map(e => e.code).join("','")}')
        `)
 
@@ -203,6 +204,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
       socketSend(sessionDoc, { event: 'syncItems_progress', storeId: storeDoc._id, caption: `Mikrodan Kartlar cekildi` })
       resolve(`${docs.length} adet stok karti aktarilacak. baslama:${new Date().toString()}`)
       let i = 0
+      let lastUpdate_prices = storeDoc.posIntegration.lastUpdate_prices || ''
       function calistir() {
         return new Promise((resolve, reject) => {
           if (i >= docs.length) return resolve(true)
@@ -255,17 +257,27 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
             //   Scale = true
             // }
             StockPrices = ((priceDocs || []).filter(e => e.code == docs[i].code).map(e => {
-              return {
+              let obj = {
                 master: e.code,
                 isBarcode: false,
                 ordr: e.ordr,
-                storeId: 0,
+                storeId: e.storeId,
                 startDate: new Date().toISOString(),
                 endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 12)).toISOString(),
                 price: e.price,
                 newPrice: e.newPrice,
                 deleted: false
               }
+              if (e.updatedAt > (storeDoc.posIntegration.lastUpdate_prices || '')) {
+                if (e.updatedAt > lastUpdate_prices)
+                  lastUpdate_prices = e.updatedAt
+                obj.price = 0
+                // yeni fiyat var
+              } else {
+                obj.newPrice = null
+              }
+
+              return obj
             }) || []).sort((a, b) => a.ordr - b.ordr)
 
 
@@ -361,7 +373,9 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
       }
 
       calistir()
-        .then(() => {
+        .then(async () => {
+          storeDoc.posIntegration.lastUpdate_prices = lastUpdate_prices
+          await storeDoc.save()
           socketSend(sessionDoc, { event: 'syncItems_progress_end', storeId: storeDoc._id })
         })
         .catch(err => {
