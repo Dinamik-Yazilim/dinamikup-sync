@@ -19,8 +19,12 @@ const nextConfig = {
   },
   poweredByHeader: false,
   eslint: {
-    // Eski deprecated seçenekleri devre dışı bırak
+    // Build sırasında ESLint'i çalıştır ama hatalara izin ver
     ignoreDuringBuilds: false,
+  },
+  typescript: {
+    // Build sırasında TypeScript tip kontrolü yap
+    ignoreBuildErrors: false,
   },
 
   // experimental: {
