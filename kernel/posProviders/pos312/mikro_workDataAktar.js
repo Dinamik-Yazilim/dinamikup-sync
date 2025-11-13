@@ -61,9 +61,7 @@ function mikroWorkDataAktar(mainApp, orgDoc, storeDoc, fisData) {
       } else if (mainApp == 'mikro16') {
 
       }
-      if (fisData.musteri) {
-        seriNo = 'T' + seriNo.substring(1)
-      } else if (iade) {
+      if (iade) {
         seriNo = 'I' + seriNo.substring(1)
       }
       let query = `
@@ -411,7 +409,7 @@ function odemeInsert(mainApp, fisData, tarih, depoNo, amount, odemeToplam) {
             @Vergi1*@OdemeOran /*po_Vergi1*/, @Vergi2*@OdemeOran /*po_Vergi2*/, @Vergi3*@OdemeOran /*po_Vergi3*/, @Vergi4*@OdemeOran /*po_Vergi4*/, 
             @Vergi5*@OdemeOran /*po_Vergi5*/, @Vergi6*@OdemeOran /*po_Vergi6*/, 0 /*po_Vergi7*/, 0 /*po_Vergi8*/, 0 /*po_Vergi9*/, 
             0 /*po_Vergi10*/, 0 /*po_Vergi11*/, 0 /*po_Vergi12*/, 0 /*po_Vergi13*/, 0 /*po_Vergi14*/, 0 /*po_Vergi15*/, 0 /*po_Vergi16*/, 
-            0 /*po_Vergi17*/, 0 /*po_Vergi18*/, 0 /*po_Vergi19*/, 0 /*po_Vergi20*/, 0 /*po_Fisfatura*/, 1 /*po_Pozisyon*/, 
+            0 /*po_Vergi17*/, 0 /*po_Vergi18*/, 0 /*po_Vergi19*/, 0 /*po_Vergi20*/, 0 /*po_Fisfatura*/, CASE WHEN @CariKod<>'' THEN 0 ELSE 1  END /*po_Pozisyon*/, 
             @CariKod /*po_CariKodu*/, 0 /*po_Yuvarlama*/, ${amount} /*po_Odm_AnaDtut1*/, ${amount} /*po_Odm_OrjDtut1*/, 0 /*po_Odm_AnaDtut2*/, 0 /*po_Odm_OrjDtut2*/, 0 /*po_Odm_AnaDtut3*/, 0 /*po_Odm_OrjDtut3*/, 0 /*po_Odm_AnaDtut4*/, 
             0 /*po_Odm_OrjDtut4*/, 0 /*po_Odm_AnaDtut5*/, 0 /*po_Odm_OrjDtut5*/, 0 /*po_Odm_AnaDtut6*/, 0 /*po_Odm_OrjDtut6*/, 0 /*po_Odm_AnaDtut7*/, 0 /*po_Odm_OrjDtut7*/, 
             0 /*po_Odm_AnaDtut8*/, 0 /*po_Odm_OrjDtut8*/, 0 /*po_Odm_AnaDtut9*/, 0 /*po_Odm_OrjDtut9*/, 0 /*po_Odm_AnaDtut10*/, 0 /*po_Odm_OrjDtut10*/, 
