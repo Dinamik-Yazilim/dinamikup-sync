@@ -88,6 +88,14 @@ function mikroWorkDataAktar(mainApp, orgDoc, storeDoc, fisData) {
         DECLARE @VergiMatrah4 FLOAT=0;
         DECLARE @VergiMatrah5 FLOAT=0;
         DECLARE @VergiMatrah6 FLOAT=0;
+        DECLARE @VergiMatrah7 FLOAT=0;
+        DECLARE @VergiMatrah8 FLOAT=0;
+        DECLARE @VergiMatrah9 FLOAT=0;
+        DECLARE @VergiMatrah10 FLOAT=0;
+        DECLARE @VergiMatrah11 FLOAT=0;
+        DECLARE @VergiMatrah12 FLOAT=0;
+        DECLARE @VergiMatrah13 FLOAT=0;
+        DECLARE @VergiMatrah14 FLOAT=0;
 
         DECLARE @Vergi0 FLOAT=0;
         DECLARE @Vergi1 FLOAT=0;
@@ -96,6 +104,14 @@ function mikroWorkDataAktar(mainApp, orgDoc, storeDoc, fisData) {
         DECLARE @Vergi4 FLOAT=0;
         DECLARE @Vergi5 FLOAT=0;
         DECLARE @Vergi6 FLOAT=0; 
+        DECLARE @Vergi7 FLOAT=0; 
+        DECLARE @Vergi8 FLOAT=0; 
+        DECLARE @Vergi9 FLOAT=0; 
+        DECLARE @Vergi10 FLOAT=0; 
+        DECLARE @Vergi11 FLOAT=0; 
+        DECLARE @Vergi12 FLOAT=0; 
+        DECLARE @Vergi13 FLOAT=0; 
+        DECLARE @Vergi14 FLOAT=0; 
         DECLARE @OdemeOran FLOAT=0;
 
         SELECT @EvrakSira=ISNULL(MAX(sth_evrakno_sira),0)+52001 FROM S_${tarih}_${depoNo} WITH(NOLOCK) WHERE sth_evrakno_seri=@EvrakSeri AND sth_evraktip=@STH_EVRAKTIP;
@@ -272,6 +288,14 @@ function mikroWorkDataAktar(mainApp, orgDoc, storeDoc, fisData) {
           WHEN ${storeDoc.db}.dbo.fn_VergiYuzde(4)=@VergiYuzde THEN 4
           WHEN ${storeDoc.db}.dbo.fn_VergiYuzde(5)=@VergiYuzde THEN 5
           WHEN ${storeDoc.db}.dbo.fn_VergiYuzde(6)=@VergiYuzde THEN 6
+          WHEN ${storeDoc.db}.dbo.fn_VergiYuzde(7)=@VergiYuzde THEN 7
+          WHEN ${storeDoc.db}.dbo.fn_VergiYuzde(8)=@VergiYuzde THEN 8
+          WHEN ${storeDoc.db}.dbo.fn_VergiYuzde(9)=@VergiYuzde THEN 9
+          WHEN ${storeDoc.db}.dbo.fn_VergiYuzde(10)=@VergiYuzde THEN 10
+          WHEN ${storeDoc.db}.dbo.fn_VergiYuzde(11)=@VergiYuzde THEN 11
+          WHEN ${storeDoc.db}.dbo.fn_VergiYuzde(12)=@VergiYuzde THEN 12
+          WHEN ${storeDoc.db}.dbo.fn_VergiYuzde(13)=@VergiYuzde THEN 13
+          WHEN ${storeDoc.db}.dbo.fn_VergiYuzde(14)=@VergiYuzde THEN 14
           ELSE 0 END;
 
           SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN ${tutar} ELSE 0 END;
@@ -281,6 +305,14 @@ function mikroWorkDataAktar(mainApp, orgDoc, storeDoc, fisData) {
           SELECT @VergiMatrah4=@VergiMatrah4 + CASE WHEN @VergiPntr=4 THEN ${tutar} ELSE 0 END;
           SELECT @VergiMatrah5=@VergiMatrah5 + CASE WHEN @VergiPntr=5 THEN ${tutar} ELSE 0 END;
           SELECT @VergiMatrah6=@VergiMatrah6 + CASE WHEN @VergiPntr=6 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah7=@VergiMatrah7 + CASE WHEN @VergiPntr=7 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah8=@VergiMatrah8 + CASE WHEN @VergiPntr=8 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah9=@VergiMatrah9 + CASE WHEN @VergiPntr=9 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah10=@VergiMatrah10 + CASE WHEN @VergiPntr=10 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah11=@VergiMatrah11 + CASE WHEN @VergiPntr=11 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah12=@VergiMatrah12 + CASE WHEN @VergiPntr=12 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah13=@VergiMatrah13 + CASE WHEN @VergiPntr=13 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah14=@VergiMatrah14 + CASE WHEN @VergiPntr=14 THEN ${tutar} ELSE 0 END;
 
           SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN ${vergi} ELSE 0 END;
           SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN ${vergi} ELSE 0 END;
@@ -289,6 +321,14 @@ function mikroWorkDataAktar(mainApp, orgDoc, storeDoc, fisData) {
           SELECT @Vergi4=@Vergi4 + CASE WHEN @VergiPntr=4 THEN ${vergi} ELSE 0 END;
           SELECT @Vergi5=@Vergi5 + CASE WHEN @VergiPntr=5 THEN ${vergi} ELSE 0 END;
           SELECT @Vergi6=@Vergi6 + CASE WHEN @VergiPntr=6 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi6=@Vergi7 + CASE WHEN @VergiPntr=7 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi6=@Vergi8 + CASE WHEN @VergiPntr=8 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi6=@Vergi9 + CASE WHEN @VergiPntr=9 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi6=@Vergi10 + CASE WHEN @VergiPntr=10 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi6=@Vergi11 + CASE WHEN @VergiPntr=11 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi6=@Vergi12 + CASE WHEN @VergiPntr=12 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi6=@Vergi13 + CASE WHEN @VergiPntr=13 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi6=@Vergi14 + CASE WHEN @VergiPntr=14 THEN ${vergi} ELSE 0 END;
         
           INSERT INTO S_${tarih}_${depoNo} (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, 
           sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, 

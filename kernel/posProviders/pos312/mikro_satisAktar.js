@@ -130,10 +130,10 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
         DECLARE @VergiYuzde FLOAT = 0;
         DECLARE @VergiMatrah0 FLOAT=0,@VergiMatrah1 FLOAT=0, @VergiMatrah2 FLOAT=0, @VergiMatrah3 FLOAT=0, @VergiMatrah4 FLOAT=0;
         DECLARE @VergiMatrah5 FLOAT=0, @VergiMatrah6 FLOAT=0, @VergiMatrah7 FLOAT=0, @VergiMatrah8 FLOAT=0, @VergiMatrah9 FLOAT=0;
-        DECLARE @VergiMatrah10 FLOAT=0, @VergiMatrah11 FLOAT=0, @VergiMatrah12 FLOAT=0;
+        DECLARE @VergiMatrah10 FLOAT=0, @VergiMatrah11 FLOAT=0, @VergiMatrah12 FLOAT=0, @VergiMatrah13 FLOAT=0, @VergiMatrah14 FLOAT=0;
 
         DECLARE @Vergi0 FLOAT=0, @Vergi1 FLOAT=0, @Vergi2 FLOAT=0, @Vergi3 FLOAT=0, @Vergi4 FLOAT=0, @Vergi5 FLOAT=0, @Vergi6 FLOAT=0; 
-        DECLARE @Vergi7 FLOAT=0, @Vergi8 FLOAT=0, @Vergi9 FLOAT=0, @Vergi10 FLOAT=0, @Vergi11 FLOAT=0, @Vergi12 FLOAT=0; 
+        DECLARE @Vergi7 FLOAT=0, @Vergi8 FLOAT=0, @Vergi9 FLOAT=0, @Vergi10 FLOAT=0, @Vergi11 FLOAT=0, @Vergi12 FLOAT=0, @Vergi13 FLOAT=0, @Vergi14 FLOAT=0; 
         
         DECLARE @OdemeOran FLOAT=0;
       `
@@ -337,6 +337,8 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
           WHEN dbo.fn_VergiYuzde(10)=@VergiYuzde THEN 10
           WHEN dbo.fn_VergiYuzde(11)=@VergiYuzde THEN 11
           WHEN dbo.fn_VergiYuzde(12)=@VergiYuzde THEN 12
+          WHEN dbo.fn_VergiYuzde(13)=@VergiYuzde THEN 13
+          WHEN dbo.fn_VergiYuzde(14)=@VergiYuzde THEN 14
           ELSE 0 END;
 
           SELECT @VergiMatrah0=@VergiMatrah0 + CASE WHEN @VergiPntr=0 THEN ${tutar} ELSE 0 END;
@@ -352,6 +354,8 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
           SELECT @VergiMatrah10=@VergiMatrah10 + CASE WHEN @VergiPntr=10 THEN ${tutar} ELSE 0 END;
           SELECT @VergiMatrah11=@VergiMatrah11 + CASE WHEN @VergiPntr=11 THEN ${tutar} ELSE 0 END;
           SELECT @VergiMatrah12=@VergiMatrah12 + CASE WHEN @VergiPntr=12 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah13=@VergiMatrah13 + CASE WHEN @VergiPntr=13 THEN ${tutar} ELSE 0 END;
+          SELECT @VergiMatrah14=@VergiMatrah14 + CASE WHEN @VergiPntr=14 THEN ${tutar} ELSE 0 END;
 
           SELECT @Vergi0=@Vergi0 + CASE WHEN @VergiPntr=0 THEN ${vergi} ELSE 0 END;
           SELECT @Vergi1=@Vergi1 + CASE WHEN @VergiPntr=1 THEN ${vergi} ELSE 0 END;
@@ -366,6 +370,8 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
           SELECT @Vergi10=@Vergi10 + CASE WHEN @VergiPntr=10 THEN ${vergi} ELSE 0 END;
           SELECT @Vergi11=@Vergi11 + CASE WHEN @VergiPntr=11 THEN ${vergi} ELSE 0 END;
           SELECT @Vergi12=@Vergi12 + CASE WHEN @VergiPntr=12 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi13=@Vergi13 + CASE WHEN @VergiPntr=13 THEN ${vergi} ELSE 0 END;
+          SELECT @Vergi14=@Vergi14 + CASE WHEN @VergiPntr=14 THEN ${vergi} ELSE 0 END;
           `
         }
       })
@@ -436,6 +442,8 @@ function mikroSatisAktar(mainApp, orgDoc, storeDoc, fisData) {
           WHEN dbo.fn_VergiYuzde(10)=@VergiYuzde THEN 10
           WHEN dbo.fn_VergiYuzde(11)=@VergiYuzde THEN 11
           WHEN dbo.fn_VergiYuzde(12)=@VergiYuzde THEN 12
+          WHEN dbo.fn_VergiYuzde(13)=@VergiYuzde THEN 13
+          WHEN dbo.fn_VergiYuzde(14)=@VergiYuzde THEN 14
           ELSE 0 END;
 
           INSERT INTO STOK_HAREKETLERI (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, sth_create_user, sth_create_date, 
