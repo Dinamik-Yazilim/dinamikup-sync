@@ -61,7 +61,9 @@ function mikroWorkDataAktar(mainApp, orgDoc, storeDoc, fisData) {
       } else if (mainApp == 'mikro16') {
 
       }
-      if (iade) {
+      if (fisData.musteri) {
+        seriNo = 'T' + seriNo.substring(1)
+      } else if (iade) {
         seriNo = 'I' + seriNo.substring(1)
       }
       let query = `
@@ -292,7 +294,22 @@ function mikroWorkDataAktar(mainApp, orgDoc, storeDoc, fisData) {
         
           INSERT INTO S_${tarih}_${depoNo} (sth_Guid, sth_DBCno, sth_SpecRECno, sth_iptal, sth_fileid, sth_hidden, sth_kilitli, sth_degisti, sth_checksum, 
           sth_create_user, sth_create_date, sth_lastup_user, sth_lastup_date, sth_special1, sth_special2, sth_special3, 
-          sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7, sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru, sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no, sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
+          sth_firmano, sth_subeno, sth_tarih, sth_tip, sth_cins, sth_normal_iade, sth_evraktip, sth_evrakno_seri, sth_evrakno_sira, sth_satirno, 
+          sth_belge_no, sth_belge_tarih, sth_stok_kod, sth_isk_mas1, sth_isk_mas2, sth_isk_mas3, sth_isk_mas4, sth_isk_mas5, sth_isk_mas6, sth_isk_mas7,
+           sth_isk_mas8, sth_isk_mas9, sth_isk_mas10, sth_sat_iskmas1, sth_sat_iskmas2, sth_sat_iskmas3, sth_sat_iskmas4, sth_sat_iskmas5, 
+           sth_sat_iskmas6, sth_sat_iskmas7, sth_sat_iskmas8, sth_sat_iskmas9, sth_sat_iskmas10, sth_pos_satis, sth_promosyon_fl, sth_cari_cinsi, 
+           sth_cari_kodu, sth_cari_grup_no, sth_isemri_gider_kodu, sth_plasiyer_kodu, sth_har_doviz_cinsi, sth_har_doviz_kuru, sth_alt_doviz_kuru,
+            sth_stok_doviz_cinsi, sth_stok_doviz_kuru, sth_miktar, sth_miktar2, sth_birim_pntr, sth_tutar, sth_iskonto1, sth_iskonto2, sth_iskonto3, 
+            sth_iskonto4, sth_iskonto5, sth_iskonto6, sth_masraf1, sth_masraf2, sth_masraf3, sth_masraf4, sth_vergi_pntr, sth_vergi, 
+            sth_masraf_vergi_pntr, sth_masraf_vergi, sth_netagirlik, sth_odeme_op, sth_aciklama, sth_sip_uid, sth_fat_uid, 
+            sth_giris_depo_no, sth_cikis_depo_no, sth_malkbl_sevk_tarihi, sth_cari_srm_merkezi, sth_stok_srm_merkezi, sth_fis_tarihi, 
+            sth_fis_sirano, sth_vergisiz_fl, sth_maliyet_ana, sth_maliyet_alternatif, sth_maliyet_orjinal, sth_adres_no, sth_parti_kodu, sth_lot_no,
+             sth_kons_uid, sth_proje_kodu, sth_exim_kodu, sth_otv_pntr, sth_otv_vergi, sth_brutagirlik, sth_disticaret_turu, 
+             sth_otvtutari, sth_otvvergisiz_fl, sth_oiv_pntr, sth_oiv_vergi, sth_oivvergisiz_fl, sth_fiyat_liste_no, sth_oivtutari, 
+             sth_Tevkifat_turu, sth_nakliyedeposu, sth_nakliyedurumu, sth_yetkili_uid, sth_taxfree_fl, sth_ilave_edilecek_kdv, sth_ismerkezi_kodu, 
+             sth_HareketGrupKodu1, sth_HareketGrupKodu2, sth_HareketGrupKodu3, sth_Olcu1, sth_Olcu2, sth_Olcu3, sth_Olcu4, sth_Olcu5, 
+             sth_FormulMiktarNo, sth_FormulMiktar, sth_eirs_senaryo, sth_eirs_tipi, sth_teslim_tarihi, sth_matbu_fl, sth_satis_fiyat_doviz_cinsi, 
+             sth_satis_fiyat_doviz_kuru, sth_eticaret_kanal_kodu, sth_bagli_ithalat_kodu,
           sth_tevkifat_sifirlandi_fl ${sth_m17fields})
           VALUES(NEWID(), 0, 0, 0, 1002, 0, 0, 0, 0, @MikroUserNo, GETDATE(), @MikroUserNo, GETDATE(), '', '', '', 
           0, 0, @Tarih, @STH_TIP /*sth_tip*/, @STH_CINS /*sth_cins*/, @STH_IADE /*sth_normal_iade*/,@STH_EVRAKTIP /*sth_evraktip*/, 
@@ -300,7 +317,7 @@ function mikroWorkDataAktar(mainApp, orgDoc, storeDoc, fisData) {
           '${e.stockCode}' /*sth_stok_kod*/, 0 /*sth_isk_mas1*/, 0 /*sth_isk_mas2*/, 0 /*sth_isk_mas3*/, 0 /*sth_isk_mas4*/, 0 /*sth_isk_mas5*/, 0 /*sth_isk_mas6*/,
           0 /*sth_isk_mas7*/, 0 /*sth_isk_mas8*/, 0 /*sth_isk_mas9*/, 0 /*sth_isk_mas10*/, 0 /*sth_sat_iskmas1*/, 0 /*sth_sat_iskmas2*/, 0 /*sth_sat_iskmas3*/,
           0 /*sth_sat_iskmas4*/, 0 /*sth_sat_iskmas5*/, 0 /*sth_sat_iskmas6*/, 0 /*sth_sat_iskmas7*/, 0 /*sth_sat_iskmas8*/, 0 /*sth_sat_iskmas9*/, 0 /*sth_sat_iskmas10*/,
-          0 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, @CariKod /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
+          1 /*sth_pos_satis*/, 0 /*sth_promosyon_fl*/, 0 /*sth_cari_cinsi*/, @CariKod /*sth_cari_kodu*/, 0 /*sth_cari_grup_no*/, 
           '' /*sth_isemri_gider_kodu*/, '' /*sth_plasiyer_kodu*/, 0 /*sth_har_doviz_cinsi*/, 0 /*sth_har_doviz_kuru*/, 0 /*sth_alt_doviz_kuru*/, 
           0 /*sth_stok_doviz_cinsi*/, 0 /*sth_stok_doviz_kuru*/, ${e.quantity} /*sth_miktar*/, 0 /*sth_miktar2*/, 1 /*sth_birim_pntr*/, 
           ${tutar} /*sth_tutar*/, 0 /*sth_iskonto1*/, 0 /*sth_iskonto2*/, 0 /*sth_iskonto3*/, 0 /*sth_iskonto4*/, 0 /*sth_iskonto5*/, 0 /*sth_iskonto6*/, 
@@ -394,7 +411,7 @@ function odemeInsert(mainApp, fisData, tarih, depoNo, amount, odemeToplam) {
             @Vergi1*@OdemeOran /*po_Vergi1*/, @Vergi2*@OdemeOran /*po_Vergi2*/, @Vergi3*@OdemeOran /*po_Vergi3*/, @Vergi4*@OdemeOran /*po_Vergi4*/, 
             @Vergi5*@OdemeOran /*po_Vergi5*/, @Vergi6*@OdemeOran /*po_Vergi6*/, 0 /*po_Vergi7*/, 0 /*po_Vergi8*/, 0 /*po_Vergi9*/, 
             0 /*po_Vergi10*/, 0 /*po_Vergi11*/, 0 /*po_Vergi12*/, 0 /*po_Vergi13*/, 0 /*po_Vergi14*/, 0 /*po_Vergi15*/, 0 /*po_Vergi16*/, 
-            0 /*po_Vergi17*/, 0 /*po_Vergi18*/, 0 /*po_Vergi19*/, 0 /*po_Vergi20*/, 0 /*po_Fisfatura*/, case @CariKod when '' then 1 else 0 END /*po_Pozisyon*/, 
+            0 /*po_Vergi17*/, 0 /*po_Vergi18*/, 0 /*po_Vergi19*/, 0 /*po_Vergi20*/, 0 /*po_Fisfatura*/, 1 /*po_Pozisyon*/, 
             @CariKod /*po_CariKodu*/, 0 /*po_Yuvarlama*/, ${amount} /*po_Odm_AnaDtut1*/, ${amount} /*po_Odm_OrjDtut1*/, 0 /*po_Odm_AnaDtut2*/, 0 /*po_Odm_OrjDtut2*/, 0 /*po_Odm_AnaDtut3*/, 0 /*po_Odm_OrjDtut3*/, 0 /*po_Odm_AnaDtut4*/, 
             0 /*po_Odm_OrjDtut4*/, 0 /*po_Odm_AnaDtut5*/, 0 /*po_Odm_OrjDtut5*/, 0 /*po_Odm_AnaDtut6*/, 0 /*po_Odm_OrjDtut6*/, 0 /*po_Odm_AnaDtut7*/, 0 /*po_Odm_OrjDtut7*/, 
             0 /*po_Odm_AnaDtut8*/, 0 /*po_Odm_OrjDtut8*/, 0 /*po_Odm_AnaDtut9*/, 0 /*po_Odm_OrjDtut9*/, 0 /*po_Odm_AnaDtut10*/, 0 /*po_Odm_OrjDtut10*/, 
