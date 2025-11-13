@@ -193,7 +193,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
       console.log('barcodeDocs.length', barcodeDocs.length)
 
       let priceDocs = await getList(sessionDoc, orgDoc, `SELECT sfiyat_stokkod as code, 0 as isBarcode, sfiyat_listesirano as ordr, 
-        sfiyat_deposirano as storeId, GETDATE() as startDate, GETDATE() as endDate, sfiyat_fiyati as price, sfiyat_fiyati as newPrice, 0 as [deleted], sfiyat_lastup_date as updatedAt FROM STOK_SATIS_FIYAT_LISTELERI F 
+        case WHEN sfiyat_deposirano>100 THEN sfiyat_deposirano+900 ELSE sfiyat_deposirano END as storeId, GETDATE() as startDate, GETDATE() as endDate, sfiyat_fiyati as price, sfiyat_fiyati as newPrice, 0 as [deleted], sfiyat_lastup_date as updatedAt FROM STOK_SATIS_FIYAT_LISTELERI F 
         INNER JOIN STOKLAR S ON S.sto_kod=F.sfiyat_stokkod
         WHERE (sfiyat_listesirano=1 OR sfiyat_listesirano>=100)  --and sfiyat_deposirano in (0)
         AND S.sto_kod IN ('${docs.map(e => e.code).join("','")}')
@@ -274,7 +274,7 @@ exports.syncItems_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
                 obj.price = 0
                 // yeni fiyat var
               } else {
-                obj.newPrice = null
+                obj.newPrice = obj.price
               }
 
               return obj
