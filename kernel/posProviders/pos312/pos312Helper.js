@@ -512,7 +512,7 @@ exports.syncFirms_pos312 = function (dbModel, sessionDoc, req, orgDoc, storeDoc)
 
           let dataItem = {
             "id": docs[i].id,
-            "name": docs[i].name.replaceAll('İ', 'I') + '#' + docs[i].code,
+            "name": docs[i].name.replaceAll('İ', 'I'),
             "customerCode": docs[i].code,
             "taxOffice": docs[i].taxOffice,
             "taxNumber": docs[i].taxNumber,
